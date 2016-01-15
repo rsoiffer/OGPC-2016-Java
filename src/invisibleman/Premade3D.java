@@ -37,10 +37,6 @@ public abstract class Premade3D {
                 Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed)::add)),
                 Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed)::add)),
                 Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed)::add)));
-//        e.add(Input.whileKeyDown(Keyboard.KEY_A).forEach(dt -> velocity.edit(new Vec2(-speed, 0)::add)),
-//                Input.whileKeyDown(Keyboard.KEY_D).forEach(dt -> velocity.edit(new Vec2(speed, 0)::add)),
-//                Input.whileKeyDown(Keyboard.KEY_W).forEach(dt -> velocity.edit(new Vec2(0, speed)::add)),
-//                Input.whileKeyDown(Keyboard.KEY_S).forEach(dt -> velocity.edit(new Vec2(0, -speed)::add)));
     }
 
     //Graphics

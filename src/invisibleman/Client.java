@@ -9,7 +9,7 @@ import org.lwjgl.opengl.Display;
 import static util.Color4.WHITE;
 import util.Vec3;
 
-public abstract class ClientMain {
+public abstract class Client {
 
     public static Connection conn;
 
@@ -39,6 +39,7 @@ public abstract class ClientMain {
 
         //Create the player
         new InvisibleMan().create();
+        new Tree().create();
 
         //Start the game
         Core.run();

@@ -28,10 +28,10 @@ public class ColorDemo {
         //Create the hero
         new LAE(hero -> {
             //Create the hero's variables
-            Signal<Vec2> position = Premade.makePosition(hero);
-            Signal<Vec2> velocity = Premade.makeVelocity(hero);
-            Premade.makeGravity(hero, new Vec2(0, -1000));
-            Signal<Sprite> sprite = Premade.makeSpriteGraphics(hero, "hero");
+            Signal<Vec2> position = Premade2D.makePosition(hero);
+            Signal<Vec2> velocity = Premade2D.makeVelocity(hero);
+            Premade2D.makeGravity(hero, new Vec2(0, -1000));
+            Signal<Sprite> sprite = Premade2D.makeSpriteGraphics(hero, "hero");
 
             //Set initial position
             position.set(new Vec2(0, 500));

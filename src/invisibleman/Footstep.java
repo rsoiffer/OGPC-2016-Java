@@ -12,21 +12,25 @@ public class Footstep extends AbstractEntity {
 
     @Override
     public void create() {
+        //Create the footstep's variables
         Signal<Vec3> position = Premade3D.makePosition(this);
-        Premade3D.makeRotation(this);
+        Signal<Double> rotation = Premade3D.makeRotation(this);
         Signal<Sprite> s = Premade3D.makeSpriteGraphics(this, "footstep_white");
+
+        //Make the footstep sink slightly so it does depth order correctly
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));
+
+        //Opaqueness is low when the footstep is mostly transparent
         Signal<Double> opaqueness = new Signal(.5);
-        opaqueness.forEach(t -> {
-            s.get().color = Color4.gray(1 - t);
-            //System.out.println(1 - t);
-        });
+        s.get().color = Color4.gray(.5);
+        opaqueness.forEach(d -> s.get().color = Color4.gray(1 - d));
         onUpdate(dt -> opaqueness.edit(t -> t * Math.pow(.98, dt)));
-//            onUpdate(dt -> s.get().color = Color4.gray(1 - (1 - s.get().color.r) * Math.pow(.08, dt)));
-        //onUpdate(dt -> System.out.println(s.get().color));
-        Core.timer(600, this::destroy);
+
+        //Destroy the footstep after 10 seconds (temporary, will change later)
+        Core.timer(10, this::destroy);
     }
 
+    //Set the footstep's variables
     public void set(Vec3 pos, double rot, boolean isLeft) {
         get("position", Vec3.class).set(pos);
         get("rotation", Double.class).set(rot);

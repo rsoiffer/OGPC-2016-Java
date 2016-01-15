@@ -10,7 +10,7 @@ import util.Color4;
 import util.Vec2;
 import static util.Vec2.ZERO;
 
-public abstract class Premade {
+public abstract class Premade2D {
 
     //Movement
     public static Signal<Vec2> makePosition(AbstractEntity e) {
