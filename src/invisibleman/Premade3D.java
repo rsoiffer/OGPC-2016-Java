@@ -16,6 +16,11 @@ import util.Vec3Polar;
 public abstract class Premade3D {
 
     //Movement
+    public static Signal<Vec3> makeGravity(AbstractEntity e, Vec3 g) {
+        Signal<Vec3> velocity = e.get("velocity", Vec3.class);
+        return e.addChild(Core.update.collect(g, (v, dt) -> velocity.edit(v.multiply(dt)::add)), "gravity");
+    }
+
     public static Signal<Vec3> makePosition(AbstractEntity e) {
         return e.addChild(new Signal(ZERO), "position");
     }
@@ -51,6 +56,28 @@ public abstract class Premade3D {
         Signal<Sprite> sprite = e.addChild(new Signal(new Sprite(name)), "sprite");
         e.onUpdate(dt -> sprite.get().imageIndex += dt * sprite.get().imageSpeed);
         e.onRender(() -> sprite.get().draw(position.get(), 0, rotation.get()));
+        return sprite;
+    }
+
+    public static Signal<Sprite> makeFlatFacingSpriteGraphics(AbstractEntity e, String name) {
+        Signal<Vec3> position = e.get("position", Vec3.class);
+        Signal<Sprite> sprite = e.addChild(new Signal(new Sprite(name)), "sprite");
+        e.onUpdate(dt -> sprite.get().imageIndex += dt * sprite.get().imageSpeed);
+
+        Supplier<Vec3> towardsSprite = () -> position.get().subtract(Window3D.pos);
+        e.onRender(() -> sprite.get().draw(position.get().subtract(towardsSprite.get().cross(Window3D.UP).withLength(-sprite.get().scale.x / 2)),
+                Math.PI / 2, towardsSprite.get().direction() + Math.PI / 2));
+        return sprite;
+    }
+
+    public static Signal<Sprite> makeFacingSpriteGraphics(AbstractEntity e, String name) {
+        Signal<Vec3> position = e.get("position", Vec3.class);
+        Signal<Sprite> sprite = e.addChild(new Signal(new Sprite(name)), "sprite");
+        e.onUpdate(dt -> sprite.get().imageIndex += dt * sprite.get().imageSpeed);
+
+        Supplier<Vec3> towardsSprite = () -> position.get().subtract(Window3D.pos);
+        e.onRender(() -> sprite.get().draw(position.get().subtract(towardsSprite.get().cross(Window3D.UP).withLength(-sprite.get().scale.x / 2)),
+                Math.PI / 2 - towardsSprite.get().direction2(), towardsSprite.get().direction() + Math.PI / 2));
         return sprite;
     }
 }
