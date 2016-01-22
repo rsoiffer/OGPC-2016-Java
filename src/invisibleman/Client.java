@@ -4,15 +4,12 @@ import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import graphics.Graphics2D;
-import graphics.Window3D;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import static org.lwjgl.opengl.ARBTessellationShader.GL_QUADS;
 import org.lwjgl.opengl.Display;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL43.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glTranslated;
 import static util.Color4.RED;
 import static util.Color4.WHITE;
 import util.*;
@@ -40,23 +37,43 @@ public abstract class Client {
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
         //Hide the mouse
         Mouse.setGrabbed(true);
-        //Set the background color
-        Window3D.background = Color4.gray(.8);
-        //Draw the world edges
-        Core.render.onEvent(() -> Graphics2D.drawRect(new Vec2(-20), new Vec2(40), RED));
         //The reset button
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
-        //Draw the ground
+
+//        //Framebuffer tests
+//        Framebuffer fb = new Framebuffer();
+//        Core.renderLayer(-20).onEvent(() -> {
+//            //Framebuffer enabled
+//            fb.enable();
+//        });
+//        Core.renderLayer(20).onEvent(() -> {
+//            //Graphics2D.fillRect(Vec2.ZERO, new Vec2(100, 200), new Color4(1, .5, 0));
+//            Framebuffer.clear();
+//
+//            //Framebuffer disabled
+//            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//            Window3D.background.glClearColor();
+//
+//            fb.draw();
+//        });
+        //Create the snow particles
+        new Snow().create();
+
+        //Create the fog
+        new Fog(Color4.gray(.8), .025, .98).create();
+
         Core.render.onEvent(() -> {
-            glDisable(GL_TEXTURE_2D);
-            WHITE.glColor();
-            int size = 10000;
-            glBegin(GL_QUADS);
-            glVertex3d(-size, -size, -.1);
-            glVertex3d(size, -size, -.1);
-            glVertex3d(size, size, -.1);
-            glVertex3d(-size, size, -.1);
-            glEnd();
+            Fog.setMinTexColor(1, 1, 1, 1);
+
+            //Draw the floor
+            glTranslated(0, 0, -.1);
+            Graphics2D.fillRect(new Vec2(-200), new Vec2(400), WHITE);
+            glTranslated(0, 0, .1);
+
+            //Draw the border
+            Graphics2D.drawRect(new Vec2(-20), new Vec2(40), RED);
+
+            Fog.setMinTexColor(0, 0, 0, 0);
         });
 
         //Create the trees
@@ -67,9 +84,6 @@ public abstract class Client {
                 t.get("position", Vec3.class).set(new Vec3(i * 3, j * 3, 0));
             }
         }
-
-        //Create the snow particles
-        new Snow().create();
 
         //Create the player
         new InvisibleMan().create();

@@ -1,6 +1,7 @@
 package invisibleman;
 
 import engine.AbstractEntity;
+import engine.Core;
 import graphics.Window3D;
 import graphics.data.Sprite;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ public class Snow extends AbstractEntity {
     public void create() {
         List<Particle> particles = new LinkedList();
         for (int i = 0; i < 1000; i++) {
-            particles.add(new Particle(Vec2.randomCircle(MAX_DIST).toVec3().withZ(Math.random() * 5), Math.random() * .04 + .04));
+            particles.add(new Particle(Vec2.randomCircle(MAX_DIST).toVec3().withZ(Math.random() * 5), Math.random() * .04 + .06));
         }
         onUpdate(dt -> {
             Iterator<Particle> it = particles.iterator();
@@ -37,14 +38,14 @@ public class Snow extends AbstractEntity {
         });
 
         Sprite s = new Sprite("snowflake2");
-        onRender(() -> {
+        Core.renderLayer(2).onEvent(() -> {
             particles.forEach(p -> {
                 Vec3 pos = p.pos.add(Window3D.pos.withZ(0));
                 s.scale = new Vec2(p.size);
                 s.draw(pos.subtract(p.pos.cross(Window3D.UP).withLength(-s.scale.x / 2)),
                         -p.pos.direction2() + Math.PI / 2, p.pos.direction() + Math.PI / 2);
             });
-        });
+        }).addChild(this);
     }
 
     private static class Particle {

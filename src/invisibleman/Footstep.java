@@ -15,7 +15,9 @@ public class Footstep extends RegisteredEntity {
         //Create the footstep's variables
         Signal<Vec3> position = Premade3D.makePosition(this);
         Signal<Double> rotation = Premade3D.makeRotation(this);
+        onRender(() -> Fog.setMinTexColor(1, 1, 1, 0));
         Signal<Sprite> s = Premade3D.makeSpriteGraphics(this, "footstep_white");
+        onRender(() -> Fog.setMinTexColor(0, 0, 0, 0));
 
         //Make the footstep sink slightly so it does depth order correctly
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));
@@ -23,11 +25,11 @@ public class Footstep extends RegisteredEntity {
         //Opaqueness is low when the footstep is mostly transparent
         Signal<Double> opaqueness = new Signal(.8);
         s.get().color = Color4.gray(.2);
-        opaqueness.forEach(d -> s.get().color = Color4.gray(1 - d));
+        opaqueness.forEach(d -> s.get().color = Color4.gray(1.0207 - d));
         onUpdate(dt -> opaqueness.edit(t -> t * Math.pow(.97, dt)));
 
-        //Destroy the footstep after 300 seconds (temporary, will change later)
-        Core.timer(300, this::destroy);
+        //Destroy the footstep after 120 seconds (will probably change later)
+        Core.timer(120, this::destroy);
     }
 
     //Set the footstep's variables
