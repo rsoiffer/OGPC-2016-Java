@@ -1,17 +1,9 @@
 uniform sampler2D texture1;
-uniform vec4 min;
-uniform float fade;
-uniform float density;
-uniform vec3 fogColor;
 
 void main() {
-    float dist = gl_FragCoord.z / gl_FragCoord.w;
-    float fogAmount = pow(2, -dist * dist * density);
-
-    vec4 texColor = max(min, texture2D(texture1, gl_TexCoord[0].st));
-    if (texColor.a > .5) {
-        gl_FragColor = vec4(mix(fogColor, gl_Color.rgb * texColor.rgb * vec3(fade), fogAmount) , 1);
-    } else {
-        gl_FragColor = vec4(0);
+    vec4 color = texture2D(texture1, gl_TexCoord[0].st) * gl_Color;
+    if (color.b > 1) {
+        color = vec4(1);
     }
+    gl_FragColor = color;
 }

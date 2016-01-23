@@ -3,7 +3,14 @@ package invisibleman;
 import engine.Core;
 import engine.Destructible;
 import engine.Input;
+import engine.Signal;
 import graphics.Graphics2D;
+import graphics.data.Framebuffer;
+import graphics.data.Framebuffer.DepthAttachment;
+import graphics.data.Framebuffer.HDRTextureAttachment;
+import graphics.data.Framebuffer.TextureAttachment;
+import graphics.data.PostProcessEffect;
+import graphics.data.Shader;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -40,22 +47,22 @@ public abstract class Client {
         //The reset button
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
 
-//        //Framebuffer tests
-//        Framebuffer fb = new Framebuffer();
-//        Core.renderLayer(-20).onEvent(() -> {
-//            //Framebuffer enabled
-//            fb.enable();
-//        });
-//        Core.renderLayer(20).onEvent(() -> {
-//            //Graphics2D.fillRect(Vec2.ZERO, new Vec2(100, 200), new Color4(1, .5, 0));
-//            Framebuffer.clear();
-//
-//            //Framebuffer disabled
-//            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//            Window3D.background.glClearColor();
-//
-//            fb.draw();
-//        });
+        Shader.clear();
+        //Silly graphics effects
+        Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 6);
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "grayscale.frag")).toggleOn(cMod.map(i -> i == 2));
+        Shader wobble = new Shader("default.vert", "wobble.frag");
+        Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                wobble).toggleOn(cMod.map(i -> i == 3));
+        new PostProcessEffect(10, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "bloom.frag")).toggleOn(cMod.map(i -> i == 4));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 5));
+
         //Create the snow particles
         new Snow().create();
 
