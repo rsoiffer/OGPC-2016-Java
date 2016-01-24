@@ -37,7 +37,7 @@ public class BallAttack extends RegisteredEntity {
         //Destroy the ball when it hits the ground
         position.filter(v -> v.z < 0).onEvent(() -> {
             destroy();
-            new Explosion(position.get().withZ(0), new Color4(0, .5, 100)).create();
+            new Explosion(position.get().withZ(0), new Color4(0, .5, 1)).create();
         });
     }
 }

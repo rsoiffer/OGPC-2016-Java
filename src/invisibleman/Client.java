@@ -7,7 +7,6 @@ import engine.Signal;
 import graphics.Graphics2D;
 import graphics.data.Framebuffer;
 import graphics.data.Framebuffer.DepthAttachment;
-import graphics.data.Framebuffer.HDRTextureAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
 import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
@@ -17,9 +16,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.glTranslated;
+import util.*;
 import static util.Color4.RED;
 import static util.Color4.WHITE;
-import util.*;
 
 public abstract class Client {
 
@@ -58,8 +57,8 @@ public abstract class Client {
         Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
         new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
                 wobble).toggleOn(cMod.map(i -> i == 3));
-        new PostProcessEffect(10, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "bloom.frag")).toggleOn(cMod.map(i -> i == 4));
+//        new PostProcessEffect(10, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
+//                new Shader("default.vert", "bloom.frag")).toggleOn(cMod.map(i -> i == 4));
         new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 5));
 
