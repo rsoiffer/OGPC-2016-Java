@@ -15,10 +15,10 @@ import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import util.*;
-import static util.Color4.RED;
+import static org.lwjgl.opengl.GL11.*;
+import static util.Color4.TRANSPARENT;
 import static util.Color4.WHITE;
+import util.*;
 
 public abstract class Client {
 
@@ -46,41 +46,8 @@ public abstract class Client {
         //The reset button
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
 
-        Shader.clear();
-        //Silly graphics effects
-        Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 6);
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "grayscale.frag")).toggleOn(cMod.map(i -> i == 2));
-        Shader wobble = new Shader("default.vert", "wobble.frag");
-        Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                wobble).toggleOn(cMod.map(i -> i == 3));
-//        new PostProcessEffect(10, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
-//                new Shader("default.vert", "bloom.frag")).toggleOn(cMod.map(i -> i == 4));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 5));
-
-        //Create the snow particles
-        new Snow().create();
-
-        //Create the fog
-        new Fog(Color4.gray(.8), .025, .98).create();
-
-        Core.render.onEvent(() -> {
-            Fog.setMinTexColor(1, 1, 1, 1);
-
-            //Draw the floor
-            glTranslated(0, 0, -.1);
-            Graphics2D.fillRect(new Vec2(-200), new Vec2(400), WHITE);
-            glTranslated(0, 0, .1);
-
-            //Draw the border
-            Graphics2D.drawRect(new Vec2(-20), new Vec2(40), RED);
-
-            Fog.setMinTexColor(0, 0, 0, 0);
-        });
+        //Setup graphics effects
+        setupGraphics();
 
         //Create the trees
         for (int i = -15; i <= 15; i += 2) {
@@ -96,6 +63,44 @@ public abstract class Client {
 
         //Start the game
         Core.run();
+    }
+
+    public static PostProcessEffect kawaseBloom() {
+        Framebuffer base = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer hdr = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer blur = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Shader kawase = new Shader("default.vert", "kawase.frag");
+        Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
+        return new PostProcessEffect(5, base, () -> {
+            hdr.with(() -> onlyHDR.with(base::render));
+            kawase.with(() -> {
+                kawase.setInt("size", 0);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 1);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 2);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 2);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 3);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+            });
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            TRANSPARENT.glClearColor();
+            base.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            blur.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        });
     }
 
     public static void registerMessageHandlers() {
@@ -122,7 +127,7 @@ public abstract class Client {
         });
         conn.registerHandler(2, () -> {
             Vec3 pos = conn.read(Vec3.class);
-            ThreadManager.onMainThread(() -> new Explosion(pos, RED).create());
+            ThreadManager.onMainThread(() -> new Explosion(pos, new Color4(3, 1, 1)).create());
         });
         conn.registerHandler(5, () -> ThreadManager.onMainThread(() -> {
             RegisteredEntity.getAll(BallAttack.class, Explosion.class,
@@ -135,5 +140,45 @@ public abstract class Client {
         if (conn != null && !conn.isClosed()) {
             conn.sendMessage(id, contents);
         }
+    }
+
+    public static void setupGraphics() {
+        //Silly graphics effects
+        Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 5);
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "grayscale.frag")).toggleOn(cMod.map(i -> i == 2));
+        Shader wobble = new Shader("default.vert", "wobble.frag");
+        Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                wobble).toggleOn(cMod.map(i -> i == 3));
+        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
+                new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
+
+        //Bloom
+        kawaseBloom().create();
+//        new PostProcessEffect(7.5, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
+//                new Shader("default.vert", "tonemap.frag")).create();
+
+        //Create the snow particles
+        new Snow().create();
+
+        //Create the fog
+        new Fog(Color4.gray(.8), .025, .95).create();
+
+        Core.render.onEvent(() -> {
+            Fog.setMinTexColor(1, 1, 1, 1);
+
+            //Draw the floor
+            glTranslated(0, 0, -.1);
+            Graphics2D.fillRect(new Vec2(-200), new Vec2(400), WHITE);
+            glTranslated(0, 0, .1);
+
+            //Draw the border
+            Graphics2D.drawRect(new Vec2(-20), new Vec2(40), new Color4(3, 1, 1));
+
+            Fog.setMinTexColor(0, 0, 0, 0);
+        });
     }
 }

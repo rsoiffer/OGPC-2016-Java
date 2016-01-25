@@ -2,11 +2,14 @@ package invisibleman;
 
 import engine.AbstractEntity;
 import engine.Core;
+import graphics.Graphics3D;
 import graphics.Window3D;
 import graphics.data.Sprite;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import static org.lwjgl.opengl.GL11.*;
+import static util.Color4.WHITE;
 import util.Vec2;
 import util.Vec3;
 
@@ -39,12 +42,21 @@ public class Snow extends AbstractEntity {
 
         Sprite s = new Sprite("snowflake2");
         Core.renderLayer(2).onEvent(() -> {
+            glEnable(GL_TEXTURE_2D);
+            s.getTexture().bind();
+            WHITE.glColor();
+            glBegin(GL_QUADS);
             particles.forEach(p -> {
                 Vec3 pos = p.pos.add(Window3D.pos.withZ(0));
-                s.scale = new Vec2(p.size);
-                s.draw(pos.subtract(p.pos.cross(Window3D.UP).withLength(-s.scale.x / 2)),
-                        -p.pos.direction2() + Math.PI / 2, p.pos.direction() + Math.PI / 2);
+                Vec3 towards = pos.subtract(Window3D.pos);
+                Vec3 side = towards.cross(Window3D.UP).withLength(p.size / 2);
+                Vec3 snowUp = towards.cross(side).withLength(p.size / 2);
+                Graphics3D.drawSpriteFast(s.getTexture(), pos.add(side).add(snowUp), pos.subtract(side).add(snowUp),
+                        pos.subtract(side).subtract(snowUp), pos.add(side).subtract(snowUp), towards.reverse());
+//                s.draw(pos.subtract(p.pos.cross(Window3D.UP).withLength(-s.scale.x / 2)),
+//                        -p.pos.direction2() + Math.PI / 2, p.pos.direction() + Math.PI / 2);
             });
+            glEnd();
         }).addChild(this);
     }
 

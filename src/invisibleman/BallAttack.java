@@ -19,7 +19,7 @@ public class BallAttack extends RegisteredEntity {
         Signal<Vec3> velocity = Premade3D.makeVelocity(this);
         Signal<Vec3> gravity = Premade3D.makeGravity(this, new Vec3(0, 0, -50));
         Signal<Sprite> sprite = Premade3D.makeFacingSpriteGraphics(this, "ball");
-        sprite.get().color = new Color4(0, .5, 1);
+        sprite.get().color = new Color4(1, 2, 3);
         sprite.get().scale = new Vec2(.1);
 
         //Check for collisions with the player
@@ -37,7 +37,7 @@ public class BallAttack extends RegisteredEntity {
         //Destroy the ball when it hits the ground
         position.filter(v -> v.z < 0).onEvent(() -> {
             destroy();
-            new Explosion(position.get().withZ(0), new Color4(0, .5, 1)).create();
+            new Explosion(position.get().withZ(0), new Color4(1, 2, 3)).create();
         });
     }
 }
