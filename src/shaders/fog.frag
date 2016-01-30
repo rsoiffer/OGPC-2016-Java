@@ -6,7 +6,7 @@ uniform vec3 fogColor;
 
 void main() {
     float dist = gl_FragCoord.z / gl_FragCoord.w;
-    float fogAmount = pow(2, -dist * dist * density);
+    float fogAmount = pow(2.0, -dist * dist * density);
 
     vec4 texColor = max(min, texture2D(texture1, gl_TexCoord[0].st));
     if (texColor.a > .5) {

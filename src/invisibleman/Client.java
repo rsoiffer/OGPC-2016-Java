@@ -16,9 +16,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
+import util.*;
 import static util.Color4.TRANSPARENT;
 import static util.Color4.WHITE;
-import util.*;
 
 public abstract class Client {
 
@@ -63,6 +63,9 @@ public abstract class Client {
 
         //Start the game
         Core.run();
+
+        //Force the program to stop
+        System.exit(0);
     }
 
     public static PostProcessEffect kawaseBloom() {
@@ -72,27 +75,28 @@ public abstract class Client {
         Shader kawase = new Shader("default.vert", "kawase.frag");
         Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
         return new PostProcessEffect(5, base, () -> {
+                            hdr.clear(TRANSPARENT);
             hdr.with(() -> onlyHDR.with(base::render));
             kawase.with(() -> {
                 kawase.setInt("size", 0);
                 blur.clear(TRANSPARENT);
                 blur.with(hdr::render);
 
-                kawase.setInt("size", 1);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 2);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-
-                kawase.setInt("size", 2);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 3);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
+//                kawase.setInt("size", 1);
+//                hdr.clear(TRANSPARENT);
+//                hdr.with(blur::render);
+//
+//                kawase.setInt("size", 2);
+//                blur.clear(TRANSPARENT);
+//                blur.with(hdr::render);
+//
+//                kawase.setInt("size", 2);
+//                hdr.clear(TRANSPARENT);
+//                hdr.with(blur::render);
+//
+//                kawase.setInt("size", 3);
+//                blur.clear(TRANSPARENT);
+//                blur.with(hdr::render);
             });
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             TRANSPARENT.glClearColor();
@@ -160,7 +164,6 @@ public abstract class Client {
         kawaseBloom().create();
 //        new PostProcessEffect(7.5, new Framebuffer(new HDRTextureAttachment(), new DepthAttachment()),
 //                new Shader("default.vert", "tonemap.frag")).create();
-
         //Create the snow particles
         new Snow().create();
 

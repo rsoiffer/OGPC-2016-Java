@@ -50,7 +50,7 @@ public class InvisibleMan extends RegisteredEntity {
         //Whether you should place a left footstep or a right footstep
         Mutable<Boolean> isLeft = new Mutable(true);
         //Every .2 seconds, do the following:
-        add(Core.interval(.2).filter_E(invincible.map(d -> d < 0)).onEvent(() -> {
+        add(Core.interval(.2).filter(invincible.map(d -> d < 0)).onEvent(() -> {
             //Send a message to the server with the footstep
             Client.sendMessage(0, position.get(), Window3D.facing.t, isLeft.o);
 

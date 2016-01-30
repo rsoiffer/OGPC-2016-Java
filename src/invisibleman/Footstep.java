@@ -23,10 +23,8 @@ public class Footstep extends RegisteredEntity {
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));
 
         //Opaqueness is low when the footstep is mostly transparent
-        Signal<Double> opaqueness = new Signal(.8);
-        s.get().color = Color4.gray(.2);
-        opaqueness.forEach(d -> s.get().color = Color4.gray(1.0207 - d));
-        onUpdate(dt -> opaqueness.edit(t -> t * Math.pow(.97, dt)));
+        Signal<Double> opaqueness = Core.time().map(t -> .8 * Math.pow(.97, t));
+        opaqueness.doForEach(d -> s.get().color = new Color4(1.0207 - d, 1.0207 - d, 1.0207 - d));
 
         //Destroy the footstep after 120 seconds (will probably change later)
         Core.timer(120, this::destroy);

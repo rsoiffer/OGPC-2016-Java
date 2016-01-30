@@ -59,6 +59,14 @@ public abstract class Premade3D {
         return sprite;
     }
 
+    public static Signal<Sprite> makeFlatSpriteGraphics(AbstractEntity e, String name, double angle) {
+        Signal<Vec3> position = e.get("position", Vec3.class);
+        Signal<Sprite> sprite = e.addChild(new Signal(new Sprite(name)), "sprite");
+        e.onUpdate(dt -> sprite.get().imageIndex += dt * sprite.get().imageSpeed);
+        e.onRender(() -> sprite.get().draw(position.get().subtract(new Vec3Polar(sprite.get().scale.x / 2, angle, 0).toVec3()), Math.PI / 2, angle));
+        return sprite;
+    }
+
     public static Signal<Sprite> makeFlatFacingSpriteGraphics(AbstractEntity e, String name) {
         Signal<Vec3> position = e.get("position", Vec3.class);
         Signal<Sprite> sprite = e.addChild(new Signal(new Sprite(name)), "sprite");

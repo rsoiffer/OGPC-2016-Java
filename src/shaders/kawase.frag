@@ -4,7 +4,7 @@ uniform int size;
 
 void main() {
     vec2 uv = gl_TexCoord[0].st;
-    vec2 texelSize = 1.0 / textureSize(texture1, 0);
+    vec2 texelSize = 1.0 / vec2(1200, 800);//textureSize(texture1, 0);
     vec2 texelSize05 = texelSize * 0.5;
 
     vec2 uvOffset = texelSize.xy * vec2(size) + texelSize05;
