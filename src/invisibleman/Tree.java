@@ -25,6 +25,13 @@ public class Tree extends AbstractEntity {
                 animation.get().draw(position.get(), 0);
             }
         });
+        
+        
+        
+        
+        
+        
+        
 //        Premade3D.makeFlatSpriteGraphics(this, "green_pinetree", Math.PI / 4).get().scale = new Vec2(2, 4);
 //        Premade3D.makeFlatSpriteGraphics(this, "green_pinetree", Math.PI * 3 / 4).get().scale = new Vec2(2, 4);
 
