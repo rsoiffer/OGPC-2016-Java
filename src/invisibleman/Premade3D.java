@@ -8,6 +8,7 @@ import graphics.Window3D;
 import graphics.data.Sprite;
 import java.util.function.Supplier;
 import static org.lwjgl.input.Keyboard.*;
+import util.Mutable;
 import util.Util;
 import util.Vec3;
 import static util.Vec3.ZERO;
@@ -34,14 +35,18 @@ public abstract class Premade3D {
         return e.addChild(Core.update.collect(ZERO, (v, dt) -> position.edit(v.multiply(dt)::add)), "velocity");
     }
 
-    public static void makeWASDMovement(AbstractEntity e, double speed) {
+    public static void makeWASDMovement(AbstractEntity e, double sped) {
+        Mutable<Double> speed = new Mutable(sped);
+        Input.whenKey((KEY_LSHIFT), true).onEvent(() -> {
+            speed.o*=1.5;
+        });
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
-        e.onUpdate(dt -> velocity.set(ZERO));
+        e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
         Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();
-        e.add(Input.whileKeyDown(KEY_W).forEach(dt -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed)::add)),
-                Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed)::add)),
-                Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed)::add)),
-                Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed)::add)));
+        e.add(Input.whileKeyDown(KEY_W).forEach(dt -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.o)::add)),
+                Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed.o)::add)),
+                Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.o)::add)),
+                Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.o)::add)));
     }
 
     //Graphics
