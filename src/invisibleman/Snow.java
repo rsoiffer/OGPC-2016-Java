@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.WHITE;
+import util.Noise;
 import util.Vec2;
 import util.Vec3;
 
@@ -37,6 +38,7 @@ public class Snow extends AbstractEntity {
                 if (p.pos.toVec2().lengthSquared() > MAX_DIST * MAX_DIST) {
                     p.pos = p.pos.toVec2().withLength(MAX_DIST).toVec3().withZ(p.pos.z);
                 }
+                p.pos=p.pos.add(Snow.Particle.getWind(dt/10).toVec3());
                 p.setRotation((p.getRotation()+dt*p.getDR())%Math.PI);
             }
         });
@@ -73,7 +75,11 @@ public class Snow extends AbstractEntity {
     }
 
     private static class Particle {
-
+        
+        private static Vec2 wind;
+        private static double windcount=0;
+        private static Noise x=new Noise(Math.random()*400),y=new Noise(Math.random()*400);
+        
         private Vec3 pos;
         private double size;
         private double rotation=.25+.75*(Math.random()*Math.PI);
@@ -91,6 +97,14 @@ public class Snow extends AbstractEntity {
         }
         public void setRotation(double r){
             rotation=r;
+        }
+        
+        public static Vec2 getWind(double dt){
+            windcount+=0.01;
+            int m = 10;
+            wind=new Vec2(m*dt*x.perlin(windcount,-windcount), m*dt*y.perlin(-windcount,windcount));
+            //return wind;
+            return Vec2.ZERO;
         }
     }
 }
