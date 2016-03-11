@@ -1,9 +1,7 @@
 package invisibleman;
 
 import graphics.Graphics2D;
-import graphics.Graphics3D;
 import graphics.data.Sprite;
-import graphics.loading.SpriteContainer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -11,11 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glEnd;
-import util.*;
+import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.BLACK;
+import util.*;
 
 public class Tile {
 
@@ -32,6 +28,24 @@ public class Tile {
 
     public static Stream<Tile> all() {
         return IntStream.range(0, GRID_SIZE).boxed().flatMap(x -> IntStream.range(0, GRID_SIZE).mapToObj(y -> grid[x][y]));
+    }
+
+    public static void drawAll3D() {
+        Vec3 playerPos = RegisteredEntity.getAll(InvisibleMan.class).get(0).get("position", Vec3.class).get();
+        Vec3 nor = new Vec3(0, 0, 1);
+
+        glBegin(GL_QUADS);
+        all().filter(t -> t.x != 0 && t.y != 0 && playerPos.subtract(t.pos()).lengthSquared() < 400).forEach(t -> {
+            nor.glNormal();
+            t.pos().glVertex();
+            nor.glNormal();
+            grid[t.x - 1][t.y].pos().glVertex();
+            nor.glNormal();
+            grid[t.x - 1][t.y - 1].pos().glVertex();
+            nor.glNormal();
+            grid[t.x][t.y - 1].pos().glVertex();
+        });
+        glEnd();
     }
 
     public static double heightAt(Vec3 pos) {
@@ -128,13 +142,24 @@ public class Tile {
         if (RegisteredEntity.getAll(InvisibleMan.class).get(0).get("position", Vec3.class).get().subtract(pos()).lengthSquared() > 400) {
             return;
         }
+        if (x == 0 || y == 0) {
+            return;
+        }
 
         glBegin(GL_QUADS);
-        if (x > 0 && y > 0) {
-            Graphics3D.drawSpriteFast(SpriteContainer.loadSprite("green_pinetree"), pos(), grid[x - 1][y].pos(), grid[x - 1][y - 1].pos(), grid[x][y - 1].pos(), new Vec3(0, 0, 1));
-        }
+        Vec3 nor = new Vec3(0, 0, 1);
+        nor.glNormal();
+        pos().glVertex();
+        nor.glNormal();
+        grid[x - 1][y].pos().glVertex();
+        nor.glNormal();
+        grid[x - 1][y - 1].pos().glVertex();
+        nor.glNormal();
+        grid[x][y - 1].pos().glVertex();
         glEnd();
 
+//        glEnable(GL_TEXTURE_2D);
+//        Graphics3D.drawSpriteFast(SpriteContainer.loadSprite("green_pinetree"), pos(), grid[x - 1][y].pos(), grid[x - 1][y - 1].pos(), grid[x][y - 1].pos(), new Vec3(0, 0, 1));
 //        if (sprite != null) {
 //            sprite.draw(pos(), 0, 0);
 //        } else {

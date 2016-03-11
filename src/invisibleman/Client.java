@@ -132,7 +132,8 @@ public abstract class Client {
         Core.render.onEvent(() -> {
             Fog.setMinTexColor(1, 1, 1, 1);
 
-            Tile.all().forEach(Tile::draw3D);
+            Tile.drawAll3D();
+            //Tile.all().forEach(Tile::draw3D);
 
             Fog.setMinTexColor(0, 0, 0, 0);
         });
