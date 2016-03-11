@@ -22,7 +22,7 @@ public class InvisibleMan extends RegisteredEntity {
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
         Premade3D.makeWASDMovement(this, 1);
-        Premade3D.makeGravity(this, new Vec3(0, 0, -5));
+        Premade3D.makeGravity(this, new Vec3(0, 0, -10));
 
         //Set the initial camera position
         Window3D.pos = new Vec3(0, 0, 1);
@@ -41,19 +41,10 @@ public class InvisibleMan extends RegisteredEntity {
             }
             position.set(position.get().toVec2().clamp(new Vec2(0), Tile.size()).toVec3().withZ(position.get().z));
         });
-//        position.filter(p -> p.z < Tile.heightAt(position.get())).forEach(p -> {
-//            position.set(p.withZ(Tile.heightAt(position.get())));
-//            velocity.edit(v -> v.withZ(0));
-//        });
-
-        //Make the player go smoothly down slopes
-        add(Core.update.filter(onGround).forEach(dt -> {
-            position.edit(v -> v.withZ(Tile.heightAt(position.get())));
-        }));
 
         //Force the player to stay inside the room
-        position.filter(p -> !p.toVec2().containedBy(new Vec2(0), Tile.size())).forEach(p -> {
-            position.set(p.toVec2().clamp(new Vec2(0), Tile.size()).toVec3().withZ(p.z));
+        position.filter(p -> !p.toVec2().containedBy(new Vec2(0), Tile.size().subtract(new Vec2(Tile.TILE_SIZE)))).forEach(p -> {
+            position.set(p.toVec2().clamp(new Vec2(0), Tile.size().subtract(new Vec2(Tile.TILE_SIZE + .0001))).toVec3().withZ(p.z));
         });
 
         //Make the player slowly lose invincibility
@@ -74,7 +65,7 @@ public class InvisibleMan extends RegisteredEntity {
 
         //Jumping
         add(Input.whenKey(Keyboard.KEY_SPACE, true).filter(onGround).onEvent(() -> {
-            velocity.set(velocity.get().add(new Vec3(0, 0, 3)));
+            velocity.set(velocity.get().add(new Vec3(0, 0, 4)));
             onGround.set(false);
         }));
 

@@ -15,8 +15,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import util.*;
 import static util.Color4.TRANSPARENT;
+import util.*;
 
 public abstract class Client {
 
@@ -55,7 +55,7 @@ public abstract class Client {
             for (int j = -15; j <= 15; j += 2) {
                 Tree t = new Tree();
                 t.create();
-                t.get("position", Vec3.class).set(Tile.tileAt(new Vec2(i * 3, j * 3)).map(Tile::pos).orElse(new Vec3(i * 3, j * 3, 0)).add(new Vec3(.5, .5, 0)));
+                t.get("position", Vec3.class).set(new Vec3(i * 3, j * 3, Tile.heightAt(new Vec3(i * 3, j * 3, 0))));
             }
         }
 
@@ -67,45 +67,6 @@ public abstract class Client {
 
         //Force the program to stop
         System.exit(0);
-    }
-
-    public static PostProcessEffect kawaseBloom() {
-        Framebuffer base = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Framebuffer hdr = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Framebuffer blur = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Shader kawase = new Shader("default.vert", "kawase.frag");
-        Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
-        return new PostProcessEffect(5, base, () -> {
-            hdr.clear(TRANSPARENT);
-            hdr.with(() -> onlyHDR.with(base::render));
-            kawase.with(() -> {
-                kawase.setInt("size", 0);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-
-                kawase.setInt("size", 1);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 2);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-
-                kawase.setInt("size", 2);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 3);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-            });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            TRANSPARENT.glClearColor();
-            base.render();
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            blur.render();
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        });
     }
 
     public static void registerMessageHandlers() {
@@ -161,8 +122,6 @@ public abstract class Client {
         new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
 
-        //Bloom
-        //kawaseBloom().create();
         //Create the snow particles
         new Snow().create();
 
@@ -176,6 +135,45 @@ public abstract class Client {
             Tile.all().forEach(Tile::draw3D);
 
             Fog.setMinTexColor(0, 0, 0, 0);
+        });
+    }
+
+    public static PostProcessEffect kawaseBloom() {
+        Framebuffer base = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer hdr = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer blur = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Shader kawase = new Shader("default.vert", "kawase.frag");
+        Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
+        return new PostProcessEffect(5, base, () -> {
+            hdr.clear(TRANSPARENT);
+            hdr.with(() -> onlyHDR.with(base::render));
+            kawase.with(() -> {
+                kawase.setInt("size", 0);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 1);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 2);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 2);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 3);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+            });
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            TRANSPARENT.glClearColor();
+            base.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            blur.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         });
     }
 }
