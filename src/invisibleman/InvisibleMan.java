@@ -20,7 +20,7 @@ public class InvisibleMan extends RegisteredEntity {
         Signal<Double> invincible = addChild(new Signal(5.), "invincible");
 
         //Give the player basic first-person controls
-        Premade3D.makeMouseLook(this, 1, -1.5, 1.5);
+        Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
         Premade3D.makeWASDMovement(this, 1);
         Premade3D.makeGravity(this, new Vec3(0, 0, -5));
 
@@ -30,15 +30,30 @@ public class InvisibleMan extends RegisteredEntity {
         position.forEach(v -> Window3D.pos = v.add(new Vec3(0, 0, 1)));
 
         //Make the player collide with the floor
-        Signal<Boolean> onGround = position.filter(p -> p.toVec2().containedBy(new Vec2(0), Tile.size())).map(p -> p.z <= Tile.heightAt(position.get()));
-        position.filter(p -> p.toVec2().containedBy(new Vec2(0), Tile.size())).filter(p -> p.z < Tile.heightAt(position.get())).forEach(p -> {
-            position.set(p.withZ(Tile.heightAt(position.get())));
-            velocity.edit(v -> v.withZ(0));
+        Signal<Boolean> onGround = new Signal(true);
+        onUpdate(dt -> {
+            if (position.get().z <= Tile.heightAt(position.get()) + 2 * dt) {
+                position.edit(p -> p.withZ(Tile.heightAt(position.get())));
+                velocity.edit(v -> v.withZ(0));
+                onGround.set(true);
+            } else {
+                onGround.set(false);
+            }
+            position.set(position.get().toVec2().clamp(new Vec2(0), Tile.size()).toVec3().withZ(position.get().z));
         });
+//        position.filter(p -> p.z < Tile.heightAt(position.get())).forEach(p -> {
+//            position.set(p.withZ(Tile.heightAt(position.get())));
+//            velocity.edit(v -> v.withZ(0));
+//        });
+
+        //Make the player go smoothly down slopes
+        add(Core.update.filter(onGround).forEach(dt -> {
+            position.edit(v -> v.withZ(Tile.heightAt(position.get())));
+        }));
 
         //Force the player to stay inside the room
         position.filter(p -> !p.toVec2().containedBy(new Vec2(0), Tile.size())).forEach(p -> {
-            position.set(p.toVec2().clamp(new Vec2(0), new Vec2(Tile.GRID_SIZE * Tile.TILE_SIZE)).toVec3().withZ(p.z));
+            position.set(p.toVec2().clamp(new Vec2(0), Tile.size()).toVec3().withZ(p.z));
         });
 
         //Make the player slowly lose invincibility
@@ -60,6 +75,7 @@ public class InvisibleMan extends RegisteredEntity {
         //Jumping
         add(Input.whenKey(Keyboard.KEY_SPACE, true).filter(onGround).onEvent(() -> {
             velocity.set(velocity.get().add(new Vec3(0, 0, 3)));
+            onGround.set(false);
         }));
 
         //Creating footsteps
@@ -68,13 +84,13 @@ public class InvisibleMan extends RegisteredEntity {
         //Every .2 seconds, do the following:
         add(Core.update.filter(onGround).limit(.2).combineEventStreams(onGround.distinct()).filter(invincible.map(d -> d < 0)).onEvent(() -> {
             //Send a message to the server with the footstep
-            Client.sendMessage(0, position.get(), Window3D.facing.t, isLeft.o);
+            Client.sendMessage(0, position.get().add(new Vec3(0, 0, .02)), Window3D.facing.t, isLeft.o);
 
             //Create the footstep
             Footstep f = new Footstep();
             f.create();
             //Set the footstep's position
-            f.set(position.get().add(new Vec3(0, 0, .01)), Window3D.facing.t, isLeft.o);
+            f.set(position.get().add(new Vec3(0, 0, .02)), Window3D.facing.t, isLeft.o);
 
             //Make the next footstep switch from left to right or vice-versa
             isLeft.o = !isLeft.o;

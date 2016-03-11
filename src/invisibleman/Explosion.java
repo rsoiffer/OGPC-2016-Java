@@ -32,7 +32,7 @@ public class Explosion extends RegisteredEntity {
                 Particle p = it.next();
                 p.vel = p.vel.add(new Vec3(0, 0, -dt * 40));
                 p.pos = p.pos.add(p.vel.multiply(dt));
-                if (p.pos.z < 0) {
+                if (p.pos.z < Tile.heightAt(p.pos)) {
                     it.remove();
                 }
             }

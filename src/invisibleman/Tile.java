@@ -3,6 +3,7 @@ package invisibleman;
 import graphics.Graphics2D;
 import graphics.Graphics3D;
 import graphics.data.Sprite;
+import graphics.loading.SpriteContainer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -10,15 +11,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import static util.Color4.BLACK;
-import static util.Color4.WHITE;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glEnd;
 import util.*;
+import static util.Color4.BLACK;
 
 public class Tile {
 
     public static final int GRID_SIZE = 50;
     public static double TILE_SIZE = 1;
-    public static double HEIGHT_MULT = .1;
+    public static double HEIGHT_MULT = .2;
 
     public static Tile[][] grid;
 
@@ -32,7 +35,18 @@ public class Tile {
     }
 
     public static double heightAt(Vec3 pos) {
-        return tileAt(pos.toVec2()).get().height * HEIGHT_MULT;
+        Tile t = tileAt(pos.toVec2()).orElse(null);
+        if (t == null || t.x == GRID_SIZE - 1 || t.y == GRID_SIZE - 1) {
+            return -10000.;
+        }
+        Vec2 o = new Vec2(1).subtract(pos.subtract(t.pos()).toVec2().divide(TILE_SIZE));
+        double height = o.x * o.y * t.height;
+        height += (1 - o.x) * o.y * grid[t.x + 1][t.y].height;
+        height += (1 - o.x) * (1 - o.y) * grid[t.x + 1][t.y + 1].height;
+        height += o.x * (1 - o.y) * grid[t.x][t.y + 1].height;
+        return height * HEIGHT_MULT;
+
+//        return tileAt(pos.toVec2()).map(t -> t.height * HEIGHT_MULT).orElse(-10000.);
     }
 
     public static void load(String file) {
@@ -55,12 +69,25 @@ public class Tile {
         }
     }
 
+    public static Vec2 normalAt(Vec3 pos) {
+        Tile t = tileAt(pos.toVec2()).orElse(null);
+        if (t == null || t.x == GRID_SIZE - 1 || t.y == GRID_SIZE - 1) {
+            return null;
+        }
+        Vec2 o = new Vec2(1).subtract(pos.subtract(t.pos()).toVec2().divide(TILE_SIZE));
+        double xSlope = o.y * (t.height - grid[t.x + 1][t.y].height)
+                + (1 - o.y) * (grid[t.x][t.y + 1].height - grid[t.x + 1][t.y + 1].height);
+        double ySlope = o.x * (t.height - grid[t.x][t.y + 1].height)
+                + (1 - o.x) * (grid[t.x + 1][t.y].height - grid[t.x + 1][t.y + 1].height);
+        return new Vec2(xSlope, ySlope).multiply(-HEIGHT_MULT / TILE_SIZE);
+    }
+
     public static Vec2 size() {
         return new Vec2(GRID_SIZE * TILE_SIZE);
     }
 
     public static Optional<Tile> tileAt(Vec2 pos) {
-        if (pos.containedBy(new Vec2(0), new Vec2(GRID_SIZE * TILE_SIZE - 1))) {
+        if (pos.containedBy(new Vec2(0), size())) {
             return Optional.of(grid[(int) (pos.x / TILE_SIZE)][(int) (pos.y / TILE_SIZE)]);
         }
         return Optional.empty();
@@ -98,17 +125,27 @@ public class Tile {
     }
 
     public void draw3D() {
-        if (sprite != null) {
-            sprite.draw(pos(), 0, 0);
-        } else {
-            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE), 0, 0, WHITE);
+        if (RegisteredEntity.getAll(InvisibleMan.class).get(0).get("position", Vec3.class).get().subtract(pos()).lengthSquared() > 400) {
+            return;
         }
-        if (x > 0) {
-            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE, (grid[x - 1][y].height - height) * HEIGHT_MULT), Math.PI / 2, Math.PI / 2, WHITE);
+
+        glBegin(GL_QUADS);
+        if (x > 0 && y > 0) {
+            Graphics3D.drawSpriteFast(SpriteContainer.loadSprite("green_pinetree"), pos(), grid[x - 1][y].pos(), grid[x - 1][y - 1].pos(), grid[x][y - 1].pos(), new Vec3(0, 0, 1));
         }
-        if (y > 0) {
-            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE, (grid[x][y - 1].height - height) * HEIGHT_MULT), Math.PI / 2, 0, WHITE);
-        }
+        glEnd();
+
+//        if (sprite != null) {
+//            sprite.draw(pos(), 0, 0);
+//        } else {
+//            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE), 0, 0, WHITE);
+//        }
+//        if (x > 0) {
+//            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE, (grid[x - 1][y].height - height) * HEIGHT_MULT), Math.PI / 2, Math.PI / 2, WHITE);
+//        }
+//        if (y > 0) {
+//            Graphics3D.fillRect(pos(), new Vec2(TILE_SIZE, (grid[x][y - 1].height - height) * HEIGHT_MULT), Math.PI / 2, 0, WHITE);
+//        }
     }
 
     public Vec3 pos() {

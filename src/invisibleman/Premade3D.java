@@ -36,17 +36,14 @@ public abstract class Premade3D {
     }
 
     public static void makeWASDMovement(AbstractEntity e, double sped) {
-        Mutable<Double> speed = new Mutable(sped);
-        Input.whenKey((KEY_LSHIFT), true).onEvent(() -> {
-            speed.o*=1.5;
-        });
+        Signal<Double> speed = Input.keySignal(KEY_LSHIFT).map(b -> b ? 1.5*sped : sped);
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
         e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
         Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();
-        e.add(Input.whileKeyDown(KEY_W).forEach(dt -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.o)::add)),
-                Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed.o)::add)),
-                Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.o)::add)),
-                Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.o)::add)));
+        e.add(Input.whileKeyDown(KEY_W).forEach(dt -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.get())::add)),
+                Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed.get())::add)),
+                Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.get())::add)),
+                Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get())::add)));
     }
 
     //Graphics

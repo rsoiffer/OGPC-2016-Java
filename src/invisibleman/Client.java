@@ -15,8 +15,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.TRANSPARENT;
 import util.*;
+import static util.Color4.TRANSPARENT;
 
 public abstract class Client {
 
@@ -45,7 +45,7 @@ public abstract class Client {
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
 
         //Load the level
-        Tile.load("level.txt");
+        Tile.load("level_backup.txt");
 
         //Setup graphics effects
         setupGraphics();
@@ -132,7 +132,7 @@ public abstract class Client {
         });
         conn.registerHandler(2, () -> {
             Vec3 pos = conn.read(Vec3.class);
-            ThreadManager.onMainThread(() -> new Explosion(pos, new Color4(3, 1, 1)).create());
+            ThreadManager.onMainThread(() -> new Explosion(pos, new Color4(1, 0, 0)).create());
         });
         conn.registerHandler(5, () -> ThreadManager.onMainThread(() -> {
             RegisteredEntity.getAll(BallAttack.class, Explosion.class,
