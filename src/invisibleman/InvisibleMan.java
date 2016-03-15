@@ -18,6 +18,8 @@ public class InvisibleMan extends RegisteredEntity {
         Signal<Vec3> position = Premade3D.makePosition(this);
         Signal<Vec3> velocity = Premade3D.makeVelocity(this);
         Signal<Double> invincible = addChild(new Signal(5.), "invincible");
+        
+        position.set(Tile.size().divide(2).toVec3().withZ(Tile.heightAt(Tile.size().divide(2).toVec3())));
 
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
