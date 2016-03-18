@@ -16,9 +16,10 @@ public class InvisibleMan extends RegisteredEntity {
     protected void createInner() {
         //Create the player's variables
         Signal<Vec3> position = Premade3D.makePosition(this);
+        Signal<Vec3> prevPos = addChild(new Signal(new Vec3(0)));
         Signal<Vec3> velocity = Premade3D.makeVelocity(this);
         Signal<Double> invincible = addChild(new Signal(5.), "invincible");
-        
+
         position.set(Tile.size().divide(2).toVec3().withZ(Tile.heightAt(Tile.size().divide(2).toVec3())));
 
         //Give the player basic first-person controls
@@ -35,6 +36,9 @@ public class InvisibleMan extends RegisteredEntity {
         Signal<Boolean> onGround = new Signal(true);
         onUpdate(dt -> {
             if (position.get().z <= Tile.heightAt(position.get()) + 2 * dt) {
+                if (velocity.get().toVec2().dot(Tile.normalAt(position.get())) > 0 && Tile.normalAt(position.get()).lengthSquared() > 4) {
+                    position.set(prevPos.get());
+                }
                 position.edit(p -> p.withZ(Tile.heightAt(position.get())));
                 velocity.edit(v -> v.withZ(0));
                 onGround.set(true);
@@ -42,6 +46,7 @@ public class InvisibleMan extends RegisteredEntity {
                 onGround.set(false);
             }
             position.set(position.get().toVec2().clamp(new Vec2(0), Tile.size()).toVec3().withZ(position.get().z));
+            prevPos.set(position.get());
         });
 
         //Force the player to stay inside the room

@@ -15,6 +15,7 @@ import ui.UIShowOne;
 import ui.UIValue;
 import util.Color4;
 import util.Log;
+import util.Mutable;
 import util.Util;
 import util.Vec2;
 
@@ -75,13 +76,14 @@ public class LevelEditor {
         //Create ui
         UIElement tileUI = tileUI();
         UIElement raiseLowerUI = raiseLowerUI();
-        screen.add(tileUI, raiseLowerUI);
+        UIElement smoothUI = smoothUI();
+        screen.add(tileUI, raiseLowerUI, smoothUI);
         screen.color = () -> Color4.gray(.95);
         screen.border = true;
 
         //Switch mode
         Input.whenKey(Keyboard.KEY_SPACE, true).onEvent(() -> {
-            uiMode = (uiMode + 1) % 3;
+            uiMode = (uiMode + 1) % 4;
             switch (uiMode) {
                 case 0:
                     screen.showing = new UIElement();
@@ -91,6 +93,9 @@ public class LevelEditor {
                     break;
                 case 2:
                     screen.showing = raiseLowerUI;
+                    break;
+                case 3:
+                    screen.showing = smoothUI;
                     break;
             }
         });
@@ -113,6 +118,47 @@ public class LevelEditor {
         }));
 
         return brushSize;
+    }
+
+    private static UIElement smoothUI() {
+        UIValue height = new UIValue("Height", x -> x < 32, x -> x > -32);
+
+        UIElement showColor = new UIElement(new Vec2(200, 50));
+        showColor.color = height.value.map(v -> Color4.gray(v / 64. + .5));;
+        showColor.border = true;
+
+        UIValue brushSize = new UIValue("Brush Size", x -> x < 30, x -> x > 1);
+        brushSize.value.set(10);
+
+        UIList ui = list(false, space(25), showColor, space(10), height, brushSize);
+        ui.gravity = .5;
+        ui.setAllPadding(new Vec2(10));
+
+        Input.whileMouseDown(0).filter(dt -> uiMode == 3).filter(dt -> notOverUI.get()).forEach(dt -> Tile.all().forEach(t -> {
+            double dist2 = t.pos().toVec2().subtract(Input.getMouse()).lengthSquared();
+            double strength = 2 * Math.pow(2, -dist2 / 1000 / brushSize.value.get() / brushSize.value.get());
+            t.height += dt * strength * (height.value.get() - t.height);
+        }));
+        Input.whileMouseDown(1).filter(dt -> uiMode == 3).filter(dt -> notOverUI.get()).forEach(dt -> {
+            Mutable<Double> valSum = new Mutable(0.);
+            Mutable<Double> heightSum = new Mutable(0.);
+            Tile.all().forEach(t -> {
+                double dist2 = t.pos().toVec2().subtract(Input.getMouse()).lengthSquared();
+                double strength = Math.pow(2, -dist2 / 1000 / brushSize.value.get() / brushSize.value.get());
+                valSum.o += strength;
+                heightSum.o += strength * t.height;
+            });
+            Tile.all().forEach(t -> {
+                double dist2 = t.pos().toVec2().subtract(Input.getMouse()).lengthSquared();
+                double strength = Math.pow(2, -dist2 / 1000 / brushSize.value.get() / brushSize.value.get());
+                t.height += dt * strength * (heightSum.o / valSum.o - t.height);
+            });
+        });
+        Input.whenMouse(2, true).filter(() -> uiMode == 3).filter(notOverUI).onEvent(() -> Tile.tileAt(Input.getMouse()).ifPresent(t -> {
+            height.value.set((int) Math.round(t.height));
+        }));
+
+        return ui;
     }
 
     private static UIElement tileUI() {

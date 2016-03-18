@@ -15,8 +15,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.TRANSPARENT;
 import util.*;
+import static util.Color4.TRANSPARENT;
 
 public abstract class Client {
 
@@ -45,17 +45,20 @@ public abstract class Client {
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
 
         //Load the level
-        Tile.load("level_backup.txt");
+        Tile.load("level.txt");
 
         //Setup graphics effects
         setupGraphics();
 
         //Create the trees
-        for (int i = -15; i <= 15; i += 2) {
-            for (int j = -15; j <= 15; j += 2) {
+        for (int i = -15; i <= 15; i += 1) {
+            for (int j = -15; j <= 15; j += 1) {
+
                 Tree t = new Tree();
                 t.create();
-                t.get("position", Vec3.class).set(new Vec3(i * 3, j * 3, Tile.heightAt(new Vec3(i * 3, j * 3, 0))));
+                double x = Math.random() * 5 - 2.5;
+                double y = Math.random() * 5 - 2.5;
+                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
             }
         }
 
@@ -93,7 +96,10 @@ public abstract class Client {
         });
         conn.registerHandler(2, () -> {
             Vec3 pos = conn.read(Vec3.class);
-            ThreadManager.onMainThread(() -> new Explosion(pos, new Color4(1, 0, 0)).create());
+            ThreadManager.onMainThread(() -> {
+                new Explosion(pos, new Color4(1, 0, 0)).create();
+                Sounds.playSound("hit.wav");
+            });
         });
         conn.registerHandler(5, () -> ThreadManager.onMainThread(() -> {
             RegisteredEntity.getAll(BallAttack.class, Explosion.class,

@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.BLACK;
 import util.*;
+import static util.Color4.BLACK;
 
 public class Tile {
 
@@ -36,6 +36,18 @@ public class Tile {
 
         glBegin(GL_QUADS);
         all().filter(t -> t.x != 0 && t.y != 0 && playerPos.subtract(t.pos()).lengthSquared() < 400).forEach(t -> {
+
+            double min = Math.min(Math.min(grid[t.x - 1][t.y].pos().z, grid[t.x - 1][t.y - 1].pos().z), Math.min(grid[t.x][t.y - 1].pos().z, t.pos().z));
+            double max = Math.max(Math.max(grid[t.x - 1][t.y].pos().z, grid[t.x - 1][t.y - 1].pos().z), Math.max(grid[t.x][t.y - 1].pos().z, t.pos().z));
+
+            if (max - min > 2) {
+
+                Color4.gray(.5).glColor();
+            } else {
+
+                Color4.WHITE.glColor();
+            }
+
             nor.glNormal();
             t.pos().glVertex();
             nor.glNormal();
@@ -44,6 +56,15 @@ public class Tile {
             grid[t.x - 1][t.y - 1].pos().glVertex();
             nor.glNormal();
             grid[t.x][t.y - 1].pos().glVertex();
+        });
+        glEnd();
+        BLACK.glColor();
+        glBegin(GL_LINES);
+        all().filter(t -> t.x != 0 && t.y != 0 && playerPos.subtract(t.pos()).lengthSquared() < 400).forEach(t -> {
+            t.pos().add(new Vec3(0, 0, .01)).glVertex();
+            grid[t.x - 1][t.y].pos().add(new Vec3(0, 0, .01)).glVertex();
+            t.pos().add(new Vec3(0, 0, .01)).glVertex();
+            grid[t.x][t.y - 1].pos().add(new Vec3(0, 0, .01)).glVertex();
         });
         glEnd();
     }

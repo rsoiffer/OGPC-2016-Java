@@ -60,10 +60,11 @@ public class Footstep extends RegisteredEntity {
         Vec2 side = new Vec2(0, .1 * (isLeft ? 1 : -1)).rotate(rot);
         pos = pos.add(side.toVec3().withZ(side.dot(nor)));
 
-        Vec2 p0 = new Vec2(-.1, -.1 * (isLeft ? 1 : -1)).rotate(rot);
-        Vec2 p1 = new Vec2(.1, -.1 * (isLeft ? 1 : -1)).rotate(rot);
-        Vec2 p2 = new Vec2(.1, .1 * (isLeft ? 1 : -1)).rotate(rot);
-        Vec2 p3 = new Vec2(-.1, .1 * (isLeft ? 1 : -1)).rotate(rot);
+        double mult = 1 / Math.sqrt(1 + nor.lengthSquared());
+        Vec2 p0 = new Vec2(-.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+        Vec2 p1 = new Vec2(.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+        Vec2 p2 = new Vec2(.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+        Vec2 p3 = new Vec2(-.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
 
         Texture s = SpriteContainer.loadSprite("footstep_white");
         glEnable(GL_TEXTURE_2D);
