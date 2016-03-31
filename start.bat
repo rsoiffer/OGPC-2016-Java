@@ -1,1 +1,1 @@
-java -jar -Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true OGPC_2016_Java.jar 10.2.0.75
+java -jar OGPC_2016_Java.jar 10.4.0.62

@@ -40,6 +40,15 @@ public class InvisibleMan extends RegisteredEntity {
                     position.set(prevPos.get());
                 }
                 position.edit(p -> p.withZ(Tile.heightAt(position.get())));
+                
+                if(velocity.get().z < -12){
+                    
+                    this.destroy();
+                    
+                    new InvisibleMan().create();
+                    Client.sendMessage(2, position.get());
+                }
+                
                 velocity.edit(v -> v.withZ(0));
                 onGround.set(true);
             } else {

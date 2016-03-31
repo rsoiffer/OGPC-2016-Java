@@ -18,7 +18,7 @@ public class Tree extends AbstractEntity {
     @Override
     public void create() {
         Signal<Vec3> position = Premade3D.makePosition(this);
-        Signal<Animation> animation = new Signal(new Animation("tree", "treediffuse"));
+        Signal<Animation> animation = new Signal(new Animation("rock", "rockdiffuse"));
 
         Core.render.onEvent(() -> {
             if (RegisteredEntity.getAll(InvisibleMan.class).get(0).get("position", Vec3.class).get().subtract(position.get()).lengthSquared() < 400) {
