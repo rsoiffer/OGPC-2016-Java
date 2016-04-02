@@ -69,7 +69,7 @@ public abstract class Client {
         }
         
         //Set up GUI
-        Console console=new Console().init(Vec2.ZERO, new Vec2(1200,300), 20);
+        Console console=new Console().init(Vec2.ZERO, new Vec2(1200,300), 18);
         GUIController.add(console);
         
         Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(()->{
