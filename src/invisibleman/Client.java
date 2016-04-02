@@ -4,6 +4,7 @@ import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import engine.Signal;
+import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import graphics.data.Framebuffer;
@@ -68,13 +69,18 @@ public abstract class Client {
         }
         
         //Set up GUI
-        GUIController.add(new Console().add(new GUIRectangle().setPos(new Vec2(0)).setDim(new Vec2(1200,200)).setColor(Color4.BLACK)
-                )
-        );
+        Console console=new Console().init(Vec2.ZERO, new Vec2(1200,300), 20);
+        GUIController.add(console);
         
         Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(()->{
-            if(GUIController.getGUIList().get(0).isOpen()) GUIController.getGUIList().get(0).close();
-            else GUIController.getGUIList().get(0).open();
+            if(console.isOpen()){
+                console.close();
+                Mouse.setGrabbed(true);
+            }
+            else {
+                console.open();
+                Mouse.setGrabbed(false);
+            }
         });
         
         Core.update.onEvent(()->{
