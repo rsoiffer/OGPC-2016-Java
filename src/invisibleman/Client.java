@@ -9,6 +9,9 @@ import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
 import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
+import gui.Console;
+import gui.GUIController;
+import gui.components.GUIRectangle;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -61,7 +64,24 @@ public abstract class Client {
                 t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
             }
         }
-
+        
+        //Set up GUI
+        GUIController.add(new Console().add(new GUIRectangle().setPos(new Vec2(0)).setDim(new Vec2(1,0.3)).setColor(Color4.BLACK)
+                )
+        );
+        
+        Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(()->{
+            if(GUIController.getGUIList().get(0).isOpen()) GUIController.getGUIList().get(0).close();
+            else GUIController.getGUIList().get(0).open();
+        });
+        
+        Core.update.onEvent(()->{
+           GUIController.update();
+        });
+        Core.render.onEvent(()->{
+           GUIController.draw();
+        });
+        
         //Create the player
         new InvisibleMan().create();
 
