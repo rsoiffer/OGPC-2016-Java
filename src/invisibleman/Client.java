@@ -4,6 +4,8 @@ import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import engine.Signal;
+import graphics.Graphics2D;
+import graphics.Window3D;
 import graphics.data.Framebuffer;
 import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
@@ -66,7 +68,7 @@ public abstract class Client {
         }
         
         //Set up GUI
-        GUIController.add(new Console().add(new GUIRectangle().setPos(new Vec2(0)).setDim(new Vec2(1,0.3)).setColor(Color4.BLACK)
+        GUIController.add(new Console().add(new GUIRectangle().setPos(new Vec2(0)).setDim(new Vec2(1200,200)).setColor(Color4.BLACK)
                 )
         );
         
