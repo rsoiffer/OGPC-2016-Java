@@ -1,4 +1,4 @@
-package mc_leveleditor;
+package map;
 
 import com.codepoetics.protonpack.StreamUtils;
 import engine.AbstractEntity.LAE;
@@ -12,8 +12,8 @@ import invisibleman.Fog;
 import invisibleman.Premade3D;
 import java.io.PrintWriter;
 import java.util.function.Supplier;
-import static mc_leveleditor.CubeMap.*;
-import static mc_leveleditor.CubeType.SNOW;
+import static map.CubeMap.*;
+import static map.CubeType.SNOW;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;

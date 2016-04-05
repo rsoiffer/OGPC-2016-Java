@@ -1,10 +1,10 @@
-package mc_leveleditor;
+package map;
 
 import graphics.Graphics3D;
 import graphics.Window3D;
 import graphics.data.Texture;
 import graphics.loading.SpriteContainer;
-import static mc_leveleditor.CubeMap.getCubeType;
+import static map.CubeMap.getCubeType;
 import util.Vec2;
 import util.Vec3;
 

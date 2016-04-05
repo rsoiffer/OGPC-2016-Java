@@ -4,9 +4,6 @@ import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import engine.Signal;
-import graphics.Camera;
-import graphics.Graphics2D;
-import graphics.Window3D;
 import graphics.data.Framebuffer;
 import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
@@ -14,30 +11,32 @@ import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
 import gui.Console;
 import gui.GUIController;
-import gui.components.GUIRectangle;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import util.*;
 import static util.Color4.TRANSPARENT;
+import util.*;
 
 public abstract class Client {
 
-    static Connection conn;
+    public static boolean IS_MULTIPLAYER = false;
+    public static Connection conn;
 
     public static void main(String[] args) {
-        //Try to connect to the server
-        if (args.length == 0) {
-            conn = NetworkUtils.connectManual();
-        } else {
-            conn = NetworkUtils.connect(args[0]);
-        }
+        if (IS_MULTIPLAYER) {
+            //Try to connect to the server
+            if (args.length == 0) {
+                conn = NetworkUtils.connectManual();
+            } else {
+                conn = NetworkUtils.connect(args[0]);
+            }
 
-        //Handle messages recieved from the connection
-        registerMessageHandlers();
+            //Handle messages recieved from the connection
+            registerMessageHandlers();
+        }
 
         //Set the game to 3D - this must go before Core.init();
         Core.is3D = true;
@@ -67,29 +66,28 @@ public abstract class Client {
                 t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
             }
         }
-        
+
         //Set up GUI
-        Console console=new Console().init(Vec2.ZERO, new Vec2(1200,300), 18);
+        Console console = new Console().init(Vec2.ZERO, new Vec2(1200, 300), 18);
         GUIController.add(console);
-        
-        Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(()->{
-            if(console.isOpen()){
+
+        Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(() -> {
+            if (console.isOpen()) {
                 console.close();
                 Mouse.setGrabbed(true);
-            }
-            else {
+            } else {
                 console.open();
                 Mouse.setGrabbed(false);
             }
         });
-        
-        Core.update.onEvent(()->{
-           GUIController.update();
+
+        Core.update.onEvent(() -> {
+            GUIController.update();
         });
-        Core.render.onEvent(()->{
-           GUIController.draw();
+        Core.renderLayer(100).onEvent(() -> {
+            GUIController.draw();
         });
-        
+
         //Create the player
         new InvisibleMan().create();
 

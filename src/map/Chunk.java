@@ -1,7 +1,7 @@
-package mc_leveleditor;
+package map;
 
-import static mc_leveleditor.CubeMap.map;
-import static mc_leveleditor.CubeType.DRAW_EDGES;
+import static map.CubeMap.map;
+import static map.CubeType.DRAW_EDGES;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.BLACK;
 import static util.Color4.WHITE;

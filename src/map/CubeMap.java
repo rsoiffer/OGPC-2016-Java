@@ -1,4 +1,4 @@
-package mc_leveleditor;
+package map;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import static mc_leveleditor.Chunk.SIZE;
+import static map.Chunk.SIZE;
 import util.Log;
 import util.Mutable;
 import util.Util;

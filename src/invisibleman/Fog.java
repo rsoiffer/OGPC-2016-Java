@@ -18,7 +18,7 @@ public class Fog extends AbstractEntity {
         FOG.setVec3("fogColor", color.toFloatBuffer3());
         FOG.setFloat("density", density);
         FOG.setFloat("fade", fade);
-        Shader.clear();
+        Shader.popShader();
     }
 
     @Override

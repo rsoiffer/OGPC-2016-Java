@@ -1,4 +1,4 @@
-package mc_leveleditor;
+package map;
 
 public class CubeData {
 
