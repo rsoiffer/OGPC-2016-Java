@@ -5,6 +5,7 @@ import graphics.data.Sprite;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import map.CubeMap;
 import util.Color4;
 import util.RegisteredEntity;
 import util.Vec2;
@@ -32,7 +33,7 @@ public class Explosion extends RegisteredEntity {
                 Particle p = it.next();
                 p.vel = p.vel.add(new Vec3(0, 0, -dt * 40));
                 p.pos = p.pos.add(p.vel.multiply(dt));
-                if (p.pos.z < Tile.heightAt(p.pos)) {
+                if (CubeMap.isSolid(p.pos)) {
                     it.remove();
                 }
             }

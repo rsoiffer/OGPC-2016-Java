@@ -52,30 +52,32 @@ public class Footstep extends RegisteredEntity {
     }
 
     public static void drawFootstep(Vec3 pos, double rot, boolean isLeft, Color4 color) {
-        Vec2 nor = Tile.normalAt(pos);
-        if (nor == null) {
-            return;
-        }
-
-        Vec2 side = new Vec2(0, .1 * (isLeft ? 1 : -1)).rotate(rot);
-        pos = pos.add(side.toVec3().withZ(side.dot(nor)));
-
-        double mult = 1 / Math.sqrt(1 + nor.lengthSquared());
-        Vec2 p0 = new Vec2(-.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
-        Vec2 p1 = new Vec2(.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
-        Vec2 p2 = new Vec2(.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
-        Vec2 p3 = new Vec2(-.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
-
-        Texture s = SpriteContainer.loadSprite("footstep_white");
-        glEnable(GL_TEXTURE_2D);
-        s.bind();
         color.glColor();
-        glBegin(GL_QUADS);
-        Graphics3D.drawSpriteFast(s, pos.add(p0.toVec3().withZ(p0.dot(nor))),
-                pos.add(p1.toVec3().withZ(p1.dot(nor))),
-                pos.add(p2.toVec3().withZ(p2.dot(nor))),
-                pos.add(p3.toVec3().withZ(p3.dot(nor))), nor.toVec3().withZ(1));
-        glEnd();
+        Graphics3D.drawQuadFast(pos, new Vec2(.3, isLeft ? .3 : -.3), 0, rot);
+//        Vec2 nor = new Vec2(0);//Tile.normalAt(pos);
+//        if (nor == null) {
+//            return;
+//        }
+//
+//        Vec2 side = new Vec2(0, .1 * (isLeft ? 1 : -1)).rotate(rot);
+//        pos = pos.add(side.toVec3().withZ(side.dot(nor)));
+//
+//        double mult = 1 / Math.sqrt(1 + nor.lengthSquared());
+//        Vec2 p0 = new Vec2(-.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+//        Vec2 p1 = new Vec2(.1, -.1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+//        Vec2 p2 = new Vec2(.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+//        Vec2 p3 = new Vec2(-.1, .1 * (isLeft ? 1 : -1)).rotate(rot).multiply(mult);
+//
+//        Texture s = SpriteContainer.loadSprite("footstep_white");
+//        glEnable(GL_TEXTURE_2D);
+//        s.bind();
+//        color.glColor();
+//        glBegin(GL_QUADS);
+//        Graphics3D.drawSpriteFast(s, pos.add(p0.toVec3().withZ(p0.dot(nor))),
+//                pos.add(p1.toVec3().withZ(p1.dot(nor))),
+//                pos.add(p2.toVec3().withZ(p2.dot(nor))),
+//                pos.add(p3.toVec3().withZ(p3.dot(nor))), nor.toVec3().withZ(1));
+//        glEnd();
     }
 
     //Set the footstep's variables

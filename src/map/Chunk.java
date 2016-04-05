@@ -10,7 +10,7 @@ import util.Vec3;
 
 public class Chunk {
 
-    public static final int SIZE = 20;
+    public static final int CHUNK_SIZE = 20;
     public final int x, y, z;
     public final int drawList;
 
@@ -32,7 +32,7 @@ public class Chunk {
         for (CubeType ct : CubeType.values()) {
             ct.texture.bind();
             glBegin(GL_QUADS);
-            Util.forRange(x, x + SIZE, y, y + SIZE, (x, y) -> Util.forRange(z, z + SIZE, z -> {
+            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
                 if (map[x][y][z] == ct) {
                     map[x][y][z].drawFaces(new Vec3(x, y, z));
                 }
@@ -44,7 +44,7 @@ public class Chunk {
             BLACK.glColor();
             glDisable(GL_TEXTURE_2D);
             glBegin(GL_LINES);
-            Util.forRange(x, x + SIZE, y, y + SIZE, (x, y) -> Util.forRange(z, z + SIZE, z -> {
+            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
                 if (map[x][y][z] != null) {
                     map[x][y][z].drawEdges(new Vec3(x, y, z));
                 }

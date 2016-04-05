@@ -7,6 +7,7 @@ import engine.Signal;
 import graphics.Window3D;
 import graphics.data.Sprite;
 import java.util.function.Supplier;
+import map.CubeMap;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import util.Util;
@@ -24,6 +25,13 @@ public abstract class Premade3D {
 
     public static Signal<Vec3> makePosition(AbstractEntity e) {
         return e.addChild(new Signal(ZERO), "position");
+    }
+
+    public static Signal<Vec3> makePrevPosition(AbstractEntity e) {
+        Signal<Vec3> position = e.get("position", Vec3.class);
+        Signal<Vec3> prevPos = e.addChild(new Signal(ZERO), "prevPos");
+        e.onUpdate(dt -> prevPos.set(position.get()));
+        return prevPos;
     }
 
     public static Signal<Double> makeRotation(AbstractEntity e) {
@@ -49,6 +57,47 @@ public abstract class Premade3D {
                 -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.get())::add)),
                 Input.whileKey(KEY_D, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
                 -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get())::add)));
+    }
+
+    public static Signal<Vec3> makeCollisions(AbstractEntity e, Vec3 size) {
+        Signal<Vec3> position = e.get("position", Vec3.class);
+        Signal<Vec3> prevPos = e.get("prevPos", Vec3.class);
+        Signal<Vec3> velocity = e.get("velocity", Vec3.class);
+        Signal<Vec3> collision = new Signal(null);
+        e.onUpdate(dt -> {
+            if (CubeMap.isSolid(position.get(), size)) {
+                Vec3 pos = position.get();
+                int detail = 20;
+                Vec3 delta = position.get().subtract(prevPos.get()).divide(detail);
+                position.set(prevPos.get());
+                for (int i = 0; i < detail; i++) {
+                    position.edit(delta.withY(0).withZ(0)::add);
+                    if (CubeMap.isSolid(position.get(), size)) {
+                        position.edit(delta.withY(0).withZ(0).reverse()::add);
+                        velocity.edit(v -> v.withX(0));
+                        break;
+                    }
+                }
+                for (int i = 0; i < detail; i++) {
+                    position.edit(delta.withX(0).withZ(0)::add);
+                    if (CubeMap.isSolid(position.get(), size)) {
+                        position.edit(delta.withX(0).withZ(0).reverse()::add);
+                        velocity.edit(v -> v.withY(0));
+                        break;
+                    }
+                }
+                for (int i = 0; i < detail; i++) {
+                    position.edit(delta.withY(0).withX(0)::add);
+                    if (CubeMap.isSolid(position.get(), size)) {
+                        position.edit(delta.withY(0).withX(0).reverse()::add);
+                        velocity.edit(v -> v.withZ(0));
+                        break;
+                    }
+                }
+                collision.set(pos);
+            }
+        });
+        return collision;
     }
 
     //Graphics

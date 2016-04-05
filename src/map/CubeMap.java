@@ -1,5 +1,7 @@
 package map;
 
+import engine.Core;
+import graphics.Window3D;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -8,7 +10,7 @@ import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import static map.Chunk.SIZE;
+import static map.Chunk.CHUNK_SIZE;
 import util.Log;
 import util.Mutable;
 import util.Util;
@@ -17,17 +19,24 @@ import util.Vec3;
 public class CubeMap {
 
     public static final int WIDTH = 100, DEPTH = 100, HEIGHT = 40;
+    public static final Vec3 WORLD_SIZE = new Vec3(WIDTH, DEPTH, HEIGHT);
     public static final CubeType[][][] map = new CubeType[WIDTH][DEPTH][HEIGHT];
-    public static final Chunk[][][] chunks = new Chunk[WIDTH / SIZE][DEPTH / SIZE][HEIGHT / SIZE];
+    public static final Chunk[][][] chunks = new Chunk[WIDTH / CHUNK_SIZE][DEPTH / CHUNK_SIZE][HEIGHT / CHUNK_SIZE];
 
     static {
-        Util.forRange(0, WIDTH / SIZE, 0, DEPTH / SIZE, (x, y) -> Util.forRange(0, HEIGHT / SIZE, z -> {
-            chunks[x][y][z] = new Chunk(x * SIZE, y * SIZE, z * SIZE);
+        Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
+            chunks[x][y][z] = new Chunk(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
         }));
+        Core.render.onEvent(() -> {
+            Chunk c = getChunk(Window3D.pos);
+            if (c != null) {
+                c.redraw();
+            }
+        });
     }
 
     public static void drawAll() {
-        Util.forRange(0, WIDTH / SIZE, 0, DEPTH / SIZE, (x, y) -> Util.forRange(0, HEIGHT / SIZE, z -> {
+        Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             chunks[x][y][z].draw();
         }));
     }
@@ -40,7 +49,7 @@ public class CubeMap {
         if (x < 0 || x >= WIDTH || y < 0 || y >= DEPTH || z < 0 || z >= HEIGHT) {
             return null;
         }
-        return chunks[x / SIZE][y / SIZE][z / SIZE];
+        return chunks[x / CHUNK_SIZE][y / CHUNK_SIZE][z / CHUNK_SIZE];
     }
 
     public static CubeData getCube(Vec3 pos) {
@@ -57,6 +66,23 @@ public class CubeMap {
     public static CubeType getCubeType(Vec3 pos) {
         CubeData cd = getCube(pos);
         return cd == null ? null : cd.c;
+    }
+
+    public static boolean isSolid(Vec3 pos) {
+        return getCubeType(pos) != null;
+    }
+
+    public static boolean isSolid(Vec3 pos, Vec3 buf) {
+        for (double x = pos.x - buf.x; x < Math.ceil(pos.x + buf.x); x++) {
+            for (double y = pos.y - buf.y; y < Math.ceil(pos.y + buf.y); y++) {
+                for (double z = pos.z - buf.z; z < Math.ceil(pos.z + buf.z); z++) {
+                    if (isSolid(new Vec3(x, y, z))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static void load(String fileName) {
@@ -120,7 +146,7 @@ public class CubeMap {
     }
 
     public static void redrawAll() {
-        Util.forRange(0, WIDTH / SIZE, 0, DEPTH / SIZE, (x, y) -> Util.forRange(0, HEIGHT / SIZE, z -> {
+        Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             chunks[x][y][z].redraw();
         }));
     }

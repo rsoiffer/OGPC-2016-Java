@@ -11,6 +11,7 @@ import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
 import gui.Console;
 import gui.GUIController;
+import map.CubeMap;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -50,23 +51,22 @@ public abstract class Client {
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
 
         //Load the level
-        Tile.load("level.txt");
+        CubeMap.load("level3.txt");
 
         //Setup graphics effects
         setupGraphics();
 
         //Create the trees
-        for (int i = -15; i <= 15; i += 1) {
-            for (int j = -15; j <= 15; j += 1) {
-
-                Tree t = new Tree();
-                t.create();
-                double x = Math.random() * 5 - 2.5;
-                double y = Math.random() * 5 - 2.5;
-                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
-            }
-        }
-
+//        for (int i = -15; i <= 15; i += 1) {
+//            for (int j = -15; j <= 15; j += 1) {
+//
+//                Tree t = new Tree();
+//                t.create();
+//                double x = Math.random() * 5 - 2.5;
+//                double y = Math.random() * 5 - 2.5;
+//                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
+//            }
+//        }
         //Set up GUI
         Console console = new Console().init(Vec2.ZERO, new Vec2(1200, 300), 18);
         GUIController.add(console);
@@ -158,16 +158,11 @@ public abstract class Client {
         new Snow().create();
 
         //Create the fog
-        new Fog(Color4.gray(.8), .025, .95).create();
+        new Fog(Color4.gray(.8), .0025, .95).create();
 
-        //Draw the floor
+        //Draw the level
         Core.render.onEvent(() -> {
-            Fog.setMinTexColor(1, 1, 1, 1);
-
-            Tile.drawAll3D();
-            //Tile.all().forEach(Tile::draw3D);
-
-            Fog.setMinTexColor(0, 0, 0, 0);
+            CubeMap.drawAll();
         });
     }
 
