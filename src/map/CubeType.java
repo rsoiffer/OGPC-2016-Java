@@ -21,7 +21,7 @@ public enum CubeType {
         texture = SpriteContainer.loadSprite(name);
     }
 
-    public static final boolean DRAW_EDGES = false;
+    public static final boolean DRAW_EDGES = true;
 
     public void drawEdges(Vec3 pos) {
         //if (Window3D.pos.z < pos.z) {
