@@ -4,11 +4,17 @@ import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import engine.Signal;
+import graphics.Camera;
+import graphics.Graphics2D;
+import graphics.Window3D;
 import graphics.data.Framebuffer;
 import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
 import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
+import gui.Console;
+import gui.GUIController;
+import gui.components.GUIRectangle;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -61,7 +67,29 @@ public abstract class Client {
                 t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
             }
         }
-
+        
+        //Set up GUI
+        Console console=new Console().init(Vec2.ZERO, new Vec2(1200,300), 18);
+        GUIController.add(console);
+        
+        Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(()->{
+            if(console.isOpen()){
+                console.close();
+                Mouse.setGrabbed(true);
+            }
+            else {
+                console.open();
+                Mouse.setGrabbed(false);
+            }
+        });
+        
+        Core.update.onEvent(()->{
+           GUIController.update();
+        });
+        Core.render.onEvent(()->{
+           GUIController.draw();
+        });
+        
         //Create the player
         new InvisibleMan().create();
 

@@ -8,6 +8,7 @@ import graphics.Window3D;
 import graphics.data.Sprite;
 import java.util.function.Supplier;
 import static org.lwjgl.input.Keyboard.*;
+import org.lwjgl.input.Mouse;
 import util.Mutable;
 import util.Util;
 import util.Vec3;
@@ -40,16 +41,26 @@ public abstract class Premade3D {
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
         e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
         Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();
-        e.add(Input.whileKeyDown(KEY_W).forEach(dt -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.get())::add)),
-                Input.whileKeyDown(KEY_S).forEach(dt -> velocity.edit(Window3D.forwards().multiply(-speed.get())::add)),
-                Input.whileKeyDown(KEY_A).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.get())::add)),
-                Input.whileKeyDown(KEY_D).forEach(dt -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get())::add)));
+        e.add(Input.whileKey(KEY_W,true).filter(new Signal(Mouse.isGrabbed())).forEach(dt -> {
+                if(Mouse.isGrabbed()) velocity.edit((Mouse.isGrabbed()?Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.get()):Vec3.ZERO)::add);
+            }),
+            Input.whileKey(KEY_S,true).filter(new Signal(Mouse.isGrabbed())).forEach(dt -> {
+                if(Mouse.isGrabbed()) velocity.edit((Mouse.isGrabbed()?Window3D.forwards().multiply(-speed.get()):Vec3.ZERO)::add);
+            }),
+            Input.whileKey(KEY_A,true).filter(new Signal(Mouse.isGrabbed())).forEach(dt -> {
+                if(Mouse.isGrabbed()) velocity.edit((Mouse.isGrabbed()?Window3D.UP.cross(Window3D.forwards()).multiply(speed.get()):Vec3.ZERO)::add);
+            }),
+            Input.whileKey(KEY_D,true).filter(new Signal(Mouse.isGrabbed())).forEach(dt -> {
+                if(Mouse.isGrabbed()) velocity.edit((Mouse.isGrabbed()?Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get()):Vec3.ZERO)::add);
+            }));
     }
 
     //Graphics
     public static void makeMouseLook(AbstractEntity e, double sensitivity, double min, double max) {
-        e.onUpdate(dt -> Window3D.facing = new Vec3Polar(1, Window3D.facing.t + -sensitivity * Input.getMouseDelta().x,
-                Util.clamp(Window3D.facing.p + sensitivity * Input.getMouseDelta().y, min, max)));
+        e.onUpdate(dt -> {
+            Window3D.facing = Mouse.isGrabbed() ? (new Vec3Polar(1, Window3D.facing.t + -sensitivity * Input.getMouseDelta().x,
+            Util.clamp(Window3D.facing.p + sensitivity * Input.getMouseDelta().y, min, max))) : Window3D.facing;
+        });
     }
 
     public static Signal<Sprite> makeSpriteGraphics(AbstractEntity e, String name) {
