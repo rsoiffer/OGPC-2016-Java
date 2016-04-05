@@ -44,12 +44,15 @@ public class Server {
         }).start();
 
         registerCommand(() -> System.exit(0), "close", "end", "exit", "stop", "q", "quit");
+        
         registerCommand(() -> {
             System.out.println("Client list:");
             clients.forEach(System.out::println);
         }, "all", "clients", "connected", "list", "players");
+        
+        registerCommand(() -> Client.sendMessage(3, new Vec3(0, 0, 1)), "snowball");
+        
         registerCommand(() -> clients.forEach(ci -> ci.conn.sendMessage(5)), "new game", "restart", "start");
-
         startCommandLine();
     }
 
