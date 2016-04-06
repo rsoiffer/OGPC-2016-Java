@@ -13,7 +13,8 @@ public enum CubeType {
     SNOW("white_pixel"),
     STONE("stone_floor"),
     GRASS("grass_floor"),
-    ROCK("rockdiffuse");
+    ROCK("rockdiffuse"),
+    ICE("ice1");
 
     public final Texture texture;
 

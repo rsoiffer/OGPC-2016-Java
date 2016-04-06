@@ -45,8 +45,8 @@ public class HeightGenerator {
         }
 
         double[] ext = extrema(m);
-        grain(m, ext);
-        ext = extrema(m);
+//        grain(m, ext);
+//        ext = extrema(m);
         regulate(m, ext);
         
         for (int i = 0; i < map.length; i++) {

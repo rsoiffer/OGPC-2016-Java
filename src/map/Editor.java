@@ -13,8 +13,9 @@ import invisibleman.Premade3D;
 import java.io.PrintWriter;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
+import static map.CubeType.ICE;
+import static map.CubeType.ROCK;
 import static map.CubeType.SNOW;
-import static map.CubeType.STONE;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -24,10 +25,10 @@ import util.*;
 public class Editor {
 
     public static void main(String[] args) {
-        
+
         //generate a terrain?
         boolean gen = true;
-        
+
         //Initial graphics setup
         Core.is3D = true;
         Core.init();
@@ -87,34 +88,39 @@ public class Editor {
 //            }
 //        });
         //Initial level
-        
-        if(gen){
-            
+        if (gen) {
+
             HeightGenerator hg = new HeightGenerator(101, 101);
             hg.generate();
             int[][] hm = hg.getMap();
-            
+
             for (int[] m : hm) {
-                
+
                 for (int j = 0; j < m.length; j++) {
-                    
+
                     m[j] /= 6;
                     m[j] = m[j] > 40 ? 40 : m[j];
                 }
             }
-            
+
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
-            map[x][y][z] = STONE;
+                
+                map[x][y][z] = ROCK;
             }));
-            
+
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
-            map[x][y][z] = SNOW;
-        }));
-        }else{
-            
-        Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
-            map[x][y][z] = SNOW;
-        }));
+               
+                map[x][y][z] = SNOW;
+            }));
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
+                
+                map[x][y][z] = ICE;
+            }));
+        } else {
+
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
+                map[x][y][z] = SNOW;
+            }));
         }
         CubeMap.redrawAll();
         pos = new Vec3(10, 10, 15);
