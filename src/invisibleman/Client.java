@@ -11,6 +11,7 @@ import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
 import gui.Console;
 import gui.GUIController;
+import gui.TypingManager;
 import map.CubeMap;
 import network.Connection;
 import network.NetworkUtils;
@@ -68,18 +69,9 @@ public abstract class Client {
 //            }
 //        }
         //Set up GUI
-        Console console = new Console().init(Vec2.ZERO, new Vec2(1200, 300));
+        Console console = new Console("Con1", Vec2.ZERO, new Vec2(1200, 300));
         GUIController.add(console);
-
-        Input.whenKey(Keyboard.KEY_GRAVE, true).onEvent(() -> {
-            if (console.isOpen()) {
-                console.close();
-                Mouse.setGrabbed(true);
-            } else {
-                console.open();
-                Mouse.setGrabbed(false);
-            }
-        });
+        TypingManager.init("Con1", Keyboard.KEY_T);
 
         Core.update.onEvent(() -> {
             GUIController.update();
