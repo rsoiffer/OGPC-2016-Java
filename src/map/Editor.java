@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
-import static map.CubeType.SAND;
+import static map.CubeType.*;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -24,7 +24,10 @@ import util.*;
 
 public class Editor {
 
+    private static final boolean GENERATE_RANDOM_TERRAIN = true;
+
     public static void main(String[] args) {
+
         //Initial graphics setup
         Core.is3D = true;
         Core.init();
@@ -77,9 +80,31 @@ public class Editor {
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
         //Initial level
-        Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
-            map[x][y][z] = SAND;
-        }));
+        if (GENERATE_RANDOM_TERRAIN) {
+            HeightGenerator hg = new HeightGenerator(101, 101);
+            hg.generate();
+            int[][] hm = hg.getMap();
+            for (int[] m : hm) {
+                for (int j = 0; j < m.length; j++) {
+                    m[j] /= 6;
+                    m[j] = m[j] > 40 ? 40 : m[j];
+                }
+            }
+
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
+                map[x][y][z] = DIRT;
+            }));
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
+                map[x][y][z] = SNOW;
+            }));
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
+                map[x][y][z] = STONE;
+            }));
+        } else {
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
+                map[x][y][z] = SNOW;
+            }));
+        }
         CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
 
