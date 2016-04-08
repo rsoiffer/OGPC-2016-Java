@@ -34,20 +34,20 @@ public class Chunk {
             glBegin(GL_QUADS);
             Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
                 if (map[x][y][z] == ct) {
-                    map[x][y][z].drawFaces(new Vec3(x, y, z));
+                    CubeType.drawFaces(new Vec3(x, y, z));
                 }
             }));
             glEnd();
         }
         if (DRAW_EDGES) {
-            glLineWidth(2);
+            glLineWidth(1);
             BLACK.glColor();
             glDisable(GL_TEXTURE_2D);
             glBegin(GL_LINES);
             Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
-                if (map[x][y][z] != null) {
-                    map[x][y][z].drawEdges(new Vec3(x, y, z));
-                }
+                // if (map[x][y][z] != null) {
+                CubeType.drawEdges(new Vec3(x, y, z));
+                //}
             }));
             glEnd();
         }

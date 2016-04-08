@@ -23,7 +23,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = true;
+    public static boolean IS_MULTIPLAYER = false;
     public static Connection conn;
 
     public static void main(String[] args) {
@@ -64,7 +64,7 @@ public abstract class Client {
 //                t.create();
 //                double x = Math.random() * 5 - 2.5;
 //                double y = Math.random() * 5 - 2.5;
-//                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, Tile.heightAt(new Vec3(i * 3 + x, j * 3 + y, 0))));
+//                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, 10));
 //            }
 //        }
         //Set up GUI
@@ -155,10 +155,9 @@ public abstract class Client {
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
 
         //Create the snow particles
-        new Snow().create();
-
+        //new Snow().create();
         //Create the fog
-        new Fog(Color4.gray(.8), .0025, .95).create();
+        new Fog(new Color4(.95, .8, .3), .0025, .95).create();
 
         //Draw the level
         Core.render.onEvent(() -> {

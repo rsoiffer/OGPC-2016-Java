@@ -44,7 +44,7 @@ public abstract class Premade3D {
     }
 
     public static void makeWASDMovement(AbstractEntity e, double sped) {
-        Supplier<Double> speed = () -> Mouse.isGrabbed() ? (Input.keySignal(KEY_LSHIFT).get() ? 1.5 * sped : sped) : 0;
+        Supplier<Double> speed = () -> Mouse.isGrabbed() ? (Input.keySignal(KEY_LSHIFT).get() ? .5 * sped : sped) : 0;
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
         e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
         Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();

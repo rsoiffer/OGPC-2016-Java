@@ -25,13 +25,11 @@ public class InvisibleMan extends RegisteredEntity {
 
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
-        Premade3D.makeWASDMovement(this, 1);
+        Premade3D.makeWASDMovement(this, 2.5);
         Premade3D.makeGravity(this, new Vec3(0, 0, -10));
 
-        //Set the initial camera position
-        Window3D.pos = new Vec3(0, 0, 1);
         //Make the camera automatically follow the player
-        position.forEach(v -> Window3D.pos = v.add(new Vec3(0, 0, .8)));
+        position.doForEach(v -> Window3D.pos = v.add(new Vec3(0, 0, .8)));
 
         //Make the player collide with the floor
         Premade3D.makeCollisions(this, new Vec3(.3, .3, .9));

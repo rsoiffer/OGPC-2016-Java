@@ -27,7 +27,7 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             chunks[x][y][z] = new Chunk(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
         }));
-        Core.render.onEvent(() -> {
+        Core.render.limit(.5).onEvent(() -> {
             Chunk c = getChunk(Window3D.pos);
             if (c != null) {
                 c.redraw();
@@ -69,7 +69,7 @@ public class CubeMap {
     }
 
     public static boolean isSolid(Vec3 pos) {
-        return getCubeType(pos) != null;
+        return getCubeType(pos) != null || getCube(pos) == null;
     }
 
     public static boolean isSolid(Vec3 pos, Vec3 buf) {
