@@ -24,7 +24,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = false;
+    public static boolean IS_MULTIPLAYER = true;
     public static Connection conn;
 
     public static void main(String[] args) {
