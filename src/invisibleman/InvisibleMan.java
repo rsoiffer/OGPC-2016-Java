@@ -7,6 +7,7 @@ import graphics.Window3D;
 import map.CubeMap;
 import static map.CubeMap.WORLD_SIZE;
 import org.lwjgl.input.Keyboard;
+import static org.lwjgl.input.Keyboard.KEY_LSHIFT;
 import util.Mutable;
 import util.RegisteredEntity;
 import util.Vec3;
@@ -75,8 +76,19 @@ public class InvisibleMan extends RegisteredEntity {
             //Set the footstep's position
             f.set(position.get().add(new Vec3(0, 0, -.88)), Window3D.facing.t, isLeft.o);
 
+            //Walking leaves lighter steps
+            if (Input.keySignal(KEY_LSHIFT).get()) {
+                f.get("opacity", Double.class).set(.5);
+            }
+
             //Make the next footstep switch from left to right or vice-versa
             isLeft.o = !isLeft.o;
         }));
+
+//        add(Core.renderLayer(.6).onEvent(() -> {
+//            Fog.setMinTexColor(1, 1, 1, 1);
+//            Graphics3D.fillEllipse(position.get().add(new Vec3(0, 0, -.8)), new Vec2(.5), BLACK.withA(.5), 20);
+//            Fog.setMinTexColor(0, 0, 0, 0);
+//        }));
     }
 }

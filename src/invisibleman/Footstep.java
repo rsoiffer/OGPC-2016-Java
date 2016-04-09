@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import util.Color4;
 import static util.Color4.BLACK;
 import util.RegisteredEntity;
@@ -19,34 +20,34 @@ import util.Vec3;
 
 public class Footstep extends RegisteredEntity {
 
-    private static List<Footstep> all = new ArrayList();
+    private static List<Footstep> ALL_FOOTSTEPS = new ArrayList();
 
     static {
         Core.renderLayer(.5).onEvent(() -> {
-            Collections.sort(all, Comparator.comparingDouble(f -> -f.get("position", Vec3.class).get().subtract(Window3D.pos).lengthSquared()));
+            Collections.sort(ALL_FOOTSTEPS, Comparator.comparingDouble(f -> -Math.abs(f.get("position", Vec3.class).get().z - Window3D.pos.z)));
 
-            Fog.setMinTexColor(1, 1, 1, 0);
             Texture s = SpriteContainer.loadSprite("footstep_white");
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glEnable(GL_TEXTURE_2D);
             s.bind();
             glBegin(GL_QUADS);
 
-            all.forEach(f -> drawFootstep(f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(),
+            ALL_FOOTSTEPS.forEach(f -> drawFootstep(f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(),
                     f.get("isLeft", Boolean.class).get(), BLACK.withA(f.get("opacity", Double.class).get())));
 
             glEnd();
-            Fog.setMinTexColor(0, 0, 0, 0);
         });
     }
 
     @Override
     public void createInner() {
-        all.add(this);
+        ALL_FOOTSTEPS.add(this);
         //Create the footstep's variables
         Signal<Vec3> position = Premade3D.makePosition(this);
         Signal<Double> rotation = Premade3D.makeRotation(this);
         Signal<Boolean> isLeft = addChild(new Signal(false), "isLeft");
-        Signal<Double> opacity = addChild(Core.time().map(t -> Math.pow(.99, t)), "opacity");
+        Signal<Double> opacity = addChild(Core.update.reduce(1., (dt, x) -> x * Math.pow(.97, dt)), "opacity");
 
         //Make the footstep sink slightly so it does depth order correctly
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));
@@ -58,7 +59,7 @@ public class Footstep extends RegisteredEntity {
     @Override
     public void destroy() {
         super.destroy();
-        all.remove(this);
+        ALL_FOOTSTEPS.remove(this);
     }
 
     public static void drawFootstep(Vec3 pos, double rot, boolean isLeft, Color4 color) {

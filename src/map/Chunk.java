@@ -31,6 +31,8 @@ public class Chunk {
         glEnable(GL_TEXTURE_2D);
         for (CubeType ct : CubeType.values()) {
             ct.texture.bind();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glBegin(GL_QUADS);
             Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
                 if (map[x][y][z] == ct) {
