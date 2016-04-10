@@ -73,9 +73,9 @@ public class CubeMap {
     }
 
     public static boolean isSolid(Vec3 pos, Vec3 buf) {
-        for (double x = pos.x - buf.x; x < Math.ceil(pos.x + buf.x); x++) {
-            for (double y = pos.y - buf.y; y < Math.ceil(pos.y + buf.y); y++) {
-                for (double z = pos.z - buf.z; z < Math.ceil(pos.z + buf.z); z++) {
+        for (double x = pos.x - buf.x; x <= Math.ceil(pos.x + buf.x); x++) {
+            for (double y = pos.y - buf.y; y <= Math.ceil(pos.y + buf.y); y++) {
+                for (double z = pos.z - buf.z; z <= Math.ceil(pos.z + buf.z); z++) {
                     if (isSolid(new Vec3(x, y, z))) {
                         return true;
                     }

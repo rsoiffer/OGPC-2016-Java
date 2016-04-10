@@ -10,6 +10,7 @@ import util.Color4;
 import util.RegisteredEntity;
 import util.Vec2;
 import util.Vec3;
+import static invisibleman.MessageType.HIT;
 
 public class BallAttack extends RegisteredEntity {
 
@@ -33,7 +34,7 @@ public class BallAttack extends RegisteredEntity {
                     //im.get("position", Vec3.class).set(ZERO);
                     im.destroy();
                     new InvisibleMan().create();
-                    Client.sendMessage(2, position.get());
+                    Client.sendMessage(HIT, position.get());
                 }
             }
         })).addChild(this);

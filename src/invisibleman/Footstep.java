@@ -52,8 +52,8 @@ public class Footstep extends RegisteredEntity {
         //Make the footstep sink slightly so it does depth order correctly
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));
 
-        //Destroy the footstep after 5 minutes (will probably change later)
-        Core.timer(300, this::destroy);
+        //Destroy the footstep once it fades enough
+        opacity.filter(x -> x < .0001).onEvent(this::destroy);
     }
 
     @Override
@@ -64,13 +64,14 @@ public class Footstep extends RegisteredEntity {
 
     public static void drawFootstep(Vec3 pos, double rot, boolean isLeft, Color4 color) {
         color.glColor();
-        Graphics3D.drawQuadFast(pos, new Vec2(.3, isLeft ? .3 : -.3), 0, rot);
+        Graphics3D.drawQuadFast(pos.subtract(new Vec2(.15, 0).rotate(rot).toVec3()), new Vec2(.3, isLeft ? .3 : -.3), 0, rot);
     }
 
     //Set the footstep's variables
-    public void set(Vec3 pos, double rot, boolean isLeft) {
+    public void set(Vec3 pos, double rot, boolean isLeft, double opacity) {
         get("position", Vec3.class).set(pos);
         get("rotation", Double.class).set(rot);
         get("isLeft", Boolean.class).set(isLeft);
+        get("opacity", Double.class).set(opacity);
     }
 }

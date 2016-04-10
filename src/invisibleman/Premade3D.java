@@ -11,6 +11,7 @@ import map.CubeMap;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import util.Util;
+import util.Vec2;
 import util.Vec3;
 import static util.Vec3.ZERO;
 import util.Vec3Polar;
@@ -43,20 +44,51 @@ public abstract class Premade3D {
         return e.addChild(Core.update.collect(ZERO, (v, dt) -> position.edit(v.multiply(dt)::add)), "velocity");
     }
 
-    public static void makeWASDMovement(AbstractEntity e, double sped) {
-        Supplier<Double> speed = () -> Mouse.isGrabbed() ? (Input.keySignal(KEY_LSHIFT).get() ? .5 * sped : sped) : 0;
+    public static void makeWASDMovement(AbstractEntity e, double maxSpeed) {
+        Supplier<Double> speed = () -> maxSpeed * (Input.keySignal(KEY_LSHIFT).get() ? .5 : 1);// -> Mouse.isGrabbed() ? (Input.keySignal(KEY_LSHIFT).get() ? .5 * maxSpeed : maxSpeed) : 0;
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
-        e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
-        Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();
-
-        e.add(Input.whileKey(KEY_W, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
-                -> velocity.edit(Window3D.forwards().multiply((onlyW.get() ? 2 : 1) * speed.get())::add)),
-                Input.whileKey(KEY_S, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
-                -> velocity.edit(Window3D.forwards().multiply(-speed.get())::add)),
-                Input.whileKey(KEY_A, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
-                -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.get())::add)),
-                Input.whileKey(KEY_D, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
-                -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get())::add)));
+        e.onUpdate(dt -> {
+            Vec2 dir = new Vec2(0);
+            if (Input.keySignal(KEY_W).get()) {
+                dir = dir.add(new Vec2(1, 0));
+            }
+            if (Input.keySignal(KEY_S).get()) {
+                dir = dir.add(new Vec2(-1, 0));
+            }
+            if (Input.keySignal(KEY_A).get()) {
+                dir = dir.add(new Vec2(0, 1));
+            }
+            if (Input.keySignal(KEY_D).get()) {
+                dir = dir.add(new Vec2(0, -1));
+            }
+            if (dir.equals(new Vec2(0))) {
+                velocity.set(new Vec3(0, 0, velocity.get().z));
+            } else {
+                if (dir.equals(new Vec2(1, 0))) {
+                    dir = dir.withLength(speed.get());
+                } else {
+                    dir = dir.withLength(speed.get() * .75);
+                }
+                dir = dir.rotate(Window3D.facing.t);
+                velocity.set(new Vec3(dir.x, dir.y, velocity.get().z));
+            }
+        });
+//        e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
+//        //Supplier<Boolean> onlyW = () -> Input.keySignal(KEY_W).get() && !Input.keySignal(KEY_S).get() && !Input.keySignal(KEY_A).get() && !Input.keySignal(KEY_D).get();
+//
+//        e.add(Input.whileKey(KEY_W, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
+//                -> velocity.edit(Window3D.forwards().multiply(speed.get())::add)),
+//                Input.whileKey(KEY_S, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
+//                -> velocity.edit(Window3D.forwards().multiply(-speed.get())::add)),
+//                Input.whileKey(KEY_A, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
+//                -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(speed.get())::add)),
+//                Input.whileKey(KEY_D, true).filter(new Signal(Mouse.isGrabbed())).forEach(dt
+//                -> velocity.edit(Window3D.UP.cross(Window3D.forwards()).multiply(-speed.get())::add)));
+//        e.onUpdate(dt -> {
+//            if (velocity.get().toVec2().lengthSquared() > speed.get() * speed.get()) {
+//                velocity.edit(v -> v.toVec2().withLength(speed.get()).toVec3().withZ(v.z));
+//            }
+//        });
     }
 
     public static Signal<Vec3> makeCollisions(AbstractEntity e, Vec3 size) {

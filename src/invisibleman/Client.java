@@ -9,9 +9,12 @@ import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
 import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
-import gui.Console;
 import gui.GUIController;
 import gui.TypingManager;
+import gui.premadeGuis.Chat;
+import static invisibleman.MessageType.*;
+import java.util.Arrays;
+import java.util.function.Consumer;
 import map.CubeMap;
 import network.Connection;
 import network.NetworkUtils;
@@ -25,7 +28,7 @@ import util.*;
 public abstract class Client {
 
     public static boolean IS_MULTIPLAYER = true;
-    public static Connection conn;
+    private static Connection conn;
 
     public static void main(String[] args) {
         if (IS_MULTIPLAYER) {
@@ -49,7 +52,7 @@ public abstract class Client {
         //Hide the mouse
         Mouse.setGrabbed(true);
         //The reset button
-        Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(5));
+        Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(RESTART));
 
         //Load the level
         CubeMap.load("level3.txt");
@@ -69,9 +72,11 @@ public abstract class Client {
 //            }
 //        }
         //Set up GUI
-        Console console = new Console("Con1", Vec2.ZERO, new Vec2(1200, 300));
-        GUIController.add(console);
-        TypingManager.init("Con1", Keyboard.KEY_T);
+        Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
+        TypingManager.init(con);
+        GUIController.add(con);
+
+        Sounds.playSound("ethereal.mp3", true, .05);
 
         Core.update.onEvent(() -> {
             GUIController.update();
@@ -90,45 +95,51 @@ public abstract class Client {
         System.exit(0);
     }
 
-    public static void registerMessageHandlers() {
-        conn.registerHandler(0, () -> {
-            Vec3 pos = conn.read(Vec3.class);
-            double rot = conn.read(Double.class);
-            boolean isLeft = conn.read(Boolean.class);
-            ThreadManager.onMainThread(() -> {
-                Footstep f = new Footstep();
-                f.create();
-                f.set(pos, rot, isLeft);
-            });
+    public static void handleMessage(MessageType type, Consumer<Object[]> handler) {
+        conn.registerHandler(type.id(), () -> {
+            Object[] data = new Object[type.dataTypes.length];
+            for (int i = 0; i < type.dataTypes.length; i++) {
+                data[i] = conn.read(type.dataTypes[i]);
+            }
+            ThreadManager.onMainThread(() -> handler.accept(data));
         });
-        conn.registerHandler(1, () -> {
-            Vec3 pos = conn.read(Vec3.class);
-            Vec3 vel = conn.read(Vec3.class);
-            ThreadManager.onMainThread(() -> {
-                BallAttack b = new BallAttack();
-                b.create();
-                b.get("position", Vec3.class).set(pos);
-                b.get("velocity", Vec3.class).set(vel);
-                b.isEnemy = true;
-            });
-        });
-        conn.registerHandler(2, () -> {
-            Vec3 pos = conn.read(Vec3.class);
-            ThreadManager.onMainThread(() -> {
-                new Explosion(pos, new Color4(1, 0, 0)).create();
-                Sounds.playSound("hit.wav");
-            });
-        });
-        conn.registerHandler(5, () -> ThreadManager.onMainThread(() -> {
-            RegisteredEntity.getAll(BallAttack.class, Explosion.class,
-                    Footstep.class, InvisibleMan.class).forEach(Destructible::destroy);
-            new InvisibleMan().create();
-        }));
     }
 
-    public static void sendMessage(int id, Object... contents) {
+    public static void registerMessageHandlers() {
+        handleMessage(FOOTSTEP, a -> {
+            Footstep f = new Footstep();
+            f.create();
+            f.set((Vec3) a[0], (double) a[1], (boolean) a[2], (double) a[3]);
+        });
+        handleMessage(SNOWBALL, a -> {
+            BallAttack b = new BallAttack();
+            b.create();
+            b.get("position", Vec3.class).set((Vec3) a[0]);
+            b.get("velocity", Vec3.class).set((Vec3) a[1]);
+            b.isEnemy = true;
+        });
+        handleMessage(HIT, a -> {
+            new Explosion((Vec3) a[0], new Color4(1, 0, 0)).create();
+            Sounds.playSound("hit.wav");
+        });
+        handleMessage(SMOKE, a -> {
+            Smoke f = new Smoke();
+            f.create();
+            f.get("position", Vec3.class).set((Vec3) a[0]);
+            f.get("opacity", Double.class).set((double) a[1]);
+        });
+        handleMessage(RESTART, a -> {
+            RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+            new InvisibleMan().create();
+        });
+    }
+
+    public static void sendMessage(MessageType type, Object... contents) {
         if (conn != null && !conn.isClosed()) {
-            conn.sendMessage(id, contents);
+            if (!type.verify(contents)) {
+                throw new RuntimeException("Data " + Arrays.toString(contents) + " does not fit message type " + type);
+            }
+            conn.sendMessage(type.id(), contents);
         }
     }
 
