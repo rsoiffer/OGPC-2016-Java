@@ -13,6 +13,7 @@ import map.CubeMap;
 import static map.CubeMap.WORLD_SIZE;
 import network.Connection;
 import network.NetworkUtils;
+import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -86,7 +87,7 @@ public class Server {
                 sendTo(info, FOOTSTEP, f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(), f.get("isLeft", Boolean.class).get(), f.get("opacity", Double.class).get());
             });
             RegisteredEntity.getAll(Smoke.class).forEach(s -> {
-                sendTo(info, FOOTSTEP, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
+                sendTo(info, SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
             });
         }).start();
 
@@ -164,6 +165,12 @@ public class Server {
         //Draw world
         Core.render.onEvent(() -> CubeMap.drawAll());
 
+        //The reset button
+        Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> {
+            sendToAll(RESTART);
+            RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+        });
+
         //Draw GUI
         Core.renderLayer(100).onEvent(() -> {
             Camera.setProjection2D(new Vec2(0), new Vec2(1200, 800));
@@ -190,8 +197,22 @@ public class Server {
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
+        //Setup the level
         pos = WORLD_SIZE.multiply(.5);
         CubeMap.load("level3.txt");
+
+        //Attack
+        Input.whenMouse(0, true).onEvent(() -> {
+            Vec3 vel = Window3D.facing.toVec3().withLength(30);
+
+            sendToAll(SNOWBALL, pos, vel);
+
+            BallAttack b = new BallAttack();
+            b.create();
+            b.get("position", Vec3.class).set(pos);
+            b.get("velocity", Vec3.class).set(vel);
+        });
+
         Core.run();
     }
 }

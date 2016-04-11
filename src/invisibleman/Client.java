@@ -51,8 +51,6 @@ public abstract class Client {
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
         //Hide the mouse
         Mouse.setGrabbed(true);
-        //The reset button
-        Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> sendMessage(RESTART));
 
         //Load the level
         CubeMap.load("level3.txt");
@@ -76,8 +74,7 @@ public abstract class Client {
         TypingManager.init(con);
         GUIController.add(con);
 
-        Sounds.playSound("ethereal.mp3", true, .05);
-
+        //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(() -> {
             GUIController.update();
         });
