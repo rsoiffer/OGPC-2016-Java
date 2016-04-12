@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import map.CubeMap;
 import network.Connection;
 import network.NetworkUtils;
-import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Keyboard;        
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
@@ -27,7 +27,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = true;
+    public static boolean IS_MULTIPLAYER = false;
     private static Connection conn;
 
     public static void main(String[] args) {
@@ -71,7 +71,7 @@ public abstract class Client {
 //        }
         //Set up GUI
         Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
-        TypingManager.init(con);
+        TypingManager tpm = new TypingManager(con);
         GUIController.add(con);
 
         //Sounds.playSound("ethereal.mp3", true, .05);

@@ -24,7 +24,7 @@ import util.*;
 
 public class Editor {
 
-    private static final boolean GENERATE_RANDOM_TERRAIN = true;
+    private static final boolean GENERATE_RANDOM_TERRAIN = false;
 
     public static void main(String[] args) {
 
