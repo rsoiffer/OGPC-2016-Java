@@ -73,6 +73,9 @@ public abstract class Client {
         Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
         TypingManager tpm = new TypingManager(con);
         GUIController.add(con);
+        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
+                + " shoot a snowball and 't' to access chat. If there are any bugs,"
+                + " report to Rory Soiffer or become a traitor!!!");
 
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(() -> {

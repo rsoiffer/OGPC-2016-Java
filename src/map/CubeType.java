@@ -17,7 +17,9 @@ public enum CubeType {
     STONE("stone"),
     DIRT("dirt"),
     SAND("sand"),
-    SAND_BRICK("sand_brick");
+    SAND_BRICK("sand_brick"),
+    WOOD1("wood001"),
+    WOOD2("wood002"),;
 
     public final Texture texture;
 

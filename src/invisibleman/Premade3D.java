@@ -6,6 +6,7 @@ import engine.Input;
 import engine.Signal;
 import graphics.Window3D;
 import graphics.data.Sprite;
+import static gui.TypingManager.isTyping;
 import java.util.function.Supplier;
 import map.CubeMap;
 import static org.lwjgl.input.Keyboard.*;
@@ -48,29 +49,33 @@ public abstract class Premade3D {
         Supplier<Double> speed = () -> maxSpeed * (Input.keySignal(KEY_LSHIFT).get() ? .5 : 1);// -> Mouse.isGrabbed() ? (Input.keySignal(KEY_LSHIFT).get() ? .5 * maxSpeed : maxSpeed) : 0;
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
         e.onUpdate(dt -> {
-            Vec2 dir = new Vec2(0);
-            if (Input.keySignal(KEY_W).get()) {
-                dir = dir.add(new Vec2(1, 0));
-            }
-            if (Input.keySignal(KEY_S).get()) {
-                dir = dir.add(new Vec2(-1, 0));
-            }
-            if (Input.keySignal(KEY_A).get()) {
-                dir = dir.add(new Vec2(0, 1));
-            }
-            if (Input.keySignal(KEY_D).get()) {
-                dir = dir.add(new Vec2(0, -1));
-            }
-            if (dir.equals(new Vec2(0))) {
-                velocity.set(new Vec3(0, 0, velocity.get().z));
-            } else {
-                if (dir.equals(new Vec2(1, 0))) {
-                    dir = dir.withLength(speed.get());
-                } else {
-                    dir = dir.withLength(speed.get() * .75);
+
+            if (!isTyping()) {
+
+                Vec2 dir = new Vec2(0);
+                if (Input.keySignal(KEY_W).get()) {
+                    dir = dir.add(new Vec2(1, 0));
                 }
-                dir = dir.rotate(Window3D.facing.t);
-                velocity.set(new Vec3(dir.x, dir.y, velocity.get().z));
+                if (Input.keySignal(KEY_S).get()) {
+                    dir = dir.add(new Vec2(-1, 0));
+                }
+                if (Input.keySignal(KEY_A).get()) {
+                    dir = dir.add(new Vec2(0, 1));
+                }
+                if (Input.keySignal(KEY_D).get()) {
+                    dir = dir.add(new Vec2(0, -1));
+                }
+                if (dir.equals(new Vec2(0))) {
+                    velocity.set(new Vec3(0, 0, velocity.get().z));
+                } else {
+                    if (dir.equals(new Vec2(1, 0))) {
+                        dir = dir.withLength(speed.get());
+                    } else {
+                        dir = dir.withLength(speed.get() * .75);
+                    }
+                    dir = dir.rotate(Window3D.facing.t);
+                    velocity.set(new Vec3(dir.x, dir.y, velocity.get().z));
+                }
             }
         });
 //        e.onUpdate(dt -> velocity.set(ZERO.withZ(velocity.get().z)));
