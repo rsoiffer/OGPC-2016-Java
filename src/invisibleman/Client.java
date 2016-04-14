@@ -86,7 +86,7 @@ public abstract class Client {
 
             if (al.size() != 1) {
 
-                return false;
+                return "\\step only accepts one parameter.";
             }
 
             FootstepType fst = null;
@@ -102,13 +102,13 @@ public abstract class Client {
             if (fst != null) {
 
                 Footstep.changePrint(fst.getDir());
-                return true;
+                return "footsteps changed to " + print.toLowerCase();
             }
 
-            return false;
+            return al.get(0) + " is not a footprint type.";
         };
 
-        Command c = new Command("\\step", "\\step [step name]", cr);
+        Command c = new Command("\\step", cr);
         CommController.add(c);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
