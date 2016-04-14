@@ -21,16 +21,20 @@ import util.Vec3;
 public class Footstep extends RegisteredEntity {
 
     private static List<Footstep> ALL_FOOTSTEPS = new ArrayList();
+    private static String texFile;
 
     static {
+        
+        texFile = "footstep_white";
+        
         Core.renderLayer(.5).onEvent(() -> {
             Collections.sort(ALL_FOOTSTEPS, Comparator.comparingDouble(f -> -Math.abs(f.get("position", Vec3.class).get().z - Window3D.pos.z)));
 
-            Texture s = SpriteContainer.loadSprite("footstep_white");
+            Texture footprint = SpriteContainer.loadSprite("footsteps/" + texFile);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glEnable(GL_TEXTURE_2D);
-            s.bind();
+            footprint.bind();
             glBegin(GL_QUADS);
 
             ALL_FOOTSTEPS.forEach(f -> drawFootstep(f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(),
@@ -38,6 +42,11 @@ public class Footstep extends RegisteredEntity {
 
             glEnd();
         });
+    }
+    
+    public static void changePrint(String fn){
+        
+        texFile = fn;
     }
 
     @Override

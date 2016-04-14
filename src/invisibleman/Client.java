@@ -1,5 +1,8 @@
 package invisibleman;
 
+import commands.CommController;
+import commands.CommRun;
+import commands.Command;
 import engine.Core;
 import engine.Destructible;
 import engine.Input;
@@ -18,7 +21,7 @@ import java.util.function.Consumer;
 import map.CubeMap;
 import network.Connection;
 import network.NetworkUtils;
-import org.lwjgl.input.Keyboard;        
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
@@ -76,6 +79,47 @@ public abstract class Client {
         con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
                 + " shoot a snowball and 't' to access chat. If there are any bugs,"
                 + " report to Rory Soiffer or become a traitor!!!");
+
+        Footstep.changePrint(Footprints.PAW.getDir());
+        
+        CommRun cr = al -> {
+
+            System.out.println(al.size());
+            
+            if (al.size() != 1) {
+
+                return false;
+            }
+
+            String print = al.get(0);
+            System.out.println(print);
+            String newPrint;
+            
+            if(print.equalsIgnoreCase("paw")){
+                
+                newPrint = Footprints.PAW.getDir();
+            }else if(print.equalsIgnoreCase("shoe")){
+                
+                newPrint = Footprints.SHOE.getDir();
+            }else if(print.equalsIgnoreCase("steve")){
+                
+                newPrint = Footprints.STEVE.getDir();
+            }else {
+                
+                newPrint = null;
+            }
+
+            if(newPrint != null){
+                
+                Footstep.changePrint(newPrint);
+                return true;
+            }
+            
+            return false;
+        };
+
+        Command c = new Command("\\step", "\\step [step name]", cr);
+        CommController.add(c);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(() -> {
