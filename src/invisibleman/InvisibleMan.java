@@ -34,12 +34,12 @@ public class InvisibleMan extends RegisteredEntity {
         //Flying cheat
         Signal<Boolean> fly = Input.whenKey(KEY_TAB, true).reduce(false, b -> !b);
         add(fly,
-                Input.whileKeyDown(KEY_W).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(20 * dt)::add)),
-                Input.whileKeyDown(KEY_S).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(-20 * dt)::add)),
-                Input.whileKeyDown(KEY_A).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(-20 * dt)::add)),
-                Input.whileKeyDown(KEY_D).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(20 * dt)::add)),
-                Input.whileKeyDown(KEY_SPACE).filter(fly).forEach(dt -> position.edit(UP.multiply(20 * dt)::add)),
-                Input.whileKeyDown(KEY_LSHIFT).filter(fly).forEach(dt -> position.edit(UP.multiply(-20 * dt)::add)),
+                Input.whileKey(KEY_W, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(20 * dt)::add)),
+                Input.whileKey(KEY_S, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(-20 * dt)::add)),
+                Input.whileKey(KEY_A, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(-20 * dt)::add)),
+                Input.whileKey(KEY_D, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(20 * dt)::add)),
+                Input.whileKey(KEY_SPACE, true).filter(fly).forEach(dt -> position.edit(UP.multiply(20 * dt)::add)),
+                Input.whileKey(KEY_LSHIFT, true).filter(fly).forEach(dt -> position.edit(UP.multiply(-20 * dt)::add)),
                 Core.update.filter(fly).forEach(dt -> velocity.set(new Vec3(0))));
 
         //Make the camera automatically follow the player
