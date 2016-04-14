@@ -12,6 +12,8 @@ public enum MessageType {
 
     HIT(Vec3.class), //position
 
+    CHAT_MESSAGE(String.class), //the contents of the message
+
     RESTART(); //no information needed
 
     public final Class[] dataTypes;

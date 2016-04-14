@@ -17,8 +17,8 @@ import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import static util.Color4.RED;
 import util.*;
+import static util.Color4.RED;
 
 public class Server {
 
@@ -43,51 +43,55 @@ public class Server {
 
     public static void main(String[] args) {
         NetworkUtils.server(conn -> {
-            ClientInfo info = new ClientInfo(conn);
-            CLIENTS.add(info);
+            ClientInfo client = new ClientInfo(conn);
+            CLIENTS.add(client);
 
-            Log.print("Client " + info.id + " connected");
+            Log.print("Client " + client.id + " connected");
             conn.onClose(() -> {
-                CLIENTS.remove(info);
-                Log.print("Client " + info.id + " disconnected");
+                CLIENTS.remove(client);
+                Log.print("Client " + client.id + " disconnected");
             });
 
-            handleMessage(info, FOOTSTEP, a -> {
+            handleMessage(client, FOOTSTEP, data -> {
                 Footstep f = new Footstep();
                 f.create();
-                f.set((Vec3) a[0], (double) a[1], (boolean) a[2], (double) a[3]);
-                sendToOthers(info, FOOTSTEP, a);
+                f.set((Vec3) data[0], (double) data[1], (boolean) data[2], (double) data[3]);
+                sendToOthers(client, FOOTSTEP, data);
             });
-            handleMessage(info, SNOWBALL, a -> {
+            handleMessage(client, SNOWBALL, data -> {
                 BallAttack b = new BallAttack();
                 b.create();
-                b.get("position", Vec3.class).set((Vec3) a[0]);
-                b.get("velocity", Vec3.class).set((Vec3) a[1]);
+                b.get("position", Vec3.class).set((Vec3) data[0]);
+                b.get("velocity", Vec3.class).set((Vec3) data[1]);
                 b.isEnemy = true;
-                sendToOthers(info, SNOWBALL, a);
+                sendToOthers(client, SNOWBALL, data);
             });
-            handleMessage(info, HIT, a -> {
-                new Explosion((Vec3) a[0], new Color4(1, 0, 0)).create();
+            handleMessage(client, HIT, data -> {
+                new Explosion((Vec3) data[0], new Color4(1, 0, 0)).create();
                 Sounds.playSound("hit.wav");
-                sendToOthers(info, HIT, a);
+                sendToOthers(client, HIT, data);
             });
-            handleMessage(info, SMOKE, a -> {
+            handleMessage(client, SMOKE, data -> {
                 Smoke f = new Smoke();
                 f.create();
-                f.get("position", Vec3.class).set((Vec3) a[0]);
-                f.get("opacity", Double.class).set((double) a[1]);
-                sendToOthers(info, SMOKE, a);
+                f.get("position", Vec3.class).set((Vec3) data[0]);
+                f.get("opacity", Double.class).set((double) data[1]);
+                sendToOthers(client, SMOKE, data);
             });
-            handleMessage(info, RESTART, a -> {
+            handleMessage(client, CHAT_MESSAGE, data -> {
+                System.out.println(data[0]);
+                sendToOthers(client, CHAT_MESSAGE, data);
+            });
+            handleMessage(client, RESTART, data -> {
                 RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
-                sendToAll(RESTART, a);
+                sendToAll(RESTART, data);
             });
 
             RegisteredEntity.getAll(Footstep.class).forEach(f -> {
-                sendTo(info, FOOTSTEP, f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(), f.get("isLeft", Boolean.class).get(), f.get("opacity", Double.class).get());
+                sendTo(client, FOOTSTEP, f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(), f.get("isLeft", Boolean.class).get(), f.get("opacity", Double.class).get());
             });
             RegisteredEntity.getAll(Smoke.class).forEach(s -> {
-                sendTo(info, SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
+                sendTo(client, SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
             });
         }).start();
 

@@ -9,21 +9,21 @@ package invisibleman;
  *
  * @author Cruz
  */
-public enum Footprints {
-    
+public enum FootstepType {
+
     PAW("footstep_paw"),
     SHOE("footstep_white"),
     STEVE("footstep_steve");
-    
+
     private String texDir;
-    
-    private Footprints(String td){
-        
+
+    private FootstepType(String td) {
+
         texDir = td;
     }
-    
-    public String getDir(){
-        
+
+    public String getDir() {
+
         return texDir;
     }
 }

@@ -24,9 +24,9 @@ public class Footstep extends RegisteredEntity {
     private static String texFile;
 
     static {
-        
+
         texFile = "footstep_white";
-        
+
         Core.renderLayer(.5).onEvent(() -> {
             Collections.sort(ALL_FOOTSTEPS, Comparator.comparingDouble(f -> -Math.abs(f.get("position", Vec3.class).get().z - Window3D.pos.z)));
 
@@ -43,9 +43,9 @@ public class Footstep extends RegisteredEntity {
             glEnd();
         });
     }
-    
-    public static void changePrint(String fn){
-        
+
+    public static void changePrint(String fn) {
+
         texFile = fn;
     }
 

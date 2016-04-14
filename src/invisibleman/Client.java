@@ -25,8 +25,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.TRANSPARENT;
 import util.*;
+import static util.Color4.TRANSPARENT;
 
 public abstract class Client {
 
@@ -80,41 +80,31 @@ public abstract class Client {
                 + " shoot a snowball and 't' to access chat. If there are any bugs,"
                 + " report to Rory Soiffer or become a traitor!!!");
 
-        Footstep.changePrint(Footprints.PAW.getDir());
-        
         CommRun cr = al -> {
 
             System.out.println(al.size());
-            
+
             if (al.size() != 1) {
 
                 return false;
             }
 
+            FootstepType fst = null;
             String print = al.get(0);
-            System.out.println(print);
-            String newPrint;
-            
-            if(print.equalsIgnoreCase("paw")){
-                
-                newPrint = Footprints.PAW.getDir();
-            }else if(print.equalsIgnoreCase("shoe")){
-                
-                newPrint = Footprints.SHOE.getDir();
-            }else if(print.equalsIgnoreCase("steve")){
-                
-                newPrint = Footprints.STEVE.getDir();
-            }else {
-                
-                newPrint = null;
+
+            try {
+
+                fst = FootstepType.valueOf(print.toUpperCase());
+            } catch (IllegalArgumentException iae) {
+
             }
 
-            if(newPrint != null){
-                
-                Footstep.changePrint(newPrint);
+            if (fst != null) {
+
+                Footstep.changePrint(fst.getDir());
                 return true;
             }
-            
+
             return false;
         };
 
