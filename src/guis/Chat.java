@@ -27,6 +27,7 @@ import static gui.TypingManager.typing;
 public class Chat extends ComponentInputGUI {
 
     private final GUIListOutputField output;
+    private final GUICommandField input;
     private final Vec2 pos;
     private final Vec2 dim;
 
@@ -35,13 +36,10 @@ public class Chat extends ComponentInputGUI {
         super(n);
         pos = p;
         dim = d;
-        GUIPanel out = new GUIPanel("Output Panel", pos, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5));
-        GUIPanel in = new GUIPanel("Input Panel", pos.add(new Vec2(0, dim.y - FONT.getHeight())), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5));
+        components.add(new GUIPanel("Output Panel", pos, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
+        components.add(new GUIPanel("Input Panel", pos.add(new Vec2(0, dim.y - FONT.getHeight())), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
         output = new GUIListOutputField("Output Field", this, pos.add(new Vec2(0, dim.y - FONT.getHeight())), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
-        inputs.add(new GUICommandField("Input Field", this, pos.add(new Vec2(0, dim.y)), dim.x, Color.white, Color4.WHITE));
-
-        components.add(out);
-        components.add(in);
+        input = new GUICommandField("Input Field", this, pos.add(new Vec2(0, dim.y)), dim.x, Color.white, Color4.WHITE);
 
         Input.whenKey(key, true).onEvent(() -> {
 
@@ -55,6 +53,7 @@ public class Chat extends ComponentInputGUI {
             this.setVisible(true);
             Mouse.setGrabbed(false);
             typing(this, true, "\\");
+            input.setText("\\");
         });
     }
 
@@ -76,7 +75,7 @@ public class Chat extends ComponentInputGUI {
     public void recieve(String name, Object text) {
 
         String t = (String) text;
-        
+
         if (!t.isEmpty() && t.charAt(0) == '\\') {
 
             output.appendLine(CommController.runCommand(t));
@@ -84,12 +83,12 @@ public class Chat extends ComponentInputGUI {
 
             output.appendLine(t);
         }
-        
+
         inputs.forEach(gcf -> {
-        
-            if(gcf instanceof GUICommandField){
-                
-                ((GUICommandField) gcf).resetIndex();
+
+            if (gcf instanceof GUICommandField) {
+
+                input.resetIndex();
             }
         });
     }
@@ -99,7 +98,7 @@ public class Chat extends ComponentInputGUI {
 
         super.update();
         output.update();
-        inputs.forEach(i -> i.update());
+        input.update();
     }
 
     @Override

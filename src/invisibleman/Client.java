@@ -14,6 +14,7 @@ import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
 import guis.Chat;
+import guis.TitleScreen;
 import static invisibleman.MessageType.*;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -61,6 +62,11 @@ public abstract class Client {
         setupGraphics();
 
         //Set up GUI
+        
+//        TitleScreen ts = new TitleScreen("main menu", new Vec2(500, 500));
+//        TypingManager tpm = new TypingManager(ts);
+//        GUIController.add(ts);
+
         Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
         TypingManager tpm = new TypingManager(con);
         GUIController.add(con);
