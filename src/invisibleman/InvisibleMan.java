@@ -80,23 +80,20 @@ public class InvisibleMan extends RegisteredEntity {
         Mutable<Boolean> isLeft = new Mutable(true);
         //Every .2 seconds, do the following:
         add(Core.update.filter(onGround).limit(.2).combineEventStreams(onGround.distinct()).filter(invincible.map(d -> d < 0)).onEvent(() -> {
+
+            Vec3 pos = position.get().withZ((int) (position.get().z - .9) + .02);
+            double opacity = Input.keySignal(KEY_LSHIFT).get() ? .5 : 1;
+
             //Create the footstep
             Footstep f = new Footstep();
             f.create();
-            double opacity = Input.keySignal(KEY_LSHIFT).get() ? .5 : 1;
-            //Set the footstep's position
-            f.set(position.get().add(new Vec3(0, 0, -.88)), Window3D.facing.t, isLeft.o, opacity);
-
-            //Walking leaves lighter steps
-            if (Input.keySignal(KEY_LSHIFT).get()) {
-                f.get("opacity", Double.class).set(.5);
-            }
+            f.set(pos, Window3D.facing.t, isLeft.o, opacity);
 
             //Make the next footstep switch from left to right or vice-versa
             isLeft.o = !isLeft.o;
 
             //Send a message to the server with the footstep
-            Client.sendMessage(FOOTSTEP, position.get().add(new Vec3(0, 0, -.88)), Window3D.facing.t, isLeft.o, opacity);
+            Client.sendMessage(FOOTSTEP, pos, Window3D.facing.t, isLeft.o, opacity);
         }));
 
         add(Core.update.filter(onGround.map(b -> !b)).limit(.1).onEvent(() -> {

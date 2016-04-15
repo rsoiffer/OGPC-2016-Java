@@ -1,7 +1,6 @@
 package map;
 
 import graphics.Graphics3D;
-import graphics.Window3D;
 import graphics.data.Texture;
 import graphics.loading.SpriteContainer;
 import static map.CubeMap.getCubeType;
@@ -25,7 +24,15 @@ public enum CubeType {
     WOOD5("wood005"),
     WOOD6("wood006"),
     WOOD7("wood007"),
-    WOOD8("wood008"),;
+    WOOD8("wood008"),
+    WOOD1_B("wood_b1"),
+    WOOD2_B("wood_b2"),
+    WOOD3_B("wood_b3"),
+    WOOD4_B("wood_b4"),
+    WOOD5_B("wood_b5"),
+    WOOD6_B("wood_b6"),
+    WOOD7_B("wood_b7"),
+    WOOD8_B("wood_b8");
 
     public final Texture texture;
 
@@ -36,6 +43,9 @@ public enum CubeType {
     public static boolean DRAW_EDGES = true;
 
     public static void drawEdges(Vec3 pos) {
+        if (!DRAW_EDGES) {
+            return;
+        }
         int[][][] isSolid = new int[2][2][2];
         Util.forRange(0, 2, 0, 2, (x, y) -> Util.forRange(0, 2, z -> {
             isSolid[x][y][z] = CubeMap.getCubeType(pos.add(new Vec3(x, y, z))) == null ? 1 : 0;
@@ -56,7 +66,7 @@ public enum CubeType {
     }
 
     public static void drawFaces(Vec3 pos) {
-        double delta = DRAW_EDGES ? Math.min(.005, pos.subtract(Window3D.pos).length() * .0005) : 0;
+        double delta = 0;
         if (getCubeType(pos.add(new Vec3(0, 0, -1))) == null) {
             Graphics3D.drawQuadFast(pos.add(new Vec3(delta)), new Vec2(1 - 2 * delta), 0, 0);
         }

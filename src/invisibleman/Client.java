@@ -1,7 +1,6 @@
 package invisibleman;
 
 import commands.CommController;
-import commands.CommRun;
 import commands.Command;
 import engine.Core;
 import engine.Destructible;
@@ -14,7 +13,7 @@ import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
-import gui.premadeGuis.Chat;
+import guis.Chat;
 import static invisibleman.MessageType.*;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -61,17 +60,6 @@ public abstract class Client {
         //Setup graphics effects
         setupGraphics();
 
-        //Create the trees
-//        for (int i = -15; i <= 15; i += 1) {
-//            for (int j = -15; j <= 15; j += 1) {
-//
-//                Tree t = new Tree();
-//                t.create();
-//                double x = Math.random() * 5 - 2.5;
-//                double y = Math.random() * 5 - 2.5;
-//                t.get("position", Vec3.class).set(new Vec3(i * 3 + x, j * 3 + y, 10));
-//            }
-//        }
         //Set up GUI
         Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
         TypingManager tpm = new TypingManager(con);
@@ -80,44 +68,28 @@ public abstract class Client {
                 + " shoot a snowball and 't' to access chat. If there are any bugs,"
                 + " report to Rory Soiffer or become a traitor!!!");
 
-        CommRun cr = al -> {
-
-            System.out.println(al.size());
+        CommController.add(new Command("\\step", al -> {
 
             if (al.size() != 1) {
-
                 return "\\step only accepts one parameter.";
             }
 
-            FootstepType fst = null;
             String print = al.get(0);
 
             try {
 
-                fst = FootstepType.valueOf(print.toUpperCase());
-            } catch (IllegalArgumentException iae) {
-
-            }
-
-            if (fst != null) {
-
+                FootstepType fst = FootstepType.valueOf(print.toUpperCase());
                 Footstep.changePrint(fst.getDir());
                 return "footsteps changed to " + print.toLowerCase();
+            } catch (IllegalArgumentException iae) {
+
+                return print + " is not a footprint type.";
             }
-
-            return al.get(0) + " is not a footprint type.";
-        };
-
-        Command c = new Command("\\step", cr);
-        CommController.add(c);
+        }));
 
         //Sounds.playSound("ethereal.mp3", true, .05);
-        Core.update.onEvent(() -> {
-            GUIController.update();
-        });
-        Core.renderLayer(100).onEvent(() -> {
-            GUIController.draw();
-        });
+        Core.update.onEvent(GUIController::update);
+        Core.renderLayer(100).onEvent(GUIController::draw);
 
         //Create the player
         new InvisibleMan().create();
