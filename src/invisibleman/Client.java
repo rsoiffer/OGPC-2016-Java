@@ -52,27 +52,41 @@ public abstract class Client {
 
         //Show the fps
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
-        //Hide the mouse
-        Mouse.setGrabbed(true);
-
-        //Load the level
-        CubeMap.load("level3.txt");
-
-        //Setup graphics effects
-        setupGraphics();
-
-        //Set up GUI
-        
-        Chat con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
-        GUIController.add(con);
-        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
-                + " shoot a snowball and 't' to access chat. If there are any bugs,"
-                + " report to Rory Soiffer or become a traitor!!!");
 
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
 
+        //Sounds.playSound("ethereal.mp3", true, .05);
+        Core.update.onEvent(GUIController::update);
+        Core.renderLayer(100).onEvent(GUIController::draw);
+
+        //Start the game        
+        ts.startGame();
+        Core.run();
+
+        //Force the program to stop
+        System.exit(0);
+    }
+
+    public static void game() {
+
+        //Hide the mouse
+        Mouse.setGrabbed(true);
+
+        //Load the level
+        CubeMap.load("levels/level3.txt");
+
+        //Setup graphics effects
+        setupGraphics();
+
+        //Set up GUI
+        Chat con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
+        GUIController.add(con);
+        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
+                + " shoot a snowball and 't' to access chat. If there are any bugs,"
+                + " report to Rory Soiffer or become a traitor!!!");
+        
         CommController.add(new Command("\\step", al -> {
 
             if (al.size() != 1) {
@@ -92,20 +106,8 @@ public abstract class Client {
             }
         }));
 
-        //Sounds.playSound("ethereal.mp3", true, .05);
-        Core.update.onEvent(GUIController::update);
-        Core.renderLayer(100).onEvent(GUIController::draw);
-
         //Create the player
         new InvisibleMan().create();
-
-        //Start the game        
-        
-        ts.startGame();
-        Core.run();
-
-        //Force the program to stop
-        System.exit(0);
     }
 
     public static void handleMessage(MessageType type, Consumer<Object[]> handler) {

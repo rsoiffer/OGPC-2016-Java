@@ -12,6 +12,7 @@ import gui.components.GUIPanel;
 import gui.types.ComponentInputGUI;
 import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
+import invisibleman.Client;
 import java.util.ArrayList;
 import java.util.List;
 import org.lwjgl.input.Mouse;
@@ -83,6 +84,7 @@ public class TitleScreen extends ComponentInputGUI {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
+            Client.game();
         }
     }
 
