@@ -42,7 +42,7 @@ public class Chunk {
             glEnd();
         }
         if (DRAW_EDGES) {
-            glLineWidth(1);
+            glLineWidth(2);
             BLACK.glColor();
             glDisable(GL_TEXTURE_2D);
             glBegin(GL_LINES);
