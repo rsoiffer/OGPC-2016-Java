@@ -8,7 +8,6 @@ package guis;
 import commands.CommController;
 import engine.Input;
 import static gui.GUIController.FONT;
-import gui.TypingManager;
 import gui.components.GUICommandField;
 import gui.components.GUIListOutputField;
 import gui.components.GUIPanel;
@@ -21,6 +20,8 @@ import util.Vec2;
 import gui.types.GUIInputComponent;
 import static gui.TypingManager.typing;
 import gui.types.GUIComponent;
+import invisibleman.Client;
+import static invisibleman.MessageType.CHAT_MESSAGE;
 import java.util.List;
 
 /**
@@ -100,6 +101,7 @@ public class Chat extends ComponentInputGUI {
             } else {
 
                 output.appendLine(t);
+                Client.sendMessage(CHAT_MESSAGE, text);
             }
 
             inputs.forEach(gcf -> {

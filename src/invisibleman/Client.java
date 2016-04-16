@@ -30,9 +30,9 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = false;
+    public static boolean IS_MULTIPLAYER = true;
     private static Connection conn;
-    public static TypingManager tpm;
+    public static Chat con;
 
     public static void main(String[] args) {
         if (IS_MULTIPLAYER) {
@@ -55,7 +55,7 @@ public abstract class Client {
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
 
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
-        tpm = new TypingManager(ts);
+        TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
@@ -82,7 +82,7 @@ public abstract class Client {
         setupGraphics();
 
         //Set up GUI
-        Chat con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
+        con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
         GUIController.add(con);
         con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
                 + " shoot a snowball and 't' to access chat. If there are any bugs,"
@@ -122,6 +122,12 @@ public abstract class Client {
     }
 
     public static void registerMessageHandlers() {
+        
+        handleMessage(CHAT_MESSAGE, a -> {
+        
+                con.addChat((String) a[0]);
+        });
+        
         handleMessage(FOOTSTEP, a -> {
             Footstep f = new Footstep();
             f.create();

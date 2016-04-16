@@ -51,6 +51,11 @@ public class Server {
                 CLIENTS.remove(client);
                 Log.print("Client " + client.id + " disconnected");
             });
+            
+            handleMessage(client, CHAT_MESSAGE, data -> {
+            
+                sendToOthers(client, CHAT_MESSAGE, data);
+            });
 
             handleMessage(client, FOOTSTEP, data -> {
                 Footstep f = new Footstep();
