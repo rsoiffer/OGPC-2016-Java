@@ -72,7 +72,6 @@ public abstract class Client {
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
-        ts.startGame();
 
         CommController.add(new Command("\\step", al -> {
 
@@ -100,7 +99,9 @@ public abstract class Client {
         //Create the player
         new InvisibleMan().create();
 
-        //Start the game
+        //Start the game        
+        
+        ts.startGame();
         Core.run();
 
         //Force the program to stop
