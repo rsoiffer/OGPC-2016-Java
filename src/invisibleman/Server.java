@@ -203,7 +203,7 @@ public class Server {
 
         //Setup the level
         pos = WORLD_SIZE.multiply(.5);
-        CubeMap.load("level3.txt");
+        CubeMap.load("levels/level3.txt");
 
         //Attack
         Input.whenMouse(0, true).onEvent(() -> {

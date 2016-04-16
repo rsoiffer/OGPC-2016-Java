@@ -8,6 +8,7 @@ package guis;
 import commands.CommController;
 import engine.Input;
 import static gui.GUIController.FONT;
+import gui.TypingManager;
 import gui.components.GUICommandField;
 import gui.components.GUIListOutputField;
 import gui.components.GUIPanel;
@@ -19,6 +20,8 @@ import util.Color4;
 import util.Vec2;
 import gui.types.GUIInputComponent;
 import static gui.TypingManager.typing;
+import gui.types.GUIComponent;
+import java.util.List;
 
 /**
  *
@@ -29,12 +32,14 @@ public class Chat extends ComponentInputGUI {
     private final GUIListOutputField output;
     private final GUICommandField input;
     private final Vec2 dim;
+    private boolean first;
 
     public Chat(String n, int key, Vec2 d) {
 
         super(n);
         dim = d;
         grabbed = false;
+        first = true;
         components.add(new GUIPanel("Output Panel", Vec2.ZERO, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
         components.add(new GUIPanel("Input Panel", new Vec2(0, dim.y - FONT.getHeight()), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
         output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y - FONT.getHeight()), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
@@ -46,6 +51,7 @@ public class Chat extends ComponentInputGUI {
             grabbed = Mouse.isGrabbed();
             Mouse.setGrabbed(false);
             typing(this, true);
+            setLeave();
         });
 
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> {
@@ -55,15 +61,13 @@ public class Chat extends ComponentInputGUI {
             Mouse.setGrabbed(false);
             typing(this, true, "\\");
             input.setText("\\");
+            setLeave();
         });
     }
 
-    @Override
-    public void setVisible(boolean v) {
+    public void setLeave() {
 
-        super.setVisible(v);
-
-        if (v) {
+        if (first) {
 
             Input.whenKey(1, true).onEvent(() -> {
 
@@ -73,6 +77,8 @@ public class Chat extends ComponentInputGUI {
                 input.setText("");
             });
         }
+
+        first = false;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class Chat extends ComponentInputGUI {
     public void recieve(String name, Object text) {
 
         if (name.equals("Input Field")) {
-            
+
             String t = (String) text;
 
             if (!t.isEmpty() && t.charAt(0) == '\\') {
@@ -104,6 +110,19 @@ public class Chat extends ComponentInputGUI {
                 }
             });
         }
+    }
+
+    @Override
+    public List<GUIComponent> mousePressed(Vec2 p) {
+        
+        List<GUIComponent> list = super.mousePressed(p);
+        
+        if(input.containsClick(p)){
+            
+            list.add(input);
+        }
+        
+        return list;
     }
 
     @Override
