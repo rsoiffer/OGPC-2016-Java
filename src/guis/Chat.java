@@ -60,6 +60,7 @@ public class Chat extends ComponentInputGUI {
             Mouse.setGrabbed(false);
             typing(this, true, "\\");
             input.setText("\\");
+            input.setCursorPos(new Vec2(1, 0));
             setLeave();
         });
     }
@@ -139,5 +140,10 @@ public class Chat extends ComponentInputGUI {
     public void addChat(String s) {
 
         output.appendLine(s);
+    }
+    
+    public void clearChat(){
+        
+        output.clear();
     }
 }

@@ -16,7 +16,9 @@ import gui.TypingManager;
 import guis.Chat;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import map.CubeMap;
 import network.Connection;
@@ -30,7 +32,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = true;
+    public static boolean IS_MULTIPLAYER = false;
     private static Connection conn;
     public static Chat con;
 
@@ -105,6 +107,25 @@ public abstract class Client {
 
                 return print + " is not a footprint type.";
             }
+        }));
+        
+        CommController.add(new Command("\\clear", al -> {
+            
+            if(al.size()!=0) return "\\clear does not accept any parameters.";
+            con.clearChat();
+            
+            return "";
+        }));
+        
+        CommController.add(new Command("\\steplist", al -> {
+            
+            if(al.size()!=0) return "\\steplist does not accept any parameters.";
+            String s = "";
+            for(FootstepType fst : FootstepType.values()){
+                
+                s += fst.name().toLowerCase() + " ";
+            }
+            return s;
         }));
 
         //Create the player
