@@ -63,16 +63,16 @@ public abstract class Client {
 
         //Set up GUI
         
-        TitleScreen ts = new TitleScreen("main menu", new Vec2(500, 500));
+        Chat con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
+        GUIController.add(con);
+        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
+                + " shoot a snowball and 't' to access chat. If there are any bugs,"
+                + " report to Rory Soiffer or become a traitor!!!");
+
+        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
-
-//        Chat con = new Chat("Con1", Keyboard.KEY_T, Vec2.ZERO, new Vec2(700, 700));
-//        TypingManager tpm = new TypingManager(con);
-//        GUIController.add(con);
-//        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
-//                + " shoot a snowball and 't' to access chat. If there are any bugs,"
-//                + " report to Rory Soiffer or become a traitor!!!");
+        ts.startGame();
 
         CommController.add(new Command("\\step", al -> {
 

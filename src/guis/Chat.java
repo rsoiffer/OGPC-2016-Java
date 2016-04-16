@@ -28,22 +28,22 @@ public class Chat extends ComponentInputGUI {
 
     private final GUIListOutputField output;
     private final GUICommandField input;
-    private final Vec2 pos;
     private final Vec2 dim;
 
-    public Chat(String n, int key, Vec2 p, Vec2 d) {
+    public Chat(String n, int key, Vec2 d) {
 
         super(n);
-        pos = p;
         dim = d;
-        components.add(new GUIPanel("Output Panel", pos, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
-        components.add(new GUIPanel("Input Panel", pos.add(new Vec2(0, dim.y - FONT.getHeight())), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
-        output = new GUIListOutputField("Output Field", this, pos.add(new Vec2(0, dim.y - FONT.getHeight())), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
-        input = new GUICommandField("Input Field", this, pos.add(new Vec2(0, dim.y)), dim.x, Color.white, Color4.WHITE);
+        grabbed = false;
+        components.add(new GUIPanel("Output Panel", Vec2.ZERO, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
+        components.add(new GUIPanel("Input Panel", new Vec2(0, dim.y - FONT.getHeight()), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
+        output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y - FONT.getHeight()), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
+        input = new GUICommandField("Input Field", this, new Vec2(0, dim.y), dim.x, Color.white, Color4.WHITE);
 
         Input.whenKey(key, true).onEvent(() -> {
 
             this.setVisible(true);
+            grabbed = Mouse.isGrabbed();
             Mouse.setGrabbed(false);
             typing(this, true);
         });
@@ -51,6 +51,7 @@ public class Chat extends ComponentInputGUI {
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> {
 
             this.setVisible(true);
+            grabbed = Mouse.isGrabbed();
             Mouse.setGrabbed(false);
             typing(this, true, "\\");
             input.setText("\\");
@@ -58,39 +59,51 @@ public class Chat extends ComponentInputGUI {
     }
 
     @Override
+    public void setVisible(boolean v) {
+
+        super.setVisible(v);
+
+        if (v) {
+
+            Input.whenKey(1, true).onEvent(() -> {
+
+                this.setVisible(false);
+                Mouse.setGrabbed(grabbed);
+                typing(this, false, "");
+                input.setText("");
+            });
+        }
+    }
+
+    @Override
     public GUIInputComponent getDefaultComponent() {
 
-        for (GUIInputComponent gcf : inputs) {
-
-            if (gcf.getName().equals("Input Field")) {
-
-                return gcf;
-            }
-        }
-
-        return null;
+        return input;
     }
 
     @Override
     public void recieve(String name, Object text) {
 
-        String t = (String) text;
+        if (name.equals("Input Field")) {
+            
+            String t = (String) text;
 
-        if (!t.isEmpty() && t.charAt(0) == '\\') {
+            if (!t.isEmpty() && t.charAt(0) == '\\') {
 
-            output.appendLine(CommController.runCommand(t));
-        } else {
+                output.appendLine(CommController.runCommand(t));
+            } else {
 
-            output.appendLine(t);
-        }
-
-        inputs.forEach(gcf -> {
-
-            if (gcf instanceof GUICommandField) {
-
-                input.resetIndex();
+                output.appendLine(t);
             }
-        });
+
+            inputs.forEach(gcf -> {
+
+                if (gcf instanceof GUICommandField) {
+
+                    input.resetIndex();
+                }
+            });
+        }
     }
 
     @Override
@@ -106,7 +119,7 @@ public class Chat extends ComponentInputGUI {
 
         super.draw();
         output.draw();
-        inputs.forEach(i -> i.draw());
+        input.draw();
     }
 
     public void addChat(String s) {
