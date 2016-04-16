@@ -33,14 +33,12 @@ public class Chat extends ComponentInputGUI {
     private final GUIListOutputField output;
     private final GUICommandField input;
     private final Vec2 dim;
-    private boolean first;
 
     public Chat(String n, int key, Vec2 d) {
 
         super(n);
         dim = d;
         grabbed = false;
-        first = true;
         components.add(new GUIPanel("Output Panel", Vec2.ZERO, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
         components.add(new GUIPanel("Input Panel", new Vec2(0, dim.y - FONT.getHeight()), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
         output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y - FONT.getHeight()), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
@@ -67,9 +65,7 @@ public class Chat extends ComponentInputGUI {
     }
 
     public void setLeave() {
-
-        if (first) {
-
+        
             Input.whenKey(1, true).onEvent(() -> {
 
                 this.setVisible(false);
@@ -77,9 +73,6 @@ public class Chat extends ComponentInputGUI {
                 typing(this, false, "");
                 input.setText("");
             });
-        }
-
-        first = false;
     }
 
     @Override
