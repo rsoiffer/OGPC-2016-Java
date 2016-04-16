@@ -43,26 +43,45 @@ public enum CubeType {
     public static boolean DRAW_EDGES = true;
 
     public static void drawEdges(Vec3 pos) {
-        if (!DRAW_EDGES) {
-            return;
-        }
+        double d = 0.05;
         int[][][] isSolid = new int[2][2][2];
         Util.forRange(0, 2, 0, 2, (x, y) -> Util.forRange(0, 2, z -> {
-            isSolid[x][y][z] = CubeMap.getCubeType(pos.add(new Vec3(x, y, z))) == null ? 1 : 0;
+            isSolid[x][y][z] = CubeMap.isSolid(pos.add(new Vec3(x, y, z)))? 0 : 1;
         }));
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < 2; k++) {
+                    if(isSolid[i][j][k] == 1) continue;
+                    Vec3 dir = new Vec3(i==0?-1:1,j==0?-1:1,k==0?-1:1);
+                    
+                    if((isSolid[i][1-j][k] | isSolid[i][j][1-k])==0){
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withX(0)).multiply(d).glVertex();
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withX(0)).multiply(d).add(Vec3.ZERO.withX(dir.x*(1-(CubeMap.isSolid(pos.add(new Vec3(i+dir.x,j,k)))?1:0)))).glVertex();
+                    }
+                    if((isSolid[1-i][j][k] | isSolid[i][j][1-k])==0){
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withY(0)).multiply(d).glVertex();
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withY(0)).multiply(d).add(Vec3.ZERO.withY(dir.y*(1-(CubeMap.isSolid(pos.add(new Vec3(i,j+dir.y,k)))?1:0)))).glVertex();
+                    }
+                    if((isSolid[1-i][j][k] | isSolid[i][1-j][k])==0){
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withZ(0)).multiply(d).glVertex();
+                        pos.add(new Vec3(i,j,k+10)).multiply(dir.withZ(0)).multiply(d).add(Vec3.ZERO.withX(dir.x*(1-(CubeMap.isSolid(pos.add(new Vec3(i,j,k+dir.z)))?1:0)))).glVertex();
+                    }
+                }
+            }
+        }
 
-        if (isSolid[0][0][0] + isSolid[1][1][0] != isSolid[1][0][0] + isSolid[0][1][0]) {
-            pos.add(new Vec3(1, 1, 0)).glVertex();
-            pos.add(new Vec3(1)).glVertex();
-        }
-        if (isSolid[0][0][0] + isSolid[1][0][1] != isSolid[1][0][0] + isSolid[0][0][1]) {
-            pos.add(new Vec3(1, 0, 1)).glVertex();
-            pos.add(new Vec3(1)).glVertex();
-        }
-        if (isSolid[0][0][0] + isSolid[0][1][1] != isSolid[0][1][0] + isSolid[0][0][1]) {
-            pos.add(new Vec3(0, 1, 1)).glVertex();
-            pos.add(new Vec3(1)).glVertex();
-        }
+//        if (isSolid[0][0][0] + isSolid[1][1][0] != isSolid[1][0][0] + isSolid[0][1][0]) {
+//            pos.add(new Vec3(1, 1, 0)).glVertex();
+//            pos.add(new Vec3(1)).glVertex();
+//        }
+//        if (isSolid[0][0][0] + isSolid[1][0][1] != isSolid[1][0][0] + isSolid[0][0][1]) {
+//            pos.add(new Vec3(1, 0, 1)).glVertex();
+//            pos.add(new Vec3(1)).glVertex();
+//        }
+//        if (isSolid[0][0][0] + isSolid[0][1][1] != isSolid[0][1][0] + isSolid[0][0][1]) {
+//            pos.add(new Vec3(0, 1, 1)).glVertex();
+//            pos.add(new Vec3(1)).glVertex();
+//        }
     }
 
     public static void drawFaces(Vec3 pos) {
