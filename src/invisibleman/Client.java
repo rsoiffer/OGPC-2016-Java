@@ -16,9 +16,7 @@ import gui.TypingManager;
 import guis.Chat;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import map.CubeMap;
 import network.Connection;
@@ -108,21 +106,25 @@ public abstract class Client {
                 return print + " is not a footprint type.";
             }
         }));
-        
+
         CommController.add(new Command("\\clear", al -> {
-            
-            if(al.size()!=0) return "\\clear does not accept any parameters.";
+
+            if (al.size() != 0) {
+                return "\\clear does not accept any parameters.";
+            }
             con.clearChat();
-            
+
             return "";
         }));
-        
+
         CommController.add(new Command("\\steplist", al -> {
-            
-            if(al.size()!=0) return "\\steplist does not accept any parameters.";
+
+            if (al.size() != 0) {
+                return "\\steplist does not accept any parameters.";
+            }
             String s = "";
-            for(FootstepType fst : FootstepType.values()){
-                
+            for (FootstepType fst : FootstepType.values()) {
+
                 s += fst.name().toLowerCase() + " ";
             }
             return s;
@@ -143,35 +145,37 @@ public abstract class Client {
     }
 
     public static void registerMessageHandlers() {
-        
-        handleMessage(CHAT_MESSAGE, a -> {
-        
-                con.addChat((String) a[0]);
-        });
-        
-        handleMessage(FOOTSTEP, a -> {
+        handleMessage(FOOTSTEP, data -> {
             Footstep f = new Footstep();
             f.create();
-            f.set((Vec3) a[0], (double) a[1], (boolean) a[2], (double) a[3]);
+            f.set((Vec3) data[0], (double) data[1], (boolean) data[2], (double) data[3]);
         });
-        handleMessage(SNOWBALL, a -> {
+
+        handleMessage(SMOKE, data -> {
+            Smoke s = new Smoke();
+            s.create();
+            s.get("position", Vec3.class).set((Vec3) data[0]);
+            s.get("opacity", Double.class).set((double) data[1]);
+        });
+
+        handleMessage(SNOWBALL, data -> {
             BallAttack b = new BallAttack();
             b.create();
-            b.get("position", Vec3.class).set((Vec3) a[0]);
-            b.get("velocity", Vec3.class).set((Vec3) a[1]);
+            b.get("position", Vec3.class).set((Vec3) data[0]);
+            b.get("velocity", Vec3.class).set((Vec3) data[1]);
             b.isEnemy = true;
         });
-        handleMessage(HIT, a -> {
-            new Explosion((Vec3) a[0], new Color4(1, 0, 0)).create();
+
+        handleMessage(HIT, data -> {
+            new Explosion((Vec3) data[0], new Color4(1, 0, 0)).create();
             Sounds.playSound("hit.wav");
         });
-        handleMessage(SMOKE, a -> {
-            Smoke f = new Smoke();
-            f.create();
-            f.get("position", Vec3.class).set((Vec3) a[0]);
-            f.get("opacity", Double.class).set((double) a[1]);
+
+        handleMessage(CHAT_MESSAGE, data -> {
+            con.addChat((String) data[0]);
         });
-        handleMessage(RESTART, a -> {
+
+        handleMessage(RESTART, data -> {
             RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
             new InvisibleMan().create();
         });

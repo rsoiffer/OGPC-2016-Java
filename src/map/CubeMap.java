@@ -1,7 +1,5 @@
 package map;
 
-import engine.Core;
-import graphics.Window3D;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +17,7 @@ import util.Vec3;
 
 public class CubeMap {
 
-    public static final int WIDTH = 100, DEPTH = 100, HEIGHT = 40;
+    public static final int WIDTH = 100, DEPTH = 100, HEIGHT = 60;
     public static final Vec3 WORLD_SIZE = new Vec3(WIDTH, DEPTH, HEIGHT);
     public static final CubeType[][][] map = new CubeType[WIDTH][DEPTH][HEIGHT];
     public static final Chunk[][][] chunks = new Chunk[WIDTH / CHUNK_SIZE][DEPTH / CHUNK_SIZE][HEIGHT / CHUNK_SIZE];
@@ -28,12 +26,6 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             chunks[x][y][z] = new Chunk(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
         }));
-        Core.render.limit(.5).onEvent(() -> {
-            Chunk c = getChunk(Window3D.pos);
-            if (c != null) {
-                c.redraw();
-            }
-        });
     }
 
     public static void drawAll() {

@@ -25,6 +25,7 @@ import static util.Color4.*;
 public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
+    private static final String LEVEL_NAME = "current";
 
     public static void main(String[] args) {
 
@@ -203,10 +204,10 @@ public class Editor {
 
         //Save and load
         Input.whenKey(KEY_RETURN, true).combineEventStreams(Core.interval(60)).onEvent(() -> {
-            CubeMap.save("levels/autosaves/level" + System.currentTimeMillis() + ".txt");
-            CubeMap.save("levels/level_current.txt");
+            CubeMap.save("levels/autosaves/level_" + LEVEL_NAME + "_" + System.currentTimeMillis() + ".txt");
+            CubeMap.save("levels/level_" + LEVEL_NAME + ".txt");
         });
-        Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_current.txt"));
+        Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_" + LEVEL_NAME + ".txt"));
 
         Core.run();
     }
