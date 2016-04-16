@@ -32,6 +32,7 @@ public abstract class Client {
 
     public static boolean IS_MULTIPLAYER = false;
     private static Connection conn;
+    public static TypingManager tpm;
 
     public static void main(String[] args) {
         if (IS_MULTIPLAYER) {
@@ -54,7 +55,7 @@ public abstract class Client {
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
 
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
-        TypingManager tpm = new TypingManager(ts);
+        tpm = new TypingManager(ts);
         GUIController.add(ts);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
