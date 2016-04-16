@@ -25,8 +25,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import util.*;
 import static util.Color4.TRANSPARENT;
+import util.*;
 
 public abstract class Client {
 
@@ -62,7 +62,7 @@ public abstract class Client {
         Core.update.onEvent(GUIController::update);
         Core.renderLayer(100).onEvent(GUIController::draw);
 
-        //Start the game        
+        //Start the game
         ts.startGame();
         Core.run();
 
@@ -76,7 +76,7 @@ public abstract class Client {
         Mouse.setGrabbed(true);
 
         //Load the level
-        CubeMap.load("levels/level3.txt");
+        CubeMap.load("levels/level_sandtemple.txt");
 
         //Setup graphics effects
         setupGraphics();
@@ -87,7 +87,7 @@ public abstract class Client {
         con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
                 + " shoot a snowball and 't' to access chat. If there are any bugs,"
                 + " report to Rory Soiffer or become a traitor!!!");
-        
+
         CommController.add(new Command("\\step", al -> {
 
             if (al.size() != 1) {

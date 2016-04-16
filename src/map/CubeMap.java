@@ -2,6 +2,7 @@ package map;
 
 import engine.Core;
 import graphics.Window3D;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -87,6 +88,9 @@ public class CubeMap {
 
     public static void load(String fileName) {
         try {
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+                map[x][y][z] = null;
+            }));
             Files.readAllLines(Paths.get(fileName)).forEach(s -> {
                 int x = Integer.parseInt(s.substring(0, s.indexOf(" ")));
                 s = s.substring(s.indexOf(" ") + 1);
@@ -149,5 +153,20 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             chunks[x][y][z].redraw();
         }));
+    }
+
+    public static void save(String fileName) {
+        try {
+            PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+                CubeType ct = map[x][y][z];
+                if (ct != null) {
+                    writer.println(x + " " + y + " " + z + " " + ct.name());
+                }
+            }));
+            writer.close();
+        } catch (Exception ex) {
+            Log.error(ex);
+        }
     }
 }

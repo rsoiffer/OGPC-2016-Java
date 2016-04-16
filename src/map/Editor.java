@@ -11,7 +11,6 @@ import graphics.Window3D;
 import static graphics.Window3D.*;
 import invisibleman.Fog;
 import invisibleman.Premade3D;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
@@ -21,6 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static util.Color4.*;
 import util.*;
+import static util.Color4.*;
 
 public class Editor {
 
@@ -203,28 +203,10 @@ public class Editor {
 
         //Save and load
         Input.whenKey(KEY_RETURN, true).combineEventStreams(Core.interval(60)).onEvent(() -> {
-            try {
-                PrintWriter writer = new PrintWriter("autosaves/level" + System.currentTimeMillis() + ".txt", "UTF-8");
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                    CubeType ct = map[x][y][z];
-                    writer.println(x + " " + y + " " + z + " " + (ct == null ? "null" : ct.name()));
-                }));
-                writer.close();
-            } catch (Exception ex) {
-                Log.error(ex);
-            }
-            try {
-                PrintWriter writer = new PrintWriter("level3.txt", "UTF-8");
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                    CubeType ct = map[x][y][z];
-                    writer.println(x + " " + y + " " + z + " " + (ct == null ? "null" : ct.name()));
-                }));
-                writer.close();
-            } catch (Exception ex) {
-                Log.error(ex);
-            }
+            CubeMap.save("levels/autosaves/level" + System.currentTimeMillis() + ".txt");
+            CubeMap.save("levels/level_current.txt");
         });
-        Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("level3.txt"));
+        Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_current.txt"));
 
         Core.run();
     }
