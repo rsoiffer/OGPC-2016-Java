@@ -25,6 +25,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static util.Color4.*;
 import util.*;
+import static util.Color4.*;
 
 public class Editor {
 
@@ -32,7 +33,7 @@ public class Editor {
     private static final String LEVEL_NAME = "current";
     private static final boolean IS_MULTIPLAYER = true;
     private static Connection conn;
-    
+
     public static void main(String[] args) {
         if (IS_MULTIPLAYER) {
             //Try to connect to the server
@@ -125,7 +126,7 @@ public class Editor {
                 }));
             }
         }
-        
+
         CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
 
@@ -148,12 +149,7 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = null;
-                                if(IS_MULTIPLAYER){
-                                    List<Object> data = new ArrayList();
-                                    data.add(new Vec3(x,y,z));
-                                    data.add(null);
-                                    sendMessage(BLOCK_PLACE, data);
-                                }
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), null);
                             }));
                     CubeMap.redrawAll();
                 });
@@ -173,12 +169,7 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = CubeType.values()[selected.o];
-                                if(IS_MULTIPLAYER){
-                                    List<Object> data = new ArrayList();
-                                    data.add(new Vec3(x,y,z));
-                                    data.add(CubeType.values()[selected.o]);
-                                    sendMessage(BLOCK_PLACE, data);
-                                }
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
                             }));
                     CubeMap.redrawAll();
                 });
@@ -243,6 +234,7 @@ public class Editor {
 
         Core.run();
     }
+
     public static void handleMessage(MessageType type, Consumer<Object[]> handler) {
         conn.registerHandler(type.id(), () -> {
             Object[] data = new Object[type.dataTypes.length];
@@ -252,34 +244,40 @@ public class Editor {
             ThreadManager.onMainThread(() -> handler.accept(data));
         });
     }
+
     public static void registerMessageHandlers() {
-        handleMessage(FOOTSTEP, data -> {});
+        handleMessage(FOOTSTEP, data -> {
+        });
 
-        handleMessage(SMOKE, data -> {});
+        handleMessage(SMOKE, data -> {
+        });
 
-        handleMessage(SNOWBALL, data -> {});
+        handleMessage(SNOWBALL, data -> {
+        });
 
-        handleMessage(HIT, data -> {});
+        handleMessage(HIT, data -> {
+        });
 
-        handleMessage(CHAT_MESSAGE, data -> {});
-        
+        handleMessage(CHAT_MESSAGE, data -> {
+        });
+
         handleMessage(BLOCK_PLACE, data -> {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
-            CubeMap.map[(int)coords.x][(int)coords.y][(int)coords.z] = (CubeType) args.get(1);
+            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = (CubeType) args.get(1);
             CubeMap.redraw((Vec3) args.get(0));
         });
-        
+
         handleMessage(MAP_FILE, data -> {
             CubeMap.load("levels/level_" + data[0] + ".txt");
             CubeMap.redrawAll();
         });
-        
-//        handleMessage(SEND_FILE, data -> {
-//            
-//        });
 
-        handleMessage(RESTART, data -> {});
+//        handleMessage(SEND_FILE, data -> {
+//
+//        });
+        handleMessage(RESTART, data -> {
+        });
     }
 
     public static void sendMessage(MessageType type, Object... contents) {
