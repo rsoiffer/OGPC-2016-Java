@@ -16,9 +16,12 @@ import gui.TypingManager;
 import guis.Chat;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import map.CubeMap;
+import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -109,7 +112,7 @@ public abstract class Client {
 
         CommController.add(new Command("\\clear", al -> {
 
-            if (al.size() != 0) {
+            if (!al.isEmpty()) {
                 return "\\clear does not accept any parameters.";
             }
             con.clearChat();
@@ -119,7 +122,7 @@ public abstract class Client {
 
         CommController.add(new Command("\\steplist", al -> {
 
-            if (al.size() != 0) {
+            if (!al.isEmpty()) {
                 return "\\steplist does not accept any parameters.";
             }
             String s = "";
@@ -128,6 +131,70 @@ public abstract class Client {
                 s += fst.name().toLowerCase() + " ";
             }
             return s;
+        }));
+        
+        CommController.add(new Command("\\setblock", al->{
+            if(al.size()>4){
+                return "Too many arguments. Usage: \\setblock (x) (y) (z) (type)";
+            }
+            if(al.size()<4){
+                return "Not enough arguments. Usage: \\setblock (x) (y) (z) (type)";
+            }
+            int[] coords = new int[3];
+            boolean[] relative = {false,false,false};
+            Vec3 pos;
+            Vec3 ppos = RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).get();
+            for (int i = 0; i < 3; i++) {
+                if(al.get(i).startsWith(":")){
+                    relative[i] = true;
+                    al.set(i, al.get(i).substring(1));
+                }
+                try{
+                    coords[i] = Integer.parseInt(al.get(i));
+                } catch (Exception e) {
+                    return "Invalid argument: " + al.get(i) + ". Usage: \\setblock (x) (y) (z) (type)";
+                }
+            }
+            pos = new Vec3(coords[0]+(relative[0]?ppos.x:0),coords[1]+(relative[1]?ppos.y:0),coords[2]+(relative[2]?ppos.z:0));
+            List<Object> data = new ArrayList();
+            data.add(pos);
+            try {
+                data.add(al.get(3).equals("null")?null:CubeType.valueOf(al.get(3)));
+            } catch (Exception e){
+                return "Invalid block type.";
+            }
+            CubeMap.map[(int)pos.x][(int)pos.y][(int)pos.z] = (CubeType) data.get(1);
+            CubeMap.redraw((Vec3) pos);
+            if(IS_MULTIPLAYER) sendMessage(BLOCK_PLACE, data);
+            return "Block placed.";
+        }));
+        CommController.add(new Command("\\pos", al->{
+            if (!al.isEmpty()) {
+                return "\\pos does not accept any parameters.";
+            }
+            Vec3 pos = RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).get();
+            return String.format("You are currently at: %f, %f, %f", pos.x, pos.y, pos.z);
+        }));
+        CommController.add(new Command("\\tp", al->{
+            if(al.size()!=3) return "Usage: \tp (x) (y) (z)";
+            boolean[] relative = {false,false,false};
+            int[] coords = new int[3];
+            Vec3 pos;
+            Vec3 ppos = RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).get();
+            for (int i = 0; i < 3; i++) {
+                if(al.get(i).startsWith(":")){
+                    relative[i] = true;
+                    al.set(i, al.get(i).substring(1));
+                }
+                try{
+                    coords[i] = Integer.parseInt(al.get(i));
+                } catch (Exception e) {
+                    return "Invalid argument: " + al.get(i) + ". Usage: \\setblock (x) (y) (z) (type)";
+                }
+            }
+            pos = new Vec3(coords[0]+(relative[0]?ppos.x:0),coords[1]+(relative[1]?ppos.y:0),coords[2]+(relative[2]?ppos.z:0));
+            RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).set(pos);
+            return String.format("Teleported to %f %f %f.", pos.x,pos.y,pos.z);
         }));
 
         //Create the player
@@ -173,6 +240,13 @@ public abstract class Client {
 
         handleMessage(CHAT_MESSAGE, data -> {
             con.addChat((String) data[0]);
+        });
+        
+        handleMessage(BLOCK_PLACE, data -> {
+            List<Object> args = Arrays.asList(data);
+            Vec3 coords = (Vec3) args.get(0);
+            CubeMap.map[(int)coords.x][(int)coords.y][(int)coords.z] = (CubeType) args.get(1);
+            CubeMap.redraw((Vec3) args.get(0));
         });
 
         handleMessage(RESTART, data -> {

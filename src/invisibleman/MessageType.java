@@ -1,6 +1,7 @@
 package invisibleman;
 
 import java.util.Arrays;
+import map.CubeType;
 import util.Vec3;
 
 public enum MessageType {
@@ -13,6 +14,8 @@ public enum MessageType {
     HIT(Vec3.class), //position
 
     CHAT_MESSAGE(String.class), //the contents of the message
+    
+    BLOCK_PLACE(Vec3.class, CubeType.class),
 
     RESTART(); //no information needed
 

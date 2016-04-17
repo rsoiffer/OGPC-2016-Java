@@ -87,6 +87,9 @@ public class Server {
                 System.out.println(data[0]);
                 sendToOthers(client, CHAT_MESSAGE, data);
             });
+            handleMessage(client, BLOCK_PLACE, data -> {
+                sendToOthers(client, BLOCK_PLACE, data);
+            });
             handleMessage(client, RESTART, data -> {
                 RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
                 sendToAll(RESTART, data);
