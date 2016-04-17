@@ -236,7 +236,7 @@ public class Editor {
 
         //Save and load
         Input.whenKey(KEY_RETURN, true).combineEventStreams(Core.interval(60)).onEvent(() -> {
-            CubeMap.save("levels/autosaves/level_" + LEVEL_NAME + "_" + System.currentTimeMillis() + ".txt");
+            //CubeMap.save("levels/autosaves/level_" + LEVEL_NAME + "_" + System.currentTimeMillis() + ".txt");
             CubeMap.save("levels/level_" + LEVEL_NAME + ".txt");
         });
         Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_" + LEVEL_NAME + ".txt"));

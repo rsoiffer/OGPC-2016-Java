@@ -33,12 +33,20 @@ public enum CubeType {
     WOOD5_B("wood_b5"),
     WOOD6_B("wood_b6"),
     WOOD7_B("wood_b7"),
-    WOOD8_B("wood_b8");
+    WOOD8_B("wood_b8"),
+    AIR(null);
 
     public final Texture texture;
 
     private CubeType(String name) {
-        texture = SpriteContainer.loadSprite(name);
+
+        if (name != null) {
+            
+            texture = SpriteContainer.loadSprite(name);
+        } else {
+            
+            texture = null;
+        }
     }
 
     public static boolean DRAW_EDGES = true;

@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import map.CubeMap;
 import static map.CubeMap.WORLD_SIZE;
+import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.input.Keyboard;
@@ -93,6 +94,9 @@ public class Server {
                 sendToOthers(client, CHAT_MESSAGE, data);
             });
             handleMessage(client, BLOCK_PLACE, data -> {
+                Vec3 pos=(Vec3) data[0];
+                CubeMap.map[(int)pos.x][(int)pos.y][(int)pos.z] = (CubeType) data[1];
+                CubeMap.redraw(pos);
                 sendToOthers(client, BLOCK_PLACE, data);
             });
             handleMessage(client, MAP_FILE, data -> {
