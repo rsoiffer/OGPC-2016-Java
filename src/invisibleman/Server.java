@@ -20,8 +20,13 @@ import org.lwjgl.opengl.Display;
 import util.*;
 import static util.Color4.RED;
 
-public class Server {
 
+
+
+public class Server {
+    
+    public static String currentMap="sandtemple";
+    
     private static class ClientInfo {
 
         static int maxID = 0;
@@ -45,7 +50,7 @@ public class Server {
         NetworkUtils.server(conn -> {
             ClientInfo client = new ClientInfo(conn);
             CLIENTS.add(client);
-
+            sendTo(client,MAP_FILE,currentMap);
             Log.print("Client " + client.id + " connected");
             conn.onClose(() -> {
                 CLIENTS.remove(client);
@@ -89,6 +94,11 @@ public class Server {
             });
             handleMessage(client, BLOCK_PLACE, data -> {
                 sendToOthers(client, BLOCK_PLACE, data);
+            });
+            handleMessage(client, MAP_FILE, data -> {
+                CubeMap.load((String) data[0]);
+                CubeMap.redrawAll();
+                sendToOthers(client, MAP_FILE, data);
             });
             handleMessage(client, RESTART, data -> {
                 RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
@@ -211,7 +221,7 @@ public class Server {
 
         //Setup the level
         pos = WORLD_SIZE.multiply(.5);
-        CubeMap.load("levels/level_sandtemple.txt");
+        CubeMap.load("levels/level_" + currentMap + ".txt");
 
         //Attack
         Input.whenMouse(0, true).onEvent(() -> {

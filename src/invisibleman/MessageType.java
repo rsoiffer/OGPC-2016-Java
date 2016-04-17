@@ -16,6 +16,10 @@ public enum MessageType {
     CHAT_MESSAGE(String.class), //the contents of the message
     
     BLOCK_PLACE(Vec3.class, CubeType.class),
+    
+    MAP_FILE(String.class),
+    
+//    SEND_FILE(String.class),
 
     RESTART(); //no information needed
 

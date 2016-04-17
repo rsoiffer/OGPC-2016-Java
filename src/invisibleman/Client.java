@@ -33,7 +33,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = false;
+    public static boolean IS_MULTIPLAYER = true;
     private static Connection conn;
     public static Chat con;
 
@@ -79,7 +79,7 @@ public abstract class Client {
         Mouse.setGrabbed(true);
 
         //Load the level
-        CubeMap.load("levels/level_sandtemple.txt");
+        if(!IS_MULTIPLAYER) CubeMap.load("levels/level_sandtemple.txt");
 
         //Setup graphics effects
         setupGraphics();
@@ -247,6 +247,10 @@ public abstract class Client {
             Vec3 coords = (Vec3) args.get(0);
             CubeMap.map[(int)coords.x][(int)coords.y][(int)coords.z] = (CubeType) args.get(1);
             CubeMap.redraw((Vec3) args.get(0));
+        });
+        
+        handleMessage(MAP_FILE, data -> {
+            CubeMap.load("levels/level_" + data[0] + ".txt");
         });
 
         handleMessage(RESTART, data -> {

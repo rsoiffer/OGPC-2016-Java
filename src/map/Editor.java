@@ -10,25 +10,41 @@ import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
 import invisibleman.Fog;
+import invisibleman.MessageType;
+import static invisibleman.MessageType.*;
 import invisibleman.Premade3D;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
 import static map.CubeType.*;
+import network.Connection;
+import network.NetworkUtils;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static util.Color4.*;
 import util.*;
-import static util.Color4.*;
 
 public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
     private static final String LEVEL_NAME = "current";
-
+    private static final boolean IS_MULTIPLAYER = true;
+    private static Connection conn;
+    
     public static void main(String[] args) {
+        if (IS_MULTIPLAYER) {
+            //Try to connect to the server
+            if (args.length == 0) {
+                conn = NetworkUtils.connectManual();
+            } else {
+                conn = NetworkUtils.connect(args[0]);
+            }
 
+            //Handle messages recieved from the connection
+            registerMessageHandlers();
+        }
         //Initial graphics setup
         Core.is3D = true;
         Core.init();
@@ -81,31 +97,35 @@ public class Editor {
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
         //Initial level
-        if (GENERATE_RANDOM_TERRAIN) {
-            HeightGenerator hg = new HeightGenerator(101, 101);
-            hg.generate();
-            int[][] hm = hg.getMap();
-            for (int[] m : hm) {
-                for (int j = 0; j < m.length; j++) {
-                    m[j] /= 6;
-                    m[j] = m[j] > 40 ? 40 : m[j];
+        if (!IS_MULTIPLAYER) {
+            if (GENERATE_RANDOM_TERRAIN) {
+                HeightGenerator hg = new HeightGenerator(101, 101);
+                hg.generate();
+                int[][] hm = hg.getMap();
+                for (int[] m : hm) {
+                    for (int j = 0; j < m.length; j++) {
+                        m[j] /= 12;
+                        m[j] += 12;
+                        m[j] = m[j] > 40 ? 40 : m[j];
+                    }
                 }
-            }
 
-            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
-                map[x][y][z] = DIRT;
-            }));
-            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
-                map[x][y][z] = SNOW;
-            }));
-            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
-                map[x][y][z] = STONE;
-            }));
-        } else {
-            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
-                map[x][y][z] = SNOW;
-            }));
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
+                    map[x][y][z] = DIRT;
+                }));
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
+                    map[x][y][z] = SNOW;
+                }));
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
+                    map[x][y][z] = STONE;
+                }));
+            } else {
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
+                    map[x][y][z] = SNOW;
+                }));
+            }
         }
+        
         CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
 
@@ -128,6 +148,12 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = null;
+                                if(IS_MULTIPLAYER){
+                                    List<Object> data = new ArrayList();
+                                    data.add(new Vec3(x,y,z));
+                                    data.add(null);
+                                    sendMessage(BLOCK_PLACE, data);
+                                }
                             }));
                     CubeMap.redrawAll();
                 });
@@ -147,6 +173,12 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = CubeType.values()[selected.o];
+                                if(IS_MULTIPLAYER){
+                                    List<Object> data = new ArrayList();
+                                    data.add(new Vec3(x,y,z));
+                                    data.add(CubeType.values()[selected.o]);
+                                    sendMessage(BLOCK_PLACE, data);
+                                }
                             }));
                     CubeMap.redrawAll();
                 });
@@ -210,5 +242,52 @@ public class Editor {
         Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_" + LEVEL_NAME + ".txt"));
 
         Core.run();
+    }
+    public static void handleMessage(MessageType type, Consumer<Object[]> handler) {
+        conn.registerHandler(type.id(), () -> {
+            Object[] data = new Object[type.dataTypes.length];
+            for (int i = 0; i < type.dataTypes.length; i++) {
+                data[i] = conn.read(type.dataTypes[i]);
+            }
+            ThreadManager.onMainThread(() -> handler.accept(data));
+        });
+    }
+    public static void registerMessageHandlers() {
+        handleMessage(FOOTSTEP, data -> {});
+
+        handleMessage(SMOKE, data -> {});
+
+        handleMessage(SNOWBALL, data -> {});
+
+        handleMessage(HIT, data -> {});
+
+        handleMessage(CHAT_MESSAGE, data -> {});
+        
+        handleMessage(BLOCK_PLACE, data -> {
+            List<Object> args = Arrays.asList(data);
+            Vec3 coords = (Vec3) args.get(0);
+            CubeMap.map[(int)coords.x][(int)coords.y][(int)coords.z] = (CubeType) args.get(1);
+            CubeMap.redraw((Vec3) args.get(0));
+        });
+        
+        handleMessage(MAP_FILE, data -> {
+            CubeMap.load("levels/level_" + data[0] + ".txt");
+            CubeMap.redrawAll();
+        });
+        
+//        handleMessage(SEND_FILE, data -> {
+//            
+//        });
+
+        handleMessage(RESTART, data -> {});
+    }
+
+    public static void sendMessage(MessageType type, Object... contents) {
+        if (conn != null && !conn.isClosed()) {
+            if (!type.verify(contents)) {
+                throw new RuntimeException("Data " + Arrays.toString(contents) + " does not fit message type " + type);
+            }
+            conn.sendMessage(type.id(), contents);
+        }
     }
 }
