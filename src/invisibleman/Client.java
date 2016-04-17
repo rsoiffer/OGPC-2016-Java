@@ -32,7 +32,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = true;
+    public static boolean IS_MULTIPLAYER = false;
     private static Connection conn;
     public static Chat con;
 
@@ -161,6 +161,10 @@ public abstract class Client {
             try {
                 CubeType ct = al.get(3).equals("null") ? null : CubeType.valueOf(al.get(3));
                 CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = ct;
+                Util.forRange(-1, 1, -1, 1, (x, y) -> Util.forRange(-1, 1, z -> {
+                    CubeMap.redraw(pos.add(new Vec3(x,y,z)));
+                }));
+                CubeMap.redraw(pos);
                 sendMessage(BLOCK_PLACE, pos, ct);
                 return "Block placed.";
             } catch (Exception e) {
