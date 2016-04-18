@@ -25,7 +25,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static util.Color4.*;
 import util.*;
-import static util.Color4.*;
 
 public class Editor {
 
@@ -45,6 +44,8 @@ public class Editor {
 
             //Handle messages recieved from the connection
             registerMessageHandlers();
+
+            Core.timer(.5, conn::open);
         }
         //Initial graphics setup
         Core.is3D = true;
@@ -149,13 +150,14 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = null;
-                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), null);
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), -1);
                             }));
                     CubeMap.redrawAll();
                 });
             } else {
                 CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     CubeMap.map[cd.x][cd.y][cd.z] = null;
+                    sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), -1);
                     CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
                 });
             }
@@ -169,13 +171,14 @@ public class Editor {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
                                 CubeMap.map[x][y][z] = CubeType.values()[selected.o];
-                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.typeToId(CubeType.values()[selected.o]));
                             }));
                     CubeMap.redrawAll();
                 });
             } else {
                 StreamUtils.takeWhile(CubeMap.rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
                     CubeMap.map[cd.x][cd.y][cd.z] = CubeType.values()[selected.o];
+                    sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), CubeType.typeToId(CubeType.values()[selected.o]));
                     CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
                 });
             }
@@ -186,6 +189,7 @@ public class Editor {
         Input.whileMouse(2, true).onEvent(() -> {
             CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                 CubeMap.map[cd.x][cd.y][cd.z] = CubeType.values()[selected.o];
+                sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), CubeType.typeToId(CubeType.values()[selected.o]));
                 CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
             });
             toFill.o = null;
@@ -220,6 +224,7 @@ public class Editor {
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 if (!checked[x][y][z]) {
                     map[x][y][z] = SAND;
+                    sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.typeToId(SAND));
                 }
             }));
             CubeMap.redrawAll();
@@ -231,6 +236,13 @@ public class Editor {
             CubeMap.save("levels/level_" + LEVEL_NAME + ".txt");
         });
         Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_" + LEVEL_NAME + ".txt"));
+
+        //Sync with other clients
+        Input.whenKey(KEY_MINUS, true).onEvent(() -> {
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), map[x][y][z]);
+            }));
+        });
 
         Core.run();
     }
@@ -270,12 +282,8 @@ public class Editor {
 
         handleMessage(MAP_FILE, data -> {
             CubeMap.load("levels/level_" + data[0] + ".txt");
-            CubeMap.redrawAll();
         });
 
-//        handleMessage(SEND_FILE, data -> {
-//
-//        });
         handleMessage(RESTART, data -> {
         });
     }

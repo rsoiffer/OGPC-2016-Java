@@ -47,6 +47,8 @@ public abstract class Client {
 
             //Handle messages recieved from the connection
             registerMessageHandlers();
+
+            Core.timer(.5, conn::open);
         }
 
         //Set the game to 3D - this must go before Core.init();
@@ -161,11 +163,8 @@ public abstract class Client {
             try {
                 CubeType ct = al.get(3).equals("null") ? null : CubeType.valueOf(al.get(3));
                 CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = ct;
-                Util.forRange(-1, 1, -1, 1, (x, y) -> Util.forRange(-1, 1, z -> {
-                    CubeMap.redraw(pos.add(new Vec3(x,y,z)));
-                }));
                 CubeMap.redraw(pos);
-                sendMessage(BLOCK_PLACE, pos, ct);
+                sendMessage(BLOCK_PLACE, pos, CubeType.typeToId(ct));
                 return "Block placed.";
             } catch (Exception e) {
                 return "Invalid block type.";
@@ -263,7 +262,7 @@ public abstract class Client {
         handleMessage(BLOCK_PLACE, data -> {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
-            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = (CubeType) args.get(1);
+            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = CubeType.idToType((int) args.get(1));
             CubeMap.redraw((Vec3) args.get(0));
         });
 
