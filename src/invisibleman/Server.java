@@ -18,16 +18,13 @@ import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import util.*;
 import static util.Color4.RED;
-
-
-
+import util.*;
 
 public class Server {
-    
-    public static String currentMap="sandtemple";
-    
+
+    public static String currentMap = "sandtemple";
+
     private static class ClientInfo {
 
         static int maxID = 0;
@@ -51,18 +48,15 @@ public class Server {
         NetworkUtils.server(conn -> {
             ClientInfo client = new ClientInfo(conn);
             CLIENTS.add(client);
-            sendTo(client,MAP_FILE,currentMap);
             Log.print("Client " + client.id + " connected");
             conn.onClose(() -> {
                 CLIENTS.remove(client);
                 Log.print("Client " + client.id + " disconnected");
             });
-            
+
             handleMessage(client, CHAT_MESSAGE, data -> {
-            
                 sendToOthers(client, CHAT_MESSAGE, data);
             });
-
             handleMessage(client, FOOTSTEP, data -> {
                 Footstep f = new Footstep();
                 f.create();
@@ -94,8 +88,8 @@ public class Server {
                 sendToOthers(client, CHAT_MESSAGE, data);
             });
             handleMessage(client, BLOCK_PLACE, data -> {
-                Vec3 pos=(Vec3) data[0];
-                CubeMap.map[(int)pos.x][(int)pos.y][(int)pos.z] = (CubeType) data[1];
+                Vec3 pos = (Vec3) data[0];
+                CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = CubeType.idToType((int) data[1]);
                 CubeMap.redraw(pos);
                 sendToOthers(client, BLOCK_PLACE, data);
             });
@@ -109,6 +103,9 @@ public class Server {
                 sendToAll(RESTART, data);
             });
 
+            client.conn.open();
+
+            sendTo(client, MAP_FILE, currentMap);
             RegisteredEntity.getAll(Footstep.class).forEach(f -> {
                 sendTo(client, FOOTSTEP, f.get("position", Vec3.class).get(), f.get("rotation", Double.class).get(), f.get("isLeft", Boolean.class).get(), f.get("opacity", Double.class).get());
             });
@@ -117,8 +114,8 @@ public class Server {
             });
         }).start();
 
-        //runCommandInterface();
-        runGraphicalInterface();
+        runCommandInterface();
+//        runGraphicalInterface();
     }
 
     private static void handleMessage(ClientInfo info, MessageType type, Consumer<Object[]> handler) {

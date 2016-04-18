@@ -3,6 +3,7 @@ package map;
 import graphics.Graphics3D;
 import graphics.data.Texture;
 import graphics.loading.SpriteContainer;
+import java.util.Arrays;
 import static java.util.stream.Stream.of;
 import static map.CubeMap.getCubeType;
 import util.Util;
@@ -34,19 +35,19 @@ public enum CubeType {
     WOOD6_B("wood_b6"),
     WOOD7_B("wood_b7"),
     WOOD8_B("wood_b8");
-    //AIR(null);
 
     public final Texture texture;
 
     private CubeType(String name) {
+        texture = SpriteContainer.loadSprite(name);
+    }
 
-        if (name != null) {
+    public static CubeType idToType(int id) {
+        return id == -1 ? null : values()[id];
+    }
 
-            texture = SpriteContainer.loadSprite(name);
-        } else {
-
-            texture = null;
-        }
+    public static int typeToId(CubeType type) {
+        return type == null ? -1 : Arrays.asList(values()).indexOf(type);
     }
 
     public static boolean DRAW_EDGES = true;

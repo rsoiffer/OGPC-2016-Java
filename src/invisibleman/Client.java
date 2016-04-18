@@ -47,6 +47,8 @@ public abstract class Client {
 
             //Handle messages recieved from the connection
             registerMessageHandlers();
+
+            Core.timer(.5, conn::open);
         }
 
         //Set the game to 3D - this must go before Core.init();
@@ -118,7 +120,7 @@ public abstract class Client {
         handleMessage(BLOCK_PLACE, data -> {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
-            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = (CubeType) args.get(1);
+            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = CubeType.idToType((int) args.get(1));
             CubeMap.redraw((Vec3) args.get(0));
         });
 
