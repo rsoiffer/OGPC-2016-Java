@@ -1,7 +1,5 @@
 package invisibleman;
 
-import commands.CommController;
-import commands.Command;
 import engine.Core;
 import engine.Destructible;
 import engine.Input;
@@ -14,6 +12,7 @@ import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
 import guis.Chat;
+import guis.Play;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
 import java.util.Arrays;
@@ -23,8 +22,6 @@ import map.CubeMap;
 import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.TRANSPARENT;
@@ -58,7 +55,10 @@ public abstract class Client {
         //Show the fps
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
 
-        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
+        Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
+        GUIController.add(ps);
+        
+        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight), ps);
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
 

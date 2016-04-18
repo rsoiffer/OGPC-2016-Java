@@ -30,25 +30,28 @@ public class TitleScreen extends ComponentInputGUI {
     private final List<GUIButton> buttons = new ArrayList();
     private final Vec2 dim;
     private final Vec2 bDim;
-    private final Vec2 bMid;
+    private final Vec2 bPos;
+    private final Play lSel;
 
-    public TitleScreen(String n, Vec2 d) {
+    public TitleScreen(String n, Vec2 d, Play ps) {
 
         super(n);
         dim = d;
-        bDim = new Vec2(100, FONT.getHeight());
-        bMid = d.divide(2).subtract(bDim.divide(2));
+        bDim = new Vec2(100, FONT.getHeight() * 2);
+        bPos = new Vec2(0, 300);
 
         components.add(new GUIPanel("back", Vec2.ZERO, dim, Color4.BLACK));
-        components.add(new GUIPanel("options Panel", bMid, bDim, Color4.RED));
-        components.add(new GUIPanel("servers Panel", bMid.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.75)));
-        components.add(new GUIPanel("play Panel", bMid.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.5)));
-        components.add(new GUIPanel("editor Panel", bMid.add(new Vec2(0, bDim.y * 3)), bDim, Color4.ORANGE.multiply(0.25)));
+        components.add(new GUIPanel("options Panel", bPos, bDim, Color4.ORANGE));
+        components.add(new GUIPanel("servers Panel", bPos.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.75)));
+        components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.5)));
+        components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 3)), bDim, Color4.ORANGE.multiply(0.25)));
                 
-        buttons.add(new GUIButton("options", this, bMid, bDim, "Options", black));
-        buttons.add(new GUIButton("servers", this, bMid.add(new Vec2(0, bDim.y)), bDim, "Servers", black));
-        buttons.add(new GUIButton("play", this, bMid.add(new Vec2(0, bDim.y * 2)), bDim, "Play", black));
-        buttons.add(new GUIButton("editor", this, bMid.add(new Vec2(0, bDim.y * 3)), bDim, "Editor", black));
+        buttons.add(new GUIButton("options", this, bPos, bDim, "Options", black));
+        buttons.add(new GUIButton("servers", this, bPos.add(new Vec2(0, bDim.y)), bDim, "Servers", black));
+        buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Play", black));
+        buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 3)), bDim, "Editor", black));
+        
+        lSel = ps;
     }
 
     @Override
@@ -87,7 +90,8 @@ public class TitleScreen extends ComponentInputGUI {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            Game.start();
+            lSel.start();
+//            Game.start();
         }
         if (name.equals("editor")) {
             this.setVisible(false);
