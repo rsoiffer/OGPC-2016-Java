@@ -12,9 +12,10 @@ import gui.components.GUIPanel;
 import gui.types.ComponentInputGUI;
 import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
-import invisibleman.Client;
+import invisibleman.Game;
 import java.util.ArrayList;
 import java.util.List;
+import map.Editor;
 import org.lwjgl.input.Mouse;
 import static org.newdawn.slick.Color.black;
 import util.Color4;
@@ -42,10 +43,12 @@ public class TitleScreen extends ComponentInputGUI {
         components.add(new GUIPanel("options Panel", bMid, bDim, Color4.RED));
         components.add(new GUIPanel("servers Panel", bMid.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.75)));
         components.add(new GUIPanel("play Panel", bMid.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.5)));
-
+        components.add(new GUIPanel("editor Panel", bMid.add(new Vec2(0, bDim.y * 3)), bDim, Color4.ORANGE.multiply(0.25)));
+                
         buttons.add(new GUIButton("options", this, bMid, bDim, "Options", black));
         buttons.add(new GUIButton("servers", this, bMid.add(new Vec2(0, bDim.y)), bDim, "Servers", black));
         buttons.add(new GUIButton("play", this, bMid.add(new Vec2(0, bDim.y * 2)), bDim, "Play", black));
+        buttons.add(new GUIButton("editor", this, bMid.add(new Vec2(0, bDim.y * 3)), bDim, "Editor", black));
     }
 
     @Override
@@ -55,7 +58,7 @@ public class TitleScreen extends ComponentInputGUI {
         buttons.forEach(GUIButton::draw);
     }
 
-    public void startGame() {
+    public void start() {
 
         this.setVisible(true);
         grabbed = Mouse.isGrabbed();
@@ -84,7 +87,13 @@ public class TitleScreen extends ComponentInputGUI {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            Client.game();
+            Game.start();
+        }
+        if (name.equals("editor")) {
+            this.setVisible(false);
+            Mouse.setGrabbed(grabbed);
+            typing(this, false);
+            Editor.start();
         }
     }
 

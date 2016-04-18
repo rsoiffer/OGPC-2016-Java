@@ -31,26 +31,12 @@ public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
     private static final String LEVEL_NAME = "current";
-    private static final boolean IS_MULTIPLAYER = true;
+    private static final boolean IS_MULTIPLAYER = false;
     private static Connection conn;
 
-    public static void main(String[] args) {
-        if (IS_MULTIPLAYER) {
-            //Try to connect to the server
-            if (args.length == 0) {
-                conn = NetworkUtils.connectManual();
-            } else {
-                conn = NetworkUtils.connect(args[0]);
-            }
-
-            //Handle messages recieved from the connection
-            registerMessageHandlers();
-        }
-        //Initial graphics setup
-        Core.is3D = true;
-        Core.init();
-        Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
-        new Fog(new Color4(.95, .8, .3), .00025, 1).create();
+    public static void start() {
+        
+        //Hide the mouse
         Mouse.setGrabbed(true);
 
         //Selecting blocks
@@ -58,6 +44,36 @@ public class Editor {
         Input.mouseWheel.forEach(x -> selected.o = (selected.o + x / 120 + CubeType.values().length) % CubeType.values().length);
         Input.whenKey(KEY_UP, true).onEvent(() -> selected.o = (selected.o + 1) % CubeType.values().length);
         Input.whenKey(KEY_DOWN, true).onEvent(() -> selected.o = (selected.o - 1 + CubeType.values().length) % CubeType.values().length);
+
+        //Initial level
+        if (!IS_MULTIPLAYER) {
+            if (GENERATE_RANDOM_TERRAIN) {
+                HeightGenerator hg = new HeightGenerator(101, 101);
+                hg.generate();
+                int[][] hm = hg.getMap();
+                for (int[] m : hm) {
+                    for (int j = 0; j < m.length; j++) {
+                        m[j] /= 12;
+                        m[j] += 12;
+                        m[j] = m[j] > 40 ? 40 : m[j];
+                    }
+                }
+
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
+                    map[x][y][z] = DIRT;
+                }));
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
+                    map[x][y][z] = SNOW;
+                }));
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
+                    map[x][y][z] = STONE;
+                }));
+            } else {
+                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
+                    map[x][y][z] = SNOW;
+                }));
+            }
+        }
 
         //Draw world
         Core.render.onEvent(() -> CubeMap.drawAll());
@@ -97,35 +113,6 @@ public class Editor {
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
-        //Initial level
-        if (!IS_MULTIPLAYER) {
-            if (GENERATE_RANDOM_TERRAIN) {
-                HeightGenerator hg = new HeightGenerator(101, 101);
-                hg.generate();
-                int[][] hm = hg.getMap();
-                for (int[] m : hm) {
-                    for (int j = 0; j < m.length; j++) {
-                        m[j] /= 12;
-                        m[j] += 12;
-                        m[j] = m[j] > 40 ? 40 : m[j];
-                    }
-                }
-
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
-                    map[x][y][z] = DIRT;
-                }));
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
-                    map[x][y][z] = SNOW;
-                }));
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
-                    map[x][y][z] = STONE;
-                }));
-            } else {
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
-                    map[x][y][z] = SNOW;
-                }));
-            }
-        }
 
         CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
@@ -167,11 +154,11 @@ public class Editor {
             if (toFill.o != null) {
                 CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
-                            (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
-                                CubeMap.map[x][y][z] = CubeType.values()[selected.o];
-                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
-                            }));
-                    CubeMap.redrawAll();
+                        (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
+                            CubeMap.map[x][y][z] = CubeType.values()[selected.o];
+                            CubeMap.redraw(new Vec3(x,y,z));
+                            sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
+                    }));
                 });
             } else {
                 StreamUtils.takeWhile(CubeMap.rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
@@ -265,7 +252,7 @@ public class Editor {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
             CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = (CubeType) args.get(1);
-            CubeMap.redraw((Vec3) args.get(0));
+            CubeMap.redraw(((Vec3) args.get(0)));
         });
 
         handleMessage(MAP_FILE, data -> {
