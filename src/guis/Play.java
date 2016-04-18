@@ -5,16 +5,16 @@
  */
 package guis;
 
-import graphics.Graphics2D;
 import static gui.TypingManager.typing;
 import gui.components.GUIButton;
+import gui.components.GUIPanel;
 import gui.types.ComponentInputGUI;
 import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
+import invisibleman.Game;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import map.Editor;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import util.Color4;
@@ -29,13 +29,12 @@ public class Play extends ComponentInputGUI {
     private Vec2 dim;
     private Vec2 bDim;
     private Vec2 bPos;
-    private final int bNum = 4;
+    private final int bNum = 10;
     private int index;
 
     private GUIButton next;
     private GUIButton prev;
-    private Vec2 cDim;
-    
+
     private boolean grabbed;
 
     public Play(String n, Vec2 d) {
@@ -43,13 +42,20 @@ public class Play extends ComponentInputGUI {
         super(n);
 
         dim = d;
-        bDim = new Vec2(100, 25);
-        bPos = new Vec2(100, 200);
+        bDim = new Vec2(300, 50);
+        bPos = new Vec2(0, 175);
         index = 0;
 
-        cDim = new Vec2(75, 50);
-        next = new GUIButton("next level", this, bPos.subtract(new Vec2(0, cDim.y * 2)), cDim, "Next", Color.black);
-        prev = new GUIButton("prev level", this, bPos.subtract(new Vec2(0, cDim.y)), cDim, "Prev", Color.black);
+        next = new GUIButton("next level", this, bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), "Next", Color.orange);
+        prev = new GUIButton("prev level", this, bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), "Prev", Color.orange);
+
+        components.add(new GUIPanel("next panel", bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.75)));
+        components.add(new GUIPanel("prev panel", bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.50)));
+
+        for (int i = 0; i < bNum; i++) {
+
+            components.add(new GUIPanel("selec panel " + i, bPos.add(new Vec2(0, bDim.y * i)), bDim, Color4.ORANGE.multiply(1.0 - (.5 / bNum) * i)));
+        }
 
         getLevels();
     }
@@ -63,7 +69,7 @@ public class Play extends ComponentInputGUI {
             String label = levels[i].getName().substring(6);
             label = label.substring(0, label.indexOf("."));
             System.out.println(label);
-            inputs.add(new GUIButton(label, this, bPos.add(new Vec2(0, dim.y * (i % bNum + 1))), bDim, label, Color.black));
+            inputs.add(new GUIButton(label, this, bPos.add(new Vec2(0, bDim.y * (i % bNum))), bDim, label, Color.white));
         }
     }
 
@@ -71,16 +77,19 @@ public class Play extends ComponentInputGUI {
     public void recieve(String name, Object info) {
 
         if (name.equals("next level")) {
-            
+
             next();
-        }
-        
-        if (name.equals("prev level")) {
-            
+        } else if (name.equals("prev level")) {
+
             prev();
+        } else {
+
+            this.setVisible(false);
+            Mouse.setGrabbed(grabbed);
+            typing(this, false);
+            Game.start(name);
         }
-        
-        System.out.println(name);
+
     }
 
     public void start() {
@@ -97,7 +106,7 @@ public class Play extends ComponentInputGUI {
 
         if (index * bNum >= inputs.size()) {
 
-            index = inputs.size() / bNum - 1;
+            index = inputs.size() / bNum;
         }
     }
 
@@ -146,12 +155,11 @@ public class Play extends ComponentInputGUI {
     @Override
     public void draw() {
 
-        Graphics2D.fillRect(bPos.subtract(new Vec2(0, cDim.y)), cDim.multiply(new Vec2(0, 2)), Color4.BLUE);
+        components.forEach(GUIComponent::draw);
 
         for (int i = index * bNum; i < inputs.size() && i < (index + 1) * bNum; i++) {
 
             inputs.get(i).draw();
-            Graphics2D.fillRect(inputs.get(i).getPos(), inputs.get(i).getDim(), Color4.BLUE.multiply(1.0 - (1.0 / i)));
         }
 
         next.draw();

@@ -21,6 +21,7 @@ import gui.types.GUIInputComponent;
 import static gui.TypingManager.typing;
 import gui.types.GUIComponent;
 import invisibleman.Client;
+import invisibleman.Game;
 import static invisibleman.MessageType.CHAT_MESSAGE;
 import java.util.List;
 
@@ -94,8 +95,8 @@ public class Chat extends ComponentInputGUI {
                 output.appendLine(CommController.runCommand(t));
             } else {
 
-                output.appendLine(t);
-                Client.sendMessage(CHAT_MESSAGE, text);
+                output.appendLine("<" + Game.getName() + "> " + t);
+                Client.sendMessage(CHAT_MESSAGE, "<" + Game.getName() + "> " + t);
             }
 
             inputs.forEach(gcf -> {

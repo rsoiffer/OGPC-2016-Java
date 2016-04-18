@@ -24,14 +24,21 @@ import util.Vec3;
  */
 public class Game extends Client {
     
-    public static void start() {
+    private static String name = "new player";
+    
+    public static String getName(){
+        
+        return name;
+    }
+    
+    public static void start(String map) {
 
         //Hide the mouse
         Mouse.setGrabbed(true);
 
         //Load the level
         if (!IS_MULTIPLAYER) {
-            CubeMap.load("levels/level_sandtemple.txt");
+            CubeMap.load("levels/level_" + map + ".txt");
         }
 
         //Setup graphics effects
@@ -40,10 +47,26 @@ public class Game extends Client {
         //Set up GUI
         con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
         GUIController.add(con);
-        con.addChat("Welcome to a new game of Invisible Man!! Try to use left click to"
-                + " shoot a snowball and 't' to access chat. If there are any bugs,"
-                + " report to Rory Soiffer or become a traitor!!!");
+        con.addChat("Welcome " + name + " to invisible man! To move around, just"
+                + " use WASD. To use chat, press T. To change your name, use the"
+                + " \\name command. Have fun!");
 
+        CommController.add(new Command("\\name", al -> {
+
+            if (al.size() < 1) {
+                return "\\name needs to have something to change your name to.";
+            }
+
+            name = "";
+            for(String s : al){
+                
+                name += s + " ";
+            }
+            
+            name += (char) 8;
+            return "Your name has been changed to " + name;
+        }));
+        
         CommController.add(new Command("\\step", al -> {
 
             if (al.size() != 1) {

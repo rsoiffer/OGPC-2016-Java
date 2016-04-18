@@ -24,8 +24,8 @@ import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.TRANSPARENT;
 import util.*;
+import static util.Color4.TRANSPARENT;
 
 public abstract class Client {
 
@@ -34,20 +34,6 @@ public abstract class Client {
     public static Chat con;
 
     public static void main(String[] args) {
-        if (IS_MULTIPLAYER) {
-            //Try to connect to the server
-            if (args.length == 0) {
-                conn = NetworkUtils.connectManual();
-            } else {
-                conn = NetworkUtils.connect(args[0]);
-            }
-
-            //Handle messages recieved from the connection
-            registerMessageHandlers();
-
-            Core.timer(.5, conn::open);
-        }
-
         //Set the game to 3D - this must go before Core.init();
         Core.is3D = true;
         Core.init();
@@ -57,7 +43,7 @@ public abstract class Client {
 
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
         GUIController.add(ps);
-        
+
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight), ps);
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
@@ -74,7 +60,21 @@ public abstract class Client {
         System.exit(0);
     }
 
-    
+    public static void connect() {
+        if (IS_MULTIPLAYER) {
+            //Try to connect to the server
+            //if (args.length == 0) {
+            conn = NetworkUtils.connectManual();
+            //} else {
+            //    conn = NetworkUtils.connect(args[0]);
+            //}
+
+            //Handle messages recieved from the connection
+            registerMessageHandlers();
+
+            Core.timer(.5, conn::open);
+        }
+    }
 
     public static void handleMessage(MessageType type, Consumer<Object[]> handler) {
         conn.registerHandler(type.id(), () -> {

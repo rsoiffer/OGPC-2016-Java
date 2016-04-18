@@ -9,6 +9,7 @@ import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
+import invisibleman.Client;
 import invisibleman.Fog;
 import invisibleman.MessageType;
 import static invisibleman.MessageType.*;
@@ -19,22 +20,23 @@ import java.util.function.Supplier;
 import static map.CubeMap.*;
 import static map.CubeType.*;
 import network.Connection;
-import network.NetworkUtils;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import static util.Color4.*;
 import util.*;
+import static util.Color4.*;
 
 public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
-    private static final String LEVEL_NAME = "current";
+    private static final String LEVEL_NAME = "cabin";
     private static final boolean IS_MULTIPLAYER = false;
     private static Connection conn;
 
     public static void start() {
-        
+        Client.connect();
+
+        new Fog(new Color4(.95, .8, .3), .00025, 1).create();
+
         //Hide the mouse
         Mouse.setGrabbed(true);
 
@@ -112,7 +114,6 @@ public class Editor {
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
-
         CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
 
@@ -154,11 +155,11 @@ public class Editor {
             if (toFill.o != null) {
                 CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
-                        (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
-                            CubeMap.map[x][y][z] = CubeType.values()[selected.o];
-                            CubeMap.redraw(new Vec3(x,y,z));
-                            sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
-                    }));
+                            (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
+                                CubeMap.map[x][y][z] = CubeType.values()[selected.o];
+                                CubeMap.redraw(new Vec3(x, y, z));
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
+                            }));
                 });
             } else {
                 StreamUtils.takeWhile(CubeMap.rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
@@ -205,7 +206,7 @@ public class Editor {
                         toCheck.add(n);
                     }
                 });
-            };
+            }
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 if (!checked[x][y][z]) {
                     map[x][y][z] = SAND;
