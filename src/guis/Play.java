@@ -15,6 +15,7 @@ import invisibleman.Game;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import map.Editor;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import util.Color4;
@@ -36,6 +37,7 @@ public class Play extends ComponentInputGUI {
     private GUIButton prev;
 
     private boolean grabbed;
+    private boolean editor;
 
     public Play(String n, Vec2 d) {
 
@@ -76,24 +78,29 @@ public class Play extends ComponentInputGUI {
     @Override
     public void recieve(String name, Object info) {
 
-        if (name.equals("next level")) {
-
-            next();
-        } else if (name.equals("prev level")) {
-
-            prev();
-        } else {
-
-            this.setVisible(false);
-            Mouse.setGrabbed(grabbed);
-            typing(this, false);
-            Game.start(name);
+        switch (name) {
+            case "next level":
+                next();
+                break;
+            case "prev level":
+                prev();
+                break;
+            default:
+                this.setVisible(false);
+                Mouse.setGrabbed(grabbed);
+                typing(this, false);
+                if (editor) {
+                    Editor.start(name);
+                } else {
+                    Game.start(name);
+                }
+                break;
         }
 
     }
 
-    public void start() {
-
+    public void start(int mode) {
+        editor = mode == 1;
         this.setVisible(true);
         grabbed = Mouse.isGrabbed();
         Mouse.setGrabbed(false);

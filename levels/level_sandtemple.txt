@@ -1,3 +1,4 @@
+f .95 .8 .3 
 0 0 0 SAND
 0 0 1 SAND
 0 0 2 SAND

@@ -32,7 +32,7 @@ public class Editor {
     private static final boolean IS_MULTIPLAYER = false;
     private static Connection conn;
 
-    public static void start() {
+    public static void start(String mapname) {
         Client.connect();
 
         new Fog(new Color4(.95, .8, .3), .00025, 1).create();
@@ -70,9 +70,10 @@ public class Editor {
                     map[x][y][z] = STONE;
                 }));
             } else {
-                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
-                    map[x][y][z] = SNOW;
-                }));
+//                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
+//                    map[x][y][z] = SNOW;
+//                }));
+                CubeMap.load(mapname);
             }
         }
 

@@ -22,7 +22,7 @@ import util.Vec3;
  *
  * @author Grant
  */
-public class Game extends Client {
+public class Game {
     
     private static String name = "new player";
     

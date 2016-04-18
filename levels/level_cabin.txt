@@ -1,3 +1,4 @@
+f .8 .8 .8 
 0 0 0 SNOW
 0 0 1 SNOW
 0 0 2 SNOW

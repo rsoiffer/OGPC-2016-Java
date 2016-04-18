@@ -1,5 +1,6 @@
 package map;
 
+import invisibleman.Client;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -10,6 +11,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import static map.Chunk.CHUNK_SIZE;
+import util.Color4;
 import util.Log;
 import util.Mutable;
 import util.Util;
@@ -84,19 +86,36 @@ public class CubeMap {
                 map[x][y][z] = null;
             }));
             Files.readAllLines(Paths.get(fileName)).forEach(s -> {
-                int x = Integer.parseInt(s.substring(0, s.indexOf(" ")));
-                s = s.substring(s.indexOf(" ") + 1);
-                int y = Integer.parseInt(s.substring(0, s.indexOf(" ")));
-                s = s.substring(s.indexOf(" ") + 1);
-                int z = Integer.parseInt(s.substring(0, s.indexOf(" ")));
-                s = s.substring(s.indexOf(" ") + 1);
-                CubeType ct = s.equals("null") ? null : CubeType.valueOf(s);
-                map[x][y][z] = ct;
+
+                if (s.charAt(0) == 'f') {
+
+                    double[] cs = argsGet(s.substring(2), 3);
+                    Client.fogColor = new Color4(cs[0], cs[1], cs[2]);
+                } else {
+
+                    double[] cs = argsGet(s, 3);
+                    s = s.substring(s.lastIndexOf(" ")+1);
+                    CubeType ct = s.equals("null") ? null : CubeType.valueOf(s);
+                    map[(int) cs[0]][(int) cs[1]][(int) cs[2]] = ct;
+                }
             });
             redrawAll();
         } catch (Exception ex) {
             Log.error(ex);
         }
+    }
+
+    private static double[] argsGet(String s, int q) {
+
+        double[] ia = new double[q];
+
+        for (int i = 0; i < q; i++) {
+
+            ia[i] = Double.parseDouble(s.substring(0, s.indexOf(" ")));
+            s = s.substring(s.indexOf(" ") + 1);
+        }
+        
+        return ia;
     }
 
     public static Iterable<CubeData> rayCast(Vec3 pos, Vec3 dir) {
@@ -150,6 +169,7 @@ public class CubeMap {
     public static void save(String fileName) {
         try {
             PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+            writer.printf("f %f %f %f \n",Client.fogColor.r,Client.fogColor.g,Client.fogColor.b);
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 CubeType ct = map[x][y][z];
                 if (ct != null) {

@@ -32,6 +32,7 @@ public abstract class Client {
     public static boolean IS_MULTIPLAYER = false;
     private static Connection conn;
     public static Chat con;
+    public static Color4 fogColor;
 
     public static void main(String[] args) {
         //Set the game to 3D - this must go before Core.init();
@@ -160,7 +161,7 @@ public abstract class Client {
         //Create the snow particles
         //new Snow().create();
         //Create the fog
-        new Fog(new Color4(.95, .8, .3), .0025, .95).create();
+        new Fog(fogColor, .0025, .95).create(); // .95 .8 .3
 
         //Draw the level
         Core.render.onEvent(() -> {

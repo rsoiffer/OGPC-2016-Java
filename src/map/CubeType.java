@@ -34,8 +34,15 @@ public enum CubeType {
     WOOD5_B("wood_b5"),
     WOOD6_B("wood_b6"),
     WOOD7_B("wood_b7"),
-    WOOD8_B("wood_b8");
-
+    WOOD8_B("wood_b8"),
+    WATER1("water001"),
+    WATER2("water002"),
+    WATER3("water003"),
+    WATER4("water004"),
+    LAVA1("lava001"),
+    LAVA2("lava002"), 
+    LAVA3("lava003"),
+    LAVA4("lava004"),;
     public final Texture texture;
 
     private CubeType(String name) {

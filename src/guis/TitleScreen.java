@@ -90,14 +90,15 @@ public class TitleScreen extends ComponentInputGUI {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            lSel.start();
+            lSel.start(0);
 //            Game.start();
         }
         if (name.equals("editor")) {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            Editor.start();
+            lSel.start(1);
+//            Editor.start();
         }
     }
 
