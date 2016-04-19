@@ -160,7 +160,7 @@ public class Game {
             Vec3 pos;
             Vec3 ppos = RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).get();
             for (int i = 0; i < 3; i++) {
-                if (al.get(i).startsWith(":")) {
+                if (al.get(i).startsWith("~")) {
                     relative[i] = true;
                     al.set(i, al.get(i).substring(1));
                 }
