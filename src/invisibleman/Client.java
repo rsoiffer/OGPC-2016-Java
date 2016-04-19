@@ -16,7 +16,6 @@ import guis.Play;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import map.CubeMap;
 import map.CubeType;
@@ -29,7 +28,7 @@ import util.*;
 
 public abstract class Client {
 
-    public static boolean IS_MULTIPLAYER = false;
+    public static boolean IS_MULTIPLAYER = true;
     private static Connection conn;
     public static Chat con;
     public static Color4 fogColor;
@@ -115,13 +114,12 @@ public abstract class Client {
         });
 
         handleMessage(CHAT_MESSAGE, data -> {
-            con.addChat((String) data[0]);
+            //con.addChat((String) data[0]);
         });
 
         handleMessage(BLOCK_PLACE, data -> {
-            List<Object> args = Arrays.asList(data);
-            Vec3 coords = (Vec3) args.get(0);
-            CubeMap.setCube((int) coords.x, (int) coords.y, (int) coords.z, (CubeType) args.get(1));
+            Vec3 coords = (Vec3) data[0];
+            CubeMap.setCube((int) coords.x, (int) coords.y, (int) coords.z, CubeType.idToType((int) data[1]));
         });
 
         handleMessage(MAP_FILE, data -> {

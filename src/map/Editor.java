@@ -10,7 +10,6 @@ import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
 import invisibleman.Client;
-import static invisibleman.Client.handleMessage;
 import static invisibleman.Client.sendMessage;
 import invisibleman.Fog;
 import static invisibleman.MessageType.*;
@@ -251,35 +250,5 @@ public class Editor {
         });
 
         Core.run();
-    }
-
-    public static void registerMessageHandlers() {
-        handleMessage(FOOTSTEP, data -> {
-        });
-
-        handleMessage(SMOKE, data -> {
-        });
-
-        handleMessage(SNOWBALL, data -> {
-        });
-
-        handleMessage(HIT, data -> {
-        });
-
-        handleMessage(CHAT_MESSAGE, data -> {
-        });
-
-        handleMessage(BLOCK_PLACE, data -> {
-            List<Object> args = Arrays.asList(data);
-            Vec3 coords = (Vec3) args.get(0);
-            setCube((int) coords.x, (int) coords.y, (int) coords.z, (CubeType) args.get(1));
-        });
-
-        handleMessage(MAP_FILE, data -> {
-            load("levels/level_" + data[0] + ".txt");
-        });
-
-        handleMessage(RESTART, data -> {
-        });
     }
 }
