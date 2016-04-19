@@ -14,7 +14,7 @@ public class Chunk {
 
     public static final int CHUNK_SIZE = 20;
     public final int x, y, z;
-    public final int drawList;
+    public int drawList;
 
     public Chunk(int x, int y, int z) {
         this.x = x;
@@ -24,7 +24,11 @@ public class Chunk {
     }
 
     public void draw() {
+//        System.out.println(this);
+//        org.lwjgl.opengl.Util.checkGLError();
         glCallList(drawList);
+//        System.out.println(this + " worked fine");
+//        org.lwjgl.opengl.Util.checkGLError();
     }
 
     @Override
@@ -54,6 +58,8 @@ public class Chunk {
 
     public void redraw() {
         System.out.println(this);
+        //glDeleteLists(drawList, 1);
+        //drawList = glGenLists(1);
         glNewList(drawList, GL_COMPILE);
         WHITE.glColor();
         glEnable(GL_TEXTURE_2D);
@@ -82,6 +88,8 @@ public class Chunk {
             glEnd();
         }
         glEndList();
+        
+        org.lwjgl.opengl.Util.checkGLError();
     }
 
     @Override

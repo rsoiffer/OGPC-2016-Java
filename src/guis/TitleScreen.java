@@ -36,21 +36,23 @@ public class TitleScreen extends ComponentInputGUI {
 
         super(n);
         dim = d;
-        bDim = new Vec2(200, FONT.getHeight() * 2);
+        bDim = new Vec2(300, FONT.getHeight() * 2);
         bPos = new Vec2(0, 150);
 
         Window2D.background = Color4.BLACK;
         components.add(new GUIPanel("options Panel", bPos, bDim, Color4.ORANGE));
         components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.8)));
         components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.6)));
-                
+        components.add(new GUIPanel("exit Panel", bPos.subtract(new Vec2(0, bDim.y)), bDim, Color4.BLUE.multiply(0.6)));
+
         buttons.add(new GUIButton("options", this, bPos, bDim, "Options", Color.white));
         buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y)), bDim, "Play", Color.white));
         buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Editor", Color.white));
+        buttons.add(new GUIButton("exit", this, bPos.subtract(new Vec2(0, bDim.y)), bDim, "Exit", Color.orange));
     }
-    
-    public static void setMainVisibleFalse(){
-        
+
+    public static void setMainVisibleFalse() {
+
         GUIController.getGUI("level select").setVisible(false);
         GUIController.getGUI("ip select").setVisible(false);
         GUIController.getGUI("main menu").setVisible(false);
@@ -89,17 +91,19 @@ public class TitleScreen extends ComponentInputGUI {
 
         if (name.equals("play")) {
 
-            //this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
             ((Play) GUIController.getGUI("level select")).start(0);
-        }
-        if (name.equals("editor")) {
-            //this.setVisible(false);
+        } else if (name.equals("editor")) {
+            
             Mouse.setGrabbed(grabbed);
             typing(this, false);
             ((Play) GUIController.getGUI("level select")).start(1);
+        } else if (name.equals("exit")) {
+
+            System.exit(1);
         }
+
     }
 
     @Override

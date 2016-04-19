@@ -39,9 +39,9 @@ public class Join extends ComponentInputGUI {
     public Join(String n) {
         
         super(n);
-        fPos = new Vec2(500, 150);
+        fPos = new Vec2(600, 150);
         fDim = new Vec2(200, FONT.getHeight());
-        bDim = new Vec2(100, 50);
+        bDim = new Vec2(100, FONT.getHeight() * 2);
         
         components.add(new GUIPanel("ip Panel", fPos, fDim, Color4.ORANGE));
         components.add(new GUIPanel("back Panel", fPos.subtract(new Vec2(0, bDim.y)), bDim, Color4.BLUE.multiply(.5)));

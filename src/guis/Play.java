@@ -36,7 +36,7 @@ public class Play extends ComponentInputGUI {
     private Vec2 dim;
     private Vec2 bDim;
     private Vec2 bPos;
-    private final int bNum = 10;
+    private final int bNum = 3;
     private int index;
 
     private GUIButton next;
@@ -53,11 +53,11 @@ public class Play extends ComponentInputGUI {
 
         dim = d;
         bDim = new Vec2(300, FONT.getHeight() * 2);
-        bPos = new Vec2(200, 150);
+        bPos = new Vec2(300, 150);
         index = 0;
 
-        next = new GUIButton("next level", this, bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), "Next", Color.orange);
-        prev = new GUIButton("prev level", this, bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), "Prev", Color.orange);
+        next = new GUIButton("prev level", this, bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), "Prev", Color.orange);
+        prev = new GUIButton("next level", this, bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), "Next", Color.orange);
         back = new GUIButton("back title", this, bPos.subtract(new Vec2(0, bDim.y * 2)), bDim, "Back", Color.orange);
 
         components.add(new GUIPanel("next panel", bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.80)));
@@ -66,7 +66,7 @@ public class Play extends ComponentInputGUI {
 
         for (int i = 0; i < bNum; i++) {
 
-            components.add(new GUIPanel("selec panel " + i, bPos.add(new Vec2(0, bDim.y * i)), bDim, Color4.ORANGE.multiply(1.0 - (.5 / bNum) * i)));
+            components.add(new GUIPanel("selec panel " + i, bPos.add(new Vec2(0, bDim.y * i)), bDim, Color4.ORANGE.multiply(.8 - (.2 * i))));
         }
     }
 
