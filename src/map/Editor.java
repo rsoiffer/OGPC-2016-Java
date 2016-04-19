@@ -10,41 +10,39 @@ import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
 import invisibleman.Client;
+import static invisibleman.Client.handleMessage;
+import static invisibleman.Client.sendMessage;
 import invisibleman.Fog;
-import invisibleman.MessageType;
 import static invisibleman.MessageType.*;
 import invisibleman.Premade3D;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
-import static map.CubeType.*;
-import network.Connection;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
-import util.*;
-import static util.Color4.*;
+import static util.Color4.RED;
+import util.Mutable;
+import util.Util;
+import util.Vec2;
+import util.Vec3;
 
 public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
-    private static final String LEVEL_NAME = "cabin";
     private static final boolean IS_MULTIPLAYER = false;
-    private static Connection conn;
 
     public static void start(String mapname) {
         Client.connect();
-
-        new Fog(new Color4(.95, .8, .3), .00025, 1).create();
 
         //Hide the mouse
         Mouse.setGrabbed(true);
 
         //Selecting blocks
         Mutable<Integer> selected = new Mutable(0);
-        Input.mouseWheel.forEach(x -> selected.o = (selected.o + x / 120 + CubeType.values().length) % CubeType.values().length);
-        Input.whenKey(KEY_UP, true).onEvent(() -> selected.o = (selected.o + 1) % CubeType.values().length);
-        Input.whenKey(KEY_DOWN, true).onEvent(() -> selected.o = (selected.o - 1 + CubeType.values().length) % CubeType.values().length);
+
+        Input.mouseWheel.forEach(x -> selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct());
+        Input.whenKey(KEY_UP, true).onEvent(() -> selected.o = (selected.o + 1) % CubeType.distinct());
+        Input.whenKey(KEY_DOWN, true).onEvent(() -> selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct());
 
         //Initial level
         if (!IS_MULTIPLAYER) {
@@ -61,24 +59,26 @@ public class Editor {
                 }
 
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
-                    map[x][y][z] = DIRT;
+                    setCube(x, y, z, CubeType.getByName("snow"));
                 }));
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
-                    map[x][y][z] = SNOW;
+                    setCube(x, y, z, CubeType.getByName("dirt"));
                 }));
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
-                    map[x][y][z] = STONE;
+                    setCube(x, y, z, CubeType.getByName("stone"));
                 }));
             } else {
 //                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
 //                    map[x][y][z] = SNOW;
 //                }));
-                CubeMap.load(mapname);
+                load("levels/level_" + mapname + ".txt");
             }
         }
 
+        new Fog(Client.fogColor, .00025, 1).create();
+
         //Draw world
-        Core.render.onEvent(() -> CubeMap.drawAll());
+        Core.render.onEvent(() -> drawAll());
 
         //Draw GUI
         Core.renderLayer(100).onEvent(() -> {
@@ -86,18 +86,22 @@ public class Editor {
 
             Graphics2D.drawEllipse(new Vec2(600, 400), new Vec2(10), RED, 20);
 
-            if (CubeMap.isSolid(pos)) {
-                Graphics2D.drawText("Inside Block", new Vec2(542, 350));
+//            Graphics2D.fillRect(new Vec2(545, 145), new Vec2(110), gray(.5));
+//            Graphics2D.drawRect(new Vec2(545, 145), new Vec2(110), BLACK);
+//
+//            Graphics2D.drawSprite(CubeType.getFirst(selected.o).texture, new Vec2(600, 200), new Vec2(100. / CubeType.getFirst(selected.o).texture.getImageWidth()), 0, WHITE);
+//            Graphics2D.drawRect(new Vec2(550, 150), new Vec2(100), BLACK);
+            for (int i = -8; i < 0; i++) {
+                CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
+            for (int i = 8; i > 0; i--) {
+                CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
+            }
+            CubeType.getFirst(selected.o).draw(new Vec2(600, 100), 100);
 
-            Graphics2D.fillRect(new Vec2(545, 145), new Vec2(110), gray(.5));
-            Graphics2D.drawRect(new Vec2(545, 145), new Vec2(110), BLACK);
-
-            Graphics2D.drawSprite(CubeType.values()[selected.o].texture, new Vec2(600, 200), new Vec2(100. / CubeType.values()[selected.o].texture.getImageWidth()), 0, WHITE);
-
-            Graphics2D.drawRect(new Vec2(550, 150), new Vec2(100), BLACK);
-            if (CubeMap.isSolid(pos)) {
+            if (isSolid(pos)) {
                 Graphics2D.fillRect(new Vec2(0), new Vec2(1200, 800), RED.withA(.4));
+                Graphics2D.drawText("Inside Block", new Vec2(542, 350));
             }
 
             Window3D.resetProjection();
@@ -115,7 +119,6 @@ public class Editor {
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
 
-        CubeMap.redrawAll();
         pos = WORLD_SIZE.multiply(.5);
 
         //Fill tool
@@ -124,7 +127,7 @@ public class Editor {
             if (toFill.o != null) {
                 toFill.o = null;
             } else {
-                CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     toFill.o = cd;
                 });
             }
@@ -133,19 +136,17 @@ public class Editor {
         //Destroy blocks
         Input.whenMouse(0, true).filter(() -> !isSolid(pos)).onEvent(() -> {
             if (toFill.o != null) {
-                CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
-                                CubeMap.map[x][y][z] = null;
+                                setCube(x, y, z, null);
                                 sendMessage(BLOCK_PLACE, new Vec3(x, y, z), -1);
                             }));
-                    CubeMap.redrawAll();
                 });
             } else {
-                CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
-                    CubeMap.map[cd.x][cd.y][cd.z] = null;
+                rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                    setCube(cd.x, cd.y, cd.z, null);
                     sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), -1);
-                    CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
                 });
             }
             toFill.o = null;
@@ -154,19 +155,19 @@ public class Editor {
         //Place blocks
         Input.whenMouse(1, true).filter(() -> !isSolid(pos)).onEvent(() -> {
             if (toFill.o != null) {
-                CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
-                                CubeMap.map[x][y][z] = CubeType.values()[selected.o];
-                                CubeMap.redraw(new Vec3(x, y, z));
-                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.values()[selected.o]);
+                                CubeType ct = CubeType.getRandom(selected.o);
+                                setCube(x, y, z, ct);
+                                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), ct.id);
                             }));
                 });
             } else {
-                StreamUtils.takeWhile(CubeMap.rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
-                    CubeMap.map[cd.x][cd.y][cd.z] = CubeType.values()[selected.o];
-                    sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), CubeType.typeToId(CubeType.values()[selected.o]));
-                    CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
+                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
+                    CubeType ct = CubeType.getRandom(selected.o);
+                    setCube(cd.x, cd.y, cd.z, ct);
+                    sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), ct.id);
                 });
             }
             toFill.o = null;
@@ -174,10 +175,10 @@ public class Editor {
 
         //Repaint blocks
         Input.whileMouse(2, true).onEvent(() -> {
-            CubeMap.rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
-                CubeMap.map[cd.x][cd.y][cd.z] = CubeType.values()[selected.o];
-                sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), CubeType.typeToId(CubeType.values()[selected.o]));
-                CubeMap.redraw(new Vec3(cd.x, cd.y, cd.z));
+            rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                CubeType ct = CubeType.getRandom(selected.o);
+                setCube(cd.x, cd.y, cd.z, ct);
+                sendMessage(BLOCK_PLACE, new Vec3(cd.x, cd.y, cd.z), ct.id);
             });
             toFill.o = null;
         });
@@ -210,38 +211,46 @@ public class Editor {
             }
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 if (!checked[x][y][z]) {
-                    map[x][y][z] = SAND;
-                    sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.typeToId(SAND));
+                    setCube(x, y, z, CubeType.getByName("snow"));
+                    sendMessage(BLOCK_PLACE, new Vec3(x, y, z), CubeType.getByName("snow").id);
                 }
             }));
-            CubeMap.redrawAll();
+        });
+
+        //Randomize blocks
+        Input.whenKey(KEY_RBRACKET, true).onEvent(() -> {
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+                if (getCubeType(x, y, z) != null) {
+                    if (CubeType.hasVersions(CubeType.getGroup(getCubeType(x, y, z)))) {
+                        setCube(x, y, z, CubeType.getRandom(CubeType.getGroup(getCubeType(x, y, z))));
+                        sendMessage(BLOCK_PLACE, new Vec3(x, y, z), getCubeType(x, y, z).id);
+                    }
+                }
+            }));
+        });
+
+        //Select block
+        Input.whenKey(KEY_Q, true).onEvent(() -> {
+            rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
+                selected.o = CubeType.getGroup(cd.c);
+            });
         });
 
         //Save and load
         Input.whenKey(KEY_RETURN, true).combineEventStreams(Core.interval(60)).onEvent(() -> {
-            //CubeMap.save("levels/autosaves/level_" + LEVEL_NAME + "_" + System.currentTimeMillis() + ".txt");
-            CubeMap.save("levels/level_" + LEVEL_NAME + ".txt");
+            save("levels/autosaves/level_" + mapname + "_" + System.currentTimeMillis() + ".txt");
+            save("levels/level_" + mapname + ".txt");
         });
-        Input.whenKey(KEY_L, true).onEvent(() -> CubeMap.load("levels/level_" + LEVEL_NAME + ".txt"));
+        //Input.whenKey(KEY_L, true).onEvent(() -> load("levels/level_" + mapname + ".txt"));
 
         //Sync with other clients
         Input.whenKey(KEY_MINUS, true).onEvent(() -> {
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), map[x][y][z]);
+                sendMessage(BLOCK_PLACE, new Vec3(x, y, z), getCubeType(x, y, z).id);
             }));
         });
 
         Core.run();
-    }
-
-    public static void handleMessage(MessageType type, Consumer<Object[]> handler) {
-        conn.registerHandler(type.id(), () -> {
-            Object[] data = new Object[type.dataTypes.length];
-            for (int i = 0; i < type.dataTypes.length; i++) {
-                data[i] = conn.read(type.dataTypes[i]);
-            }
-            ThreadManager.onMainThread(() -> handler.accept(data));
-        });
     }
 
     public static void registerMessageHandlers() {
@@ -263,25 +272,14 @@ public class Editor {
         handleMessage(BLOCK_PLACE, data -> {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
-            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = (CubeType) args.get(1);
-            CubeMap.redraw(((Vec3) args.get(0)));
+            setCube((int) coords.x, (int) coords.y, (int) coords.z, (CubeType) args.get(1));
         });
 
         handleMessage(MAP_FILE, data -> {
-            CubeMap.load("levels/level_" + data[0] + ".txt");
-            CubeMap.redrawAll();
+            load("levels/level_" + data[0] + ".txt");
         });
 
         handleMessage(RESTART, data -> {
         });
-    }
-
-    public static void sendMessage(MessageType type, Object... contents) {
-        if (conn != null && !conn.isClosed()) {
-            if (!type.verify(contents)) {
-                throw new RuntimeException("Data " + Arrays.toString(contents) + " does not fit message type " + type);
-            }
-            conn.sendMessage(type.id(), contents);
-        }
     }
 }

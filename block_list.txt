@@ -1,0 +1,36 @@
+snow
+grass
+dirt
+stone
+ice
+rocks 4
+
+stone_brick
+flower
+flowerpot
+carpet
+yellow
+
+wood_lower 3
+wood_upper 3
+log_lower
+log_upper
+wood_lower_b 3
+wood_upper_b 3
+log_lower_b
+log_upper_b
+
+water 4
+seaweed 2
+beach 3
+sand_white
+trunk
+palms
+coconut
+
+sand_brick
+sand
+
+pavement
+lava 4
+space_window

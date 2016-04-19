@@ -4,17 +4,13 @@ import commands.CommController;
 import commands.Command;
 import gui.GUIController;
 import guis.Chat;
-import static invisibleman.Client.IS_MULTIPLAYER;
-import static invisibleman.Client.con;
-import static invisibleman.Client.sendMessage;
-import static invisibleman.Client.setupGraphics;
+import static invisibleman.Client.*;
 import static invisibleman.MessageType.BLOCK_PLACE;
 import map.CubeMap;
 import map.CubeType;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import util.RegisteredEntity;
-import util.Util;
 import util.Vec2;
 import util.Vec3;
 
@@ -23,28 +19,34 @@ import util.Vec3;
  * @author Grant
  */
 public class Game {
-    
+
     private static String name = "new player";
-    
-    public static String getName(){
-        
+
+    public static String getName() {
+
         return name;
     }
-    
+
     public static void start(String map) {
+        Client.connect();
 
         //Hide the mouse
         Mouse.setGrabbed(true);
 
         //Load the level
-        if (!IS_MULTIPLAYER) {
-            CubeMap.load("levels/level_" + map + ".txt");
-        }
+        CubeMap.load("levels/level_" + map + ".txt");
 
         //Setup graphics effects
         setupGraphics();
 
         //Set up GUI
+        setupGUI();
+
+        //Create the player
+        new InvisibleMan().create();
+    }
+
+    private static void setupGUI() {
         con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
         GUIController.add(con);
         con.addChat("Welcome " + name + " to invisible man! To move around, just"
@@ -58,15 +60,15 @@ public class Game {
             }
 
             name = "";
-            for(String s : al){
-                
+            for (String s : al) {
+
                 name += s + " ";
             }
-            
+
             name += (char) 8;
             return "Your name has been changed to " + name;
         }));
-        
+
         CommController.add(new Command("\\step", al -> {
 
             if (al.size() != 1) {
@@ -134,30 +136,13 @@ public class Game {
             pos = new Vec3(coords[0] + (relative[0] ? ppos.x : 0), coords[1] + (relative[1] ? ppos.y : 0), coords[2] + (relative[2] ? ppos.z : 0));
 
             try {
-                CubeType ct = al.get(3).equals("null") ? null : CubeType.valueOf(al.get(3));
-                CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = ct;
-                Util.forRange(-1, 1, -1, 1, (x, y) -> Util.forRange(-1, 1, z -> {
-                    CubeMap.redraw(pos.add(new Vec3(x,y,z)));
-                }));
-                CubeMap.redraw(pos);
+                CubeType ct = al.get(3).equals("null") ? null : CubeType.getByName(al.get(3));
+                CubeMap.setCube((int) pos.x, (int) pos.y, (int) pos.z, ct);
                 sendMessage(BLOCK_PLACE, pos, ct);
                 return "Block placed.";
             } catch (Exception e) {
                 return "Invalid block type.";
             }
-//            List<Object> data = new ArrayList();
-//            data.add(pos);
-//            try {
-//                data.add(al.get(3).equals("null") ? null : CubeType.valueOf(al.get(3)));
-//            } catch (Exception e) {
-//                return "Invalid block type.";
-//            }
-//            CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = (CubeType) data.get(1);
-//            CubeMap.redraw((Vec3) pos);
-//            if (IS_MULTIPLAYER) {
-//                sendMessage(BLOCK_PLACE, data);
-//            }
-//            return "Block placed.";
         }));
         CommController.add(new Command("\\pos", al -> {
             if (!al.isEmpty()) {
@@ -189,9 +174,5 @@ public class Game {
             RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).set(pos);
             return String.format("Teleported to %f %f %f.", pos.x, pos.y, pos.z);
         }));
-
-        //Create the player
-        new InvisibleMan().create();
     }
-    
 }

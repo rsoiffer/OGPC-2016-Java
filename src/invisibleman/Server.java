@@ -89,13 +89,11 @@ public class Server {
             });
             handleMessage(client, BLOCK_PLACE, data -> {
                 Vec3 pos = (Vec3) data[0];
-                CubeMap.map[(int) pos.x][(int) pos.y][(int) pos.z] = CubeType.idToType((int) data[1]);
-                CubeMap.redraw(pos);
+                CubeMap.setCube((int) pos.x, (int) pos.y, (int) pos.z, CubeType.idToType((int) data[1]));
                 sendToOthers(client, BLOCK_PLACE, data);
             });
             handleMessage(client, MAP_FILE, data -> {
                 CubeMap.load((String) data[0]);
-                CubeMap.redrawAll();
                 sendToOthers(client, MAP_FILE, data);
             });
             handleMessage(client, RESTART, data -> {
@@ -114,8 +112,8 @@ public class Server {
             });
         }).start();
 
-        runCommandInterface();
-//        runGraphicalInterface();
+//        runCommandInterface();
+        runGraphicalInterface();
     }
 
     private static void handleMessage(ClientInfo info, MessageType type, Consumer<Object[]> handler) {

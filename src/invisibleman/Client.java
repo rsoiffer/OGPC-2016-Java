@@ -24,8 +24,8 @@ import network.Connection;
 import network.NetworkUtils;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
-import util.*;
 import static util.Color4.TRANSPARENT;
+import util.*;
 
 public abstract class Client {
 
@@ -121,8 +121,7 @@ public abstract class Client {
         handleMessage(BLOCK_PLACE, data -> {
             List<Object> args = Arrays.asList(data);
             Vec3 coords = (Vec3) args.get(0);
-            CubeMap.map[(int) coords.x][(int) coords.y][(int) coords.z] = CubeType.idToType((int) args.get(1));
-            CubeMap.redraw((Vec3) args.get(0));
+            CubeMap.setCube((int) coords.x, (int) coords.y, (int) coords.z, (CubeType) args.get(1));
         });
 
         handleMessage(MAP_FILE, data -> {

@@ -12,7 +12,9 @@ import gui.types.ComponentInputGUI;
 import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
 import invisibleman.Game;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import map.Editor;
@@ -63,15 +65,13 @@ public class Play extends ComponentInputGUI {
     }
 
     private void getLevels() {
-
-        File[] levels = (new File("levels")).listFiles();
-
-        for (int i = 0; i < levels.length; i++) {
-
-            String label = levels[i].getName().substring(6);
-            label = label.substring(0, label.indexOf("."));
-            System.out.println(label);
-            inputs.add(new GUIButton(label, this, bPos.add(new Vec2(0, bDim.y * (i % bNum))), bDim, label, Color.white));
+        try {
+            List<String> levels = Files.readAllLines(Paths.get("level_list.txt"));
+            for (int i = 0; i < levels.size(); i++) {
+                String label = levels.get(i);
+                inputs.add(new GUIButton(label, this, bPos.add(new Vec2(0, bDim.y * (i % bNum))), bDim, label, Color.white));
+            }
+        } catch (IOException ex) {
         }
     }
 
