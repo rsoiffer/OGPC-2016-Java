@@ -186,7 +186,9 @@ public class CubeMap {
 //    }
     public static void save(String fileName) {
         try {
+            System.out.println(fileName);
             PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+            System.out.println(writer);
             writer.printf("f %f %f %f \n", Client.fogColor.r, Client.fogColor.g, Client.fogColor.b);
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 CubeType ct = MAP[x][y][z];

@@ -43,14 +43,11 @@ public abstract class Client {
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
 
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
-        GUIController.add(ps);
-        
         Join jn = new Join("ip select");
-        GUIController.add(jn);
-
-        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight), ps, jn);
+        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
+        
         TypingManager tpm = new TypingManager(ts);
-        GUIController.add(ts);
+        GUIController.add(ts, jn, ps);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(GUIController::update);

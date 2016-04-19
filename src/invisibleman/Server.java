@@ -23,7 +23,7 @@ import util.*;
 
 public class Server {
 
-    public static String currentMap = "sandtemple";
+    public static String currentMap = "cabin";
 
     private static class ClientInfo {
 

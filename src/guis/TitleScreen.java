@@ -6,6 +6,7 @@
 package guis;
 
 import graphics.Window2D;
+import gui.GUIController;
 import static gui.GUIController.FONT;
 import static gui.TypingManager.typing;
 import gui.components.GUIButton;
@@ -15,7 +16,6 @@ import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
 import java.util.ArrayList;
 import java.util.List;
-import map.Editor;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import util.Color4;
@@ -31,29 +31,29 @@ public class TitleScreen extends ComponentInputGUI {
     private final Vec2 dim;
     private final Vec2 bDim;
     private final Vec2 bPos;
-    private final Play lSel;
-    private final Join jSel;
 
-    public TitleScreen(String n, Vec2 d, Play ps, Join jn) {
+    public TitleScreen(String n, Vec2 d) {
 
         super(n);
         dim = d;
-        bDim = new Vec2(100, FONT.getHeight() * 2);
-        bPos = new Vec2(0, 300);
+        bDim = new Vec2(200, FONT.getHeight() * 2);
+        bPos = new Vec2(0, 150);
 
         Window2D.background = Color4.BLACK;
         components.add(new GUIPanel("options Panel", bPos, bDim, Color4.ORANGE));
-        components.add(new GUIPanel("servers Panel", bPos.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.75)));
-        components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.5)));
-        components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 3)), bDim, Color4.ORANGE.multiply(0.25)));
+        components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.8)));
+        components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.6)));
                 
-        buttons.add(new GUIButton("options", this, bPos, bDim, "Options", Color.black));
-        buttons.add(new GUIButton("servers", this, bPos.add(new Vec2(0, bDim.y)), bDim, "Servers", Color.darkGray));
-        buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Play", Color.lightGray));
-        buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 3)), bDim, "Editor", Color.white));
+        buttons.add(new GUIButton("options", this, bPos, bDim, "Options", Color.white));
+        buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y)), bDim, "Play", Color.white));
+        buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Editor", Color.white));
+    }
+    
+    public static void setMainVisibleFalse(){
         
-        lSel = ps;
-        jSel = jn;
+        GUIController.getGUI("level select").setVisible(false);
+        GUIController.getGUI("ip select").setVisible(false);
+        GUIController.getGUI("main menu").setVisible(false);
     }
 
     @Override
@@ -89,18 +89,16 @@ public class TitleScreen extends ComponentInputGUI {
 
         if (name.equals("play")) {
 
-            this.setVisible(false);
+            //this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            lSel.start(0, jSel);
-//            Game.start();
+            ((Play) GUIController.getGUI("level select")).start(0);
         }
         if (name.equals("editor")) {
-            this.setVisible(false);
+            //this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            lSel.start(1, jSel);
-//            Editor.start();
+            ((Play) GUIController.getGUI("level select")).start(1);
         }
     }
 

@@ -53,7 +53,7 @@ public class Chunk {
     }
 
     public void redraw() {
-        
+        System.out.println(this);
         glNewList(drawList, GL_COMPILE);
         WHITE.glColor();
         glEnable(GL_TEXTURE_2D);
