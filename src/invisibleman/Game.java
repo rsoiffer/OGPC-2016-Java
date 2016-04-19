@@ -55,17 +55,11 @@ public class Game {
 
         CommController.add(new Command("\\name", al -> {
 
-            if (al.size() < 1) {
+            if (al.size() != 1) {
                 return "\\name needs to have something to change your name to.";
             }
 
-            name = "";
-            for (String s : al) {
-
-                name += s + " ";
-            }
-
-            name = name.substring(name.length() - 1);
+            name = al.get(0);
             return "Your name has been changed to " + name;
         }));
 

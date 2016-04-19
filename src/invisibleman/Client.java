@@ -114,7 +114,7 @@ public abstract class Client {
         });
 
         handleMessage(CHAT_MESSAGE, data -> {
-            //con.addChat((String) data[0]);
+            con.addChat((String) data[0]);
         });
 
         handleMessage(BLOCK_PLACE, data -> {
