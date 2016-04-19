@@ -11,6 +11,7 @@ import gui.components.GUIPanel;
 import gui.types.ComponentInputGUI;
 import gui.types.GUIComponent;
 import gui.types.GUIInputComponent;
+import invisibleman.Client;
 import invisibleman.Game;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +41,7 @@ public class Play extends ComponentInputGUI {
 
     private boolean grabbed;
     private boolean editor;
+    private Join multiP;
 
     public Play(String n, Vec2 d) {
 
@@ -67,7 +69,10 @@ public class Play extends ComponentInputGUI {
     private void getLevels() {
         try {
             List<String> levels = Files.readAllLines(Paths.get("level_list.txt"));
-            for (int i = 0; i < levels.size(); i++) {
+            
+            inputs.add(new GUIButton("join server", this, bPos, bDim, "Join A Server", Color.white));
+            
+            for (int i = 1; i < levels.size(); i++) {
                 String label = levels.get(i);
                 inputs.add(new GUIButton(label, this, bPos.add(new Vec2(0, bDim.y * (i % bNum))), bDim, label, Color.white));
             }
@@ -85,22 +90,30 @@ public class Play extends ComponentInputGUI {
             case "prev level":
                 prev();
                 break;
+            case "join server":
+                this.setVisible(false);
+                Mouse.setGrabbed(grabbed);
+                typing(this, false);
+                multiP.start(editor ? 1 : 0);
+                break;
             default:
                 this.setVisible(false);
                 Mouse.setGrabbed(grabbed);
                 typing(this, false);
+                Client.IS_MULTIPLAYER = false;
                 if (editor) {
-                    Editor.start(name);
+                    Editor.start(name, null);
                 } else {
-                    Game.start(name);
+                    Game.start(name, null);
                 }
                 break;
         }
 
     }
 
-    public void start(int mode) {
+    public void start(int mode, Join jn) {
         editor = mode == 1;
+        multiP = jn;
         this.setVisible(true);
         grabbed = Mouse.isGrabbed();
         Mouse.setGrabbed(false);

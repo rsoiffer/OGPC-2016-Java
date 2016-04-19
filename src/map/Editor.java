@@ -30,8 +30,8 @@ public class Editor {
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
     private static final boolean IS_MULTIPLAYER = false;
 
-    public static void start(String mapname) {
-        Client.connect();
+    public static void start(String mapname, String ip) {
+        Client.connect(ip);
 
         //Hide the mouse
         Mouse.setGrabbed(true);

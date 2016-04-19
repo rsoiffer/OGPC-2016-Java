@@ -12,6 +12,7 @@ import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
 import guis.Chat;
+import guis.Join;
 import guis.Play;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
@@ -43,8 +44,11 @@ public abstract class Client {
 
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
         GUIController.add(ps);
+        
+        Join jn = new Join("ip select");
+        GUIController.add(jn);
 
-        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight), ps);
+        TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight), ps, jn);
         TypingManager tpm = new TypingManager(ts);
         GUIController.add(ts);
 
@@ -60,11 +64,12 @@ public abstract class Client {
         System.exit(0);
     }
 
-    public static void connect() {
+    public static void connect(String ip) {
+        
         if (IS_MULTIPLAYER) {
             //Try to connect to the server
             //if (args.length == 0) {
-            conn = NetworkUtils.connectManual();
+            conn = NetworkUtils.connect(ip);
             //} else {
             //    conn = NetworkUtils.connect(args[0]);
             //}

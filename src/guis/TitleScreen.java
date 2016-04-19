@@ -32,8 +32,9 @@ public class TitleScreen extends ComponentInputGUI {
     private final Vec2 bDim;
     private final Vec2 bPos;
     private final Play lSel;
+    private final Join jSel;
 
-    public TitleScreen(String n, Vec2 d, Play ps) {
+    public TitleScreen(String n, Vec2 d, Play ps, Join jn) {
 
         super(n);
         dim = d;
@@ -52,6 +53,7 @@ public class TitleScreen extends ComponentInputGUI {
         buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 3)), bDim, "Editor", Color.white));
         
         lSel = ps;
+        jSel = jn;
     }
 
     @Override
@@ -90,14 +92,14 @@ public class TitleScreen extends ComponentInputGUI {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            lSel.start(0);
+            lSel.start(0, jSel);
 //            Game.start();
         }
         if (name.equals("editor")) {
             this.setVisible(false);
             Mouse.setGrabbed(grabbed);
             typing(this, false);
-            lSel.start(1);
+            lSel.start(1, jSel);
 //            Editor.start();
         }
     }

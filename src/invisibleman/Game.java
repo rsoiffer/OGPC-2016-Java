@@ -27,8 +27,8 @@ public class Game {
         return name;
     }
 
-    public static void start(String map) {
-        Client.connect();
+    public static void start(String map, String ip) {
+        Client.connect(ip);
 
         //Hide the mouse
         Mouse.setGrabbed(true);
