@@ -65,7 +65,7 @@ public class Game {
                 name += s + " ";
             }
 
-            name += (char) 8;
+            name = name.substring(name.length() - 1);
             return "Your name has been changed to " + name;
         }));
 
