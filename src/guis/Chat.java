@@ -7,6 +7,7 @@ package guis;
 
 import commands.CommController;
 import engine.Input;
+import gui.GUIController;
 import static gui.GUIController.FONT;
 import gui.components.GUICommandField;
 import gui.components.GUIListOutputField;
@@ -33,6 +34,7 @@ public class Chat extends ComponentInputGUI {
 
     private final GUIListOutputField output;
     private final GUICommandField input;
+    private final MiniChat minC;
     private final Vec2 dim;
 
     public Chat(String n, int key, Vec2 d) {
@@ -40,6 +42,8 @@ public class Chat extends ComponentInputGUI {
         super(n);
         dim = d;
         grabbed = false;
+        minC = ((MiniChat) GUIController.getGUI("mChat++"));
+        
         components.add(new GUIPanel("Output Panel", Vec2.ZERO, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
         components.add(new GUIPanel("Input Panel", new Vec2(0, dim.y - FONT.getHeight()), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
         output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y - FONT.getHeight()), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
@@ -50,6 +54,7 @@ public class Chat extends ComponentInputGUI {
             this.setVisible(true);
             grabbed = Mouse.isGrabbed();
             Mouse.setGrabbed(false);
+            minC.setVisible(false);
             typing(this, true);
             setLeave();
         });
@@ -59,6 +64,7 @@ public class Chat extends ComponentInputGUI {
             this.setVisible(true);
             grabbed = Mouse.isGrabbed();
             Mouse.setGrabbed(false);
+            minC.setVisible(false);
             typing(this, true, "\\");
             input.setText("\\");
             input.setCursorPos(new Vec2(1, 0));
@@ -72,6 +78,7 @@ public class Chat extends ComponentInputGUI {
 
                 this.setVisible(false);
                 Mouse.setGrabbed(grabbed);
+                GUIController.getGUI("mChat++").setVisible(true);
                 typing(this, false, "");
                 input.setText("");
             });
@@ -95,8 +102,12 @@ public class Chat extends ComponentInputGUI {
                 output.appendLine(CommController.runCommand(t));
             } else {
 
-                output.appendLine("<" + Game.getName() + "> " + t);
-                Client.sendMessage(CHAT_MESSAGE, "<" + Game.getName() + "> " + t);
+                t = "<" + Game.getName() + "> " + t;
+                output.appendLine(t);
+                System.out.println("comee");
+                minC.append(t);
+                Client.sendMessage(CHAT_MESSAGE, t);
+                
             }
 
             inputs.forEach(gcf -> {
@@ -128,6 +139,7 @@ public class Chat extends ComponentInputGUI {
         super.update();
         output.update();
         input.update();
+        minC.update();
     }
 
     @Override
@@ -141,6 +153,7 @@ public class Chat extends ComponentInputGUI {
     public void addChat(String s) {
 
         output.appendLine(s);
+        minC.append(s);
     }
     
     public void clearChat(){

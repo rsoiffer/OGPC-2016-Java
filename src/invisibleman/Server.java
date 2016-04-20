@@ -18,12 +18,12 @@ import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import static util.Color4.RED;
 import util.*;
+import static util.Color4.RED;
 
 public class Server {
 
-    public static String currentMap = "cabin";
+    public static String currentMap = "sandtemple";
 
     private static class ClientInfo {
 

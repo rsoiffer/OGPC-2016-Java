@@ -6,10 +6,12 @@ ice
 rocks 4
 
 stone_brick
+brick
 flower
 flowerpot
 carpet
 yellow
+fireplace
 
 wood_lower 3
 wood_upper 3
@@ -25,6 +27,8 @@ seaweed 2
 beach 3
 sand_white
 trunk
+leaves 1
+leaves_clump
 palms
 coconut
 

@@ -13,6 +13,7 @@ import gui.GUIController;
 import gui.TypingManager;
 import guis.Chat;
 import guis.Join;
+import guis.MiniChat;
 import guis.Play;
 import guis.TitleScreen;
 import static invisibleman.MessageType.*;
@@ -41,13 +42,15 @@ public abstract class Client {
 
         //Show the fps
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
-
+        
+        MiniChat mc = new MiniChat("mChat++");
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
         Join jn = new Join("ip select");
+
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
-        
+
         TypingManager tpm = new TypingManager(ts);
-        GUIController.add(ts, jn, ps);
+        GUIController.add(ts, jn, ps, mc);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(GUIController::update);
@@ -62,7 +65,7 @@ public abstract class Client {
     }
 
     public static void connect(String ip) {
-        
+
         if (IS_MULTIPLAYER) {
             //Try to connect to the server
             //if (args.length == 0) {

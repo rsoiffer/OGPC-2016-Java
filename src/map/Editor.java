@@ -17,6 +17,9 @@ import invisibleman.Premade3D;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
+import static map.CubeType.getByName;
+import static map.CubeType.getGroup;
+import static map.CubeType.getRandom;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import static util.Color4.RED;
@@ -27,7 +30,7 @@ import util.Vec3;
 
 public class Editor {
 
-    private static final boolean GENERATE_RANDOM_TERRAIN = false;
+    private static final boolean GENERATE_RANDOM_TERRAIN = true;
     private static final boolean IS_MULTIPLAYER = false;
 
     public static void start(String mapname, String ip) {
@@ -51,20 +54,20 @@ public class Editor {
                 int[][] hm = hg.getMap();
                 for (int[] m : hm) {
                     for (int j = 0; j < m.length; j++) {
-                        m[j] /= 12;
-                        m[j] += 12;
+                        m[j] /= 18;
+                        m[j] += 4;
                         m[j] = m[j] > 40 ? 40 : m[j];
                     }
                 }
 
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, hm[x][y] < 1 ? 0 : (hm[x][y] - 1), z -> {
-                    setCube(x, y, z, CubeType.getByName("snow"));
+                    setCube(x, y, z, CubeType.getByName("sand_white"));
                 }));
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y] < 1 ? 0 : (hm[x][y] - 1), hm[x][y], z -> {
-                    setCube(x, y, z, CubeType.getByName("dirt"));
+                    setCube(x, y, z, CubeType.getByName("sand_white"));
                 }));
                 Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(hm[x][y], 10, z -> {
-                    setCube(x, y, z, CubeType.getByName("stone"));
+                    setCube(x, y, z, getRandom(getGroup(getByName("water_1"))));
                 }));
             } else {
 //                Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, 10, z -> {
