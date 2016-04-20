@@ -24,11 +24,38 @@ public class Chunk {
     }
 
     public void draw() {
-//        System.out.println(this);
-//        org.lwjgl.opengl.Util.checkGLError();
         glCallList(drawList);
-//        System.out.println(this + " worked fine");
-//        org.lwjgl.opengl.Util.checkGLError();
+    }
+
+    private void drawCode() {
+        WHITE.glColor();
+        glEnable(GL_TEXTURE_2D);
+        for (CubeType ct : CubeType.getAll()) {
+            ct.texture.bind();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glBegin(GL_QUADS);
+            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
+                if (getCubeType(x, y, z) == ct) {
+                    drawFaces(new Vec3(x, y, z));
+                }
+            }));
+            glEnd();
+        }
+        if (DRAW_EDGES) {
+            glLineWidth(2);
+            BLACK.glColor();
+            glDisable(GL_TEXTURE_2D);
+            glBegin(GL_LINES);
+            new Vec3(0).glVertex();
+            new Vec3(0).glVertex();
+            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
+                // if (map[x][y][z] != null) {
+                drawEdges(new Vec3(x, y, z));
+                //}
+            }));
+            glEnd();
+        }
     }
 
     @Override
@@ -57,39 +84,11 @@ public class Chunk {
     }
 
     public void redraw() {
-        System.out.println(this);
-        //glDeleteLists(drawList, 1);
-        //drawList = glGenLists(1);
         glNewList(drawList, GL_COMPILE);
-        WHITE.glColor();
-        glEnable(GL_TEXTURE_2D);
-        for (CubeType ct : CubeType.getAll()) {
-            ct.texture.bind();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glBegin(GL_QUADS);
-            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
-                if (getCubeType(x, y, z) == ct) {
-                    drawFaces(new Vec3(x, y, z));
-                }
-            }));
-            glEnd();
-        }
-        if (DRAW_EDGES) {
-            glLineWidth(2);
-            BLACK.glColor();
-            glDisable(GL_TEXTURE_2D);
-            glBegin(GL_LINES);
-            Util.forRange(x, x + CHUNK_SIZE, y, y + CHUNK_SIZE, (x, y) -> Util.forRange(z, z + CHUNK_SIZE, z -> {
-                // if (map[x][y][z] != null) {
-                drawEdges(new Vec3(x, y, z));
-                //}
-            }));
-            glEnd();
-        }
+
+        drawCode();
+
         glEndList();
-        
-        org.lwjgl.opengl.Util.checkGLError();
     }
 
     @Override

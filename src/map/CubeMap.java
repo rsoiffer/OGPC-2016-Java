@@ -86,6 +86,7 @@ public class CubeMap {
 
     public static void load(String fileName) {
         try {
+            CubeType.getAll();
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 MAP[x][y][z] = null;
             }));
@@ -166,29 +167,9 @@ public class CubeMap {
         return StreamSupport.stream(rayCast(pos, dir).spliterator(), false);
     }
 
-//    public static void redraw(Vec3 pos) {
-//        Set<Chunk> TO_UPDATE = new HashSet();
-//        TO_UPDATE.add(getChunk(pos));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(1, 0, 0))));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(-1, 0, 0))));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(0, 1, 0))));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(0, -1, 0))));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(0, 0, 1))));
-//        TO_UPDATE.add(getChunk(pos.add(new Vec3(0, 0, -1))));
-//        TO_UPDATE.removeIf(c -> c == null);
-//        TO_UPDATE.forEach(Chunk::redraw);
-//    }
-//
-//    public static void redrawAll() {
-//        Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
-//            chunks[x][y][z].redraw();
-//        }));
-//    }
     public static void save(String fileName) {
         try {
-            System.out.println(fileName);
             PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-            System.out.println(writer);
             writer.printf("f %f %f %f \n", Client.fogColor.r, Client.fogColor.g, Client.fogColor.b);
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 CubeType ct = MAP[x][y][z];
