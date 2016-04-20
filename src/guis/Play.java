@@ -61,7 +61,7 @@ public class Play extends ComponentInputGUI {
         back = new GUIButton("back title", this, bPos.subtract(new Vec2(0, bDim.y * 2)), bDim, "Back", Color.orange);
 
         components.add(new GUIPanel("next panel", bPos.subtract(new Vec2(0, bDim.y)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.80)));
-        components.add(new GUIPanel("prev panel", bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.70)));
+        components.add(new GUIPanel("prev panel", bPos.subtract(new Vec2(0, bDim.y)).add(new Vec2(bDim.x / 2.0, 0)), bDim.divide(new Vec2(2, 1)), Color4.BLUE.multiply(.80)));
         components.add(new GUIPanel("back panel", bPos.subtract(new Vec2(0, bDim.y * 2)), bDim, Color4.BLUE.multiply(.50)));
 
         for (int i = 0; i < bNum; i++) {

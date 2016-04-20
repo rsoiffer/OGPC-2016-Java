@@ -30,7 +30,6 @@ public class Join extends ComponentInputGUI {
     
     private Vec2 fPos;
     private Vec2 fDim;
-    private Vec2 bDim;
     
     private boolean editor;
     private boolean grabbed;
@@ -40,13 +39,12 @@ public class Join extends ComponentInputGUI {
         
         super(n);
         fPos = new Vec2(600, 150);
-        fDim = new Vec2(200, FONT.getHeight());
-        bDim = new Vec2(100, FONT.getHeight() * 2);
+        fDim = new Vec2(300, FONT.getHeight() * 2);
         
-        components.add(new GUIPanel("ip Panel", fPos, fDim, Color4.ORANGE));
-        components.add(new GUIPanel("back Panel", fPos.subtract(new Vec2(0, bDim.y)), bDim, Color4.BLUE.multiply(.5)));
-        inputs.add(new GUICommandField("ip Input", this, fPos.add(new Vec2(0, FONT.getHeight())), fDim.x, Color.white, Color4.WHITE));
-        inputs.add(new GUIButton("back play", this, fPos.subtract(new Vec2(0, bDim.y)), bDim, "Back", Color.orange));
+        components.add(new GUIPanel("ip Panel", fPos, fDim, Color4.ORANGE.multiply(.6)));
+        components.add(new GUIPanel("back Panel", fPos.subtract(new Vec2(0, fDim.y)), fDim, Color4.BLUE.multiply(1.)));
+        inputs.add(new GUICommandField("ip Input", this, fPos.add(new Vec2(0, FONT.getHeight() * 1.5)), fDim.x, Color.white, Color4.WHITE));
+        inputs.add(new GUIButton("back play", this, fPos.subtract(new Vec2(0, fDim.y)), fDim, "Back", Color.orange));
     }
     
     @Override
