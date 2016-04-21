@@ -1,4 +1,4 @@
-package invisibleman;
+package map;
 
 import engine.Signal;
 import graphics.data.Animation;

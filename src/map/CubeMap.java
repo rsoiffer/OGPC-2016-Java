@@ -1,14 +1,15 @@
 package map;
 
-import invisibleman.Client;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
+import static java.util.stream.Stream.of;
 import java.util.stream.StreamSupport;
 import static map.Chunk.CHUNK_SIZE;
+import networking.Client;
 import util.*;
 
 public class CubeMap {
@@ -187,13 +188,7 @@ public class CubeMap {
         if (MAP[x][y][z] != ct) {
             MAP[x][y][z] = ct;
             Vec3 pos = new Vec3(x, y, z);
-            TO_REDRAW.add(getChunk(pos));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(1, 0, 0))));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(-1, 0, 0))));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(0, 1, 0))));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(0, -1, 0))));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(0, 0, 1))));
-            TO_REDRAW.add(getChunk(pos.add(new Vec3(0, 0, -1))));
+            of(-1, 1).forEach(x2 -> of(-1, 1).forEach(y2 -> of(-1, 1).forEach(z2 -> TO_REDRAW.add(getChunk(pos.add(new Vec3(x2, y2, z2)))))));
         }
     }
 }

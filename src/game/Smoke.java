@@ -1,4 +1,4 @@
-package invisibleman;
+package game;
 
 import engine.Core;
 import engine.Signal;

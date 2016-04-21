@@ -1,4 +1,4 @@
-package invisibleman;
+package game;
 
 import engine.AbstractEntity;
 import engine.Core;
