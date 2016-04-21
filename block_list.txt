@@ -38,3 +38,5 @@ sand
 pavement
 lava 4
 space_window
+
+model_tree
