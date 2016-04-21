@@ -1,4 +1,5 @@
 f 0.300000 0.500000 1.000000 
+m 56 43 11 tree
 0 0 0 sand_white
 0 0 1 sand_white
 0 0 2 sand_white

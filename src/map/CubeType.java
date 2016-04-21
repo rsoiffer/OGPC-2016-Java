@@ -85,9 +85,13 @@ public class CubeType {
             Files.readAllLines(Paths.get("block_list.txt")).forEach(s -> {
                 if (!s.isEmpty()) {
                     if (!s.contains(" ")) {
-                        CubeType ct = new CubeType(s);
-                        TYPES.add(ct);
-                        GROUPS.add(Arrays.asList(ct));
+//                        if(s.startsWith("model_")){
+//                            
+//                        } else {
+                            CubeType ct = new CubeType(s);
+                            TYPES.add(ct);
+                            GROUPS.add(Arrays.asList(ct));
+//                        }
                     } else {
                         String[] a = s.split(" ");
                         ArrayList<CubeType> versions = new ArrayList();
