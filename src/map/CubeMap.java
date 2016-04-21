@@ -1,5 +1,7 @@
 package map;
 
+import engine.Signal;
+import graphics.data.Animation;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,6 +21,8 @@ public class CubeMap {
 
     private static final CubeType[][][] MAP = new CubeType[WIDTH][DEPTH][HEIGHT];
     private static final Chunk[][][] CHUNKS = new Chunk[WIDTH / CHUNK_SIZE][DEPTH / CHUNK_SIZE][HEIGHT / CHUNK_SIZE];
+    
+    private static final Map<Vec3, Signal<Animation>> MODELS = new HashMap();
 
     private static final Set<Chunk> TO_REDRAW = new HashSet();
 
@@ -35,6 +39,9 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             CHUNKS[x][y][z].draw();
         }));
+        MODELS.forEach((p,a) -> {
+            a.get().draw(p.add(new Vec2(.5).toVec3()), 0);
+        });
     }
 
     public static Chunk getChunk(Vec3 pos) {
@@ -97,9 +104,13 @@ public class CubeMap {
             Files.readAllLines(Paths.get(fileName)).forEach(s -> {
 
                 if (s.charAt(0) == 'f') {
-
                     double[] cs = argsGet(s.substring(2), 3);
                     Client.fogColor = new Color4(cs[0], cs[1], cs[2]);
+                } else if (s.charAt(0) == 'm'){
+                    double[] cs = argsGet(s.substring(2),3);
+                    Vec3 j = new Vec3(cs[0], cs[1], cs[2]);
+                    String name = s.substring(s.lastIndexOf(" ")+1);
+                    MODELS.put(j, new Signal(new Animation(name, name+"diffuse")));
                 } else {
 
                     double[] cs = argsGet(s, 3);
