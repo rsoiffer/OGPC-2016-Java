@@ -36927,7 +36927,6 @@ f 0.300000 0.500000 1.000000
 31 77 9 sand_white
 31 77 10 sand_white
 31 77 11 sand_white
-31 77 12 leaves_clump
 31 78 0 sand_white
 31 78 1 sand_white
 31 78 2 sand_white
