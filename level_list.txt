@@ -1,3 +1,5 @@
+beach
 cabin
-current
-sandtemple
+castle
+city
+sand_temple

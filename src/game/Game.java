@@ -1,11 +1,12 @@
-package invisibleman;
+package game;
 
+import networking.Client;
 import commands.CommController;
 import commands.Command;
 import gui.GUIController;
 import guis.Chat;
-import static invisibleman.Client.*;
-import static invisibleman.MessageType.BLOCK_PLACE;
+import static networking.Client.*;
+import static networking.MessageType.BLOCK_PLACE;
 import map.CubeMap;
 import map.CubeType;
 import org.lwjgl.input.Keyboard;

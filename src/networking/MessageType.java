@@ -1,4 +1,4 @@
-package invisibleman;
+package networking;
 
 import java.util.Arrays;
 import util.Vec3;

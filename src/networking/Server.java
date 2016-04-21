@@ -1,11 +1,11 @@
-package invisibleman;
+package networking;
 
 import engine.*;
+import game.*;
 import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
-import static invisibleman.MessageType.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -14,12 +14,13 @@ import static map.CubeMap.WORLD_SIZE;
 import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
+import static networking.MessageType.*;
 import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import util.*;
 import static util.Color4.RED;
+import util.*;
 
 public class Server {
 
@@ -72,7 +73,7 @@ public class Server {
                 sendToOthers(client, SNOWBALL, data);
             });
             handleMessage(client, HIT, data -> {
-                new Explosion((Vec3) data[0], new Color4(1, 0, 0)).create();
+                Particle.explode((Vec3) data[0], RED);
                 Sounds.playSound("hit.wav");
                 sendToOthers(client, HIT, data);
             });
@@ -97,7 +98,8 @@ public class Server {
                 sendToOthers(client, MAP_FILE, data);
             });
             handleMessage(client, RESTART, data -> {
-                RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+                RegisteredEntity.getAll(BallAttack.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+                Particle.clear();
                 sendToAll(RESTART, data);
             });
 
@@ -189,7 +191,8 @@ public class Server {
         //The reset button
         Input.whenKey(Keyboard.KEY_BACKSLASH, true).onEvent(() -> {
             sendToAll(RESTART);
-            RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+            RegisteredEntity.getAll(BallAttack.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+            Particle.clear();
         });
 
         //Draw GUI

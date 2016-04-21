@@ -1,9 +1,10 @@
-package invisibleman;
+package networking;
 
 import engine.Core;
 import engine.Destructible;
 import engine.Input;
 import engine.Signal;
+import game.*;
 import graphics.data.Framebuffer;
 import graphics.data.Framebuffer.DepthAttachment;
 import graphics.data.Framebuffer.TextureAttachment;
@@ -11,18 +12,14 @@ import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
-import guis.Chat;
-import guis.Join;
-import guis.MiniChat;
-import guis.Play;
-import guis.TitleScreen;
-import static invisibleman.MessageType.*;
+import guis.*;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import map.CubeMap;
 import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
+import static networking.MessageType.*;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.TRANSPARENT;
@@ -42,7 +39,7 @@ public abstract class Client {
 
         //Show the fps
         Core.render.bufferCount(Core.interval(1)).forEach(i -> Display.setTitle("FPS: " + i));
-        
+
         MiniChat mc = new MiniChat("mChat++");
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
         Join jn = new Join("ip select");
@@ -114,7 +111,7 @@ public abstract class Client {
         });
 
         handleMessage(HIT, data -> {
-            new Explosion((Vec3) data[0], new Color4(1, 0, 0)).create();
+            Particle.explode((Vec3) data[0], new Color4(0, .5, 1));
             Sounds.playSound("hit.wav");
         });
 
@@ -132,7 +129,8 @@ public abstract class Client {
         });
 
         handleMessage(RESTART, data -> {
-            RegisteredEntity.getAll(BallAttack.class, Explosion.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+            RegisteredEntity.getAll(BallAttack.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
+            Particle.clear();
             new InvisibleMan().create();
         });
     }

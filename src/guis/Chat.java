@@ -21,9 +21,9 @@ import util.Vec2;
 import gui.types.GUIInputComponent;
 import static gui.TypingManager.typing;
 import gui.types.GUIComponent;
-import invisibleman.Client;
-import invisibleman.Game;
-import static invisibleman.MessageType.CHAT_MESSAGE;
+import networking.Client;
+import game.Game;
+import static networking.MessageType.CHAT_MESSAGE;
 import java.util.List;
 
 /**

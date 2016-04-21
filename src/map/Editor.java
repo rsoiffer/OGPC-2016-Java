@@ -5,21 +5,19 @@ import engine.AbstractEntity.LAE;
 import engine.Core;
 import engine.Input;
 import engine.Signal;
+import game.Fog;
+import game.Premade3D;
 import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
-import invisibleman.Client;
-import static invisibleman.Client.sendMessage;
-import invisibleman.Fog;
-import static invisibleman.MessageType.*;
-import invisibleman.Premade3D;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
-import static map.CubeType.getByName;
-import static map.CubeType.getGroup;
-import static map.CubeType.getRandom;
+import static map.CubeType.*;
+import networking.Client;
+import static networking.Client.sendMessage;
+import static networking.MessageType.BLOCK_PLACE;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import static util.Color4.RED;
@@ -30,7 +28,7 @@ import util.Vec3;
 
 public class Editor {
 
-    private static final boolean GENERATE_RANDOM_TERRAIN = true;
+    private static final boolean GENERATE_RANDOM_TERRAIN = false;
     private static final boolean IS_MULTIPLAYER = false;
 
     public static void start(String mapname, String ip) {
