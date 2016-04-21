@@ -46,7 +46,7 @@ public class Chat extends ComponentInputGUI {
         
         components.add(new GUIPanel("Output Panel", Vec2.ZERO, dim.subtract(new Vec2(0, FONT.getHeight())), Color4.gray(.3).withA(.5)));
         components.add(new GUIPanel("Input Panel", new Vec2(0, dim.y - FONT.getHeight()), dim.withY(FONT.getHeight()), Color4.BLACK.withA(.5)));
-        output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y - FONT.getHeight()), dim.subtract(new Vec2(0, 2 * FONT.getHeight())), Color.white);
+        output = new GUIListOutputField("Output Field", this, new Vec2(0, dim.y + FONT.getHeight()), dim, Color.white);
         input = new GUICommandField("Input Field", this, new Vec2(0, dim.y), dim.x, Color.white, Color4.WHITE);
 
         Input.whenKey(key, true).onEvent(() -> {
@@ -104,7 +104,6 @@ public class Chat extends ComponentInputGUI {
 
                 t = "<" + Game.getName() + "> " + t;
                 output.appendLine(t);
-                System.out.println("comee");
                 minC.append(t);
                 Client.sendMessage(CHAT_MESSAGE, t);
                 
