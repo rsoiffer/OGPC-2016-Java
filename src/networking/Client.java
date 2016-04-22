@@ -2,14 +2,7 @@ package networking;
 
 import engine.Core;
 import engine.Destructible;
-import engine.Input;
-import engine.Signal;
 import game.*;
-import graphics.data.Framebuffer;
-import graphics.data.Framebuffer.DepthAttachment;
-import graphics.data.Framebuffer.TextureAttachment;
-import graphics.data.PostProcessEffect;
-import graphics.data.Shader;
 import gui.GUIController;
 import gui.TypingManager;
 import guis.*;
@@ -21,10 +14,7 @@ import network.Connection;
 import network.NetworkUtils;
 import static networking.MessageType.*;
 import org.lwjgl.opengl.Display;
-import static org.lwjgl.opengl.GL11.*;
-import static util.Color4.TRANSPARENT;
 import util.*;
-import static util.Color4.BLACK;
 
 public abstract class Client {
 
@@ -90,17 +80,17 @@ public abstract class Client {
     }
 
     public static void registerMessageHandlers() {
-        
+
         handleMessage(GET_NAME, data -> {
-        
+
             Game.setName((String) data[0]);
         });
-        
+
         handleMessage(SCORE, data -> {
-        
+
             ((Score) GUIController.getGUI("scorb")).point((String) data[0]);
         });
-        
+
         handleMessage(FOOTSTEP, data -> {
             Footstep f = new Footstep();
             f.create();
@@ -155,70 +145,5 @@ public abstract class Client {
             }
             conn.sendMessage(type.id(), contents);
         }
-    }
-
-    public static void setupGraphics() {
-        //Silly graphics effects
-        Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 5);
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "grayscale.frag")).toggleOn(cMod.map(i -> i == 2));
-        Shader wobble = new Shader("default.vert", "wobble.frag");
-        Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                wobble).toggleOn(cMod.map(i -> i == 3));
-        new PostProcessEffect(10, new Framebuffer(new TextureAttachment(), new DepthAttachment()),
-                new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
-
-        //Create the snow particles
-        new Snow().create();
-        
-        //Create the fog
-        new Fog(BLACK, .0025, .95).create(); // .95 .8 .3
-
-        //Draw the level
-        Core.render.onEvent(() -> {
-            CubeMap.drawAll();
-        });
-    }
-
-    public static PostProcessEffect kawaseBloom() {
-        Framebuffer base = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Framebuffer hdr = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Framebuffer blur = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
-        Shader kawase = new Shader("default.vert", "kawase.frag");
-        Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
-        return new PostProcessEffect(5, base, () -> {
-            hdr.clear(TRANSPARENT);
-            hdr.with(() -> onlyHDR.with(base::render));
-            kawase.with(() -> {
-                kawase.setInt("size", 0);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-
-                kawase.setInt("size", 1);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 2);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-
-                kawase.setInt("size", 2);
-                hdr.clear(TRANSPARENT);
-                hdr.with(blur::render);
-
-                kawase.setInt("size", 3);
-                blur.clear(TRANSPARENT);
-                blur.with(hdr::render);
-            });
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            TRANSPARENT.glClearColor();
-            base.render();
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            blur.render();
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        });
     }
 }

@@ -90,7 +90,7 @@ public class CubeMap {
         try {
             CubeType.getAll();
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                setCube(x,y,z,null);
+                setCube(x, y, z, null);
             }));
 
             Map<String, String> replace = new HashMap();
