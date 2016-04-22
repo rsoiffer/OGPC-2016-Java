@@ -24,7 +24,7 @@ import util.*;
 
 public class Server {
 
-    public static String currentMap = "sand_temple";
+    public static String currentMap = "castle";
 
     private static class ClientInfo {
 
@@ -79,18 +79,18 @@ public class Server {
                 Particle.explode((Vec3) data[0], RED);
                 Sounds.playSound("hit.wav");
                 sendToOthers(client, HIT, data);
-                
+
                 String name = "";
-                
-                for(ClientInfo ci : CLIENTS){
-                    
-                    if(ci.id == (int) data[1]){
-                        
+
+                for (ClientInfo ci : CLIENTS) {
+
+                    if (ci.id == (int) data[1]) {
+
                         name = ci.name;
                         break;
                     }
                 }
-                
+
                 sendToAll(SCORE, name);
                 sendToAll(CHAT_MESSAGE, name + " got " + client.name);
             });
@@ -109,13 +109,13 @@ public class Server {
                 }
 
                 System.out.println(client.toString() + " changed their name to " + client.name);
-                
+
                 if (!cnae) {
-                    
+
                     client.name = (String) data[0];
-                }else{
-                    
-                    client.name = (String) data[0] +" "+ client.id;
+                } else {
+
+                    client.name = (String) data[0] + " " + client.id;
                     sendTo(client, GET_NAME, client.name);
                 }
             });
