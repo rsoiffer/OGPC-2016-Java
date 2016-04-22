@@ -1,18 +1,28 @@
 package game;
 
-import networking.Client;
 import commands.CommController;
 import commands.Command;
+import engine.Core;
+import engine.Input;
+import engine.Signal;
+import graphics.data.Framebuffer;
+import graphics.data.PostProcessEffect;
+import graphics.data.Shader;
 import gui.GUIController;
 import guis.Chat;
 import guis.Score;
-import static networking.Client.*;
-import static networking.MessageType.BLOCK_PLACE;
 import map.CubeMap;
 import map.CubeType;
+import networking.Client;
+import static networking.Client.con;
+import static networking.Client.sendMessage;
+import static networking.MessageType.BLOCK_PLACE;
 import static networking.MessageType.GET_NAME;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import static org.lwjgl.opengl.GL11.*;
+import static util.Color4.BLACK;
+import static util.Color4.TRANSPARENT;
 import util.RegisteredEntity;
 import util.Vec2;
 import util.Vec3;
@@ -29,9 +39,9 @@ public class Game {
 
         return name;
     }
-    
-    public static void setName(String n){
-        
+
+    public static void setName(String n) {
+
         name = n;
     }
 
@@ -54,15 +64,41 @@ public class Game {
         new InvisibleMan().create();
     }
 
+    public static void setupGraphics() {
+        //Silly graphics effects
+        Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 5);
+        new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
+                new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
+        new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
+                new Shader("default.vert", "grayscale.frag")).toggleOn(cMod.map(i -> i == 2));
+        Shader wobble = new Shader("default.vert", "wobble.frag");
+        Core.time().forEach(t -> wobble.setVec2("wobble", new Vec2(.01 * Math.sin(3 * t), .01 * Math.cos(3.1 * t)).toFloatBuffer()));
+        new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
+                wobble).toggleOn(cMod.map(i -> i == 3));
+        new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
+                new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
+
+        //Create the snow particles
+        new Snow().create();
+
+        //Create the fog
+        new Fog(BLACK, .0025, .95).create(); // .95 .8 .3
+
+        //Draw the level
+        Core.render.onEvent(() -> {
+            CubeMap.drawAll();
+        });
+    }
+
     private static void setupGUI() {
         con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
         Score sb = new Score("scorb");
         GUIController.add(con, sb);
-        
+
         con.addChat("Welcome " + name + " to invisible man! To move around, just"
                 + " use WASD. To use chat, press T. To change your name, use the"
                 + " \\name command. Have fun!");
-        
+
         sb.setVisible(true);
 
         CommController.add(new Command("\\name", al -> {
@@ -70,8 +106,10 @@ public class Game {
             if (al.size() != 1) {
                 return "\\name needs to have something to change your name to.";
             }
-            
-            if(name.length()>14) return "Your name is too long. Maximum 8 characters.";
+
+            if (name.length() > 14) {
+                return "Your name is too long. Maximum 8 characters.";
+            }
             name = al.get(0);
             Client.sendMessage(GET_NAME, name);
             return "Your name has been changed to " + name;
@@ -182,5 +220,44 @@ public class Game {
             RegisteredEntity.get(InvisibleMan.class).get().get("position", Vec3.class).set(pos);
             return String.format("Teleported to %f %f %f.", pos.x, pos.y, pos.z);
         }));
+    }
+
+    public static PostProcessEffect kawaseBloom() {
+        Framebuffer base = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer hdr = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Framebuffer blur = new Framebuffer(new Framebuffer.HDRTextureAttachment(), new Framebuffer.DepthAttachment());
+        Shader kawase = new Shader("default.vert", "kawase.frag");
+        Shader onlyHDR = new Shader("default.vert", "onlyHDR.frag");
+        return new PostProcessEffect(5, base, () -> {
+            hdr.clear(TRANSPARENT);
+            hdr.with(() -> onlyHDR.with(base::render));
+            kawase.with(() -> {
+                kawase.setInt("size", 0);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 1);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 2);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+
+                kawase.setInt("size", 2);
+                hdr.clear(TRANSPARENT);
+                hdr.with(blur::render);
+
+                kawase.setInt("size", 3);
+                blur.clear(TRANSPARENT);
+                blur.with(hdr::render);
+            });
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            TRANSPARENT.glClearColor();
+            base.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            blur.render();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        });
     }
 }

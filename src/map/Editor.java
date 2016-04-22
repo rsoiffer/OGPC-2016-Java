@@ -38,6 +38,8 @@ public class Editor {
         //Hide the mouse
         Mouse.setGrabbed(true);
 
+        new Fog(BLACK, .00025, 1).create();
+
         //Selecting blocks
         Mutable<Integer> selected = new Mutable(0);
 
@@ -75,8 +77,6 @@ public class Editor {
                 load("levels/level_" + mapname + ".txt");
             }
         }
-
-        new Fog(BLACK, .00025, 1).create();
 
         //Draw world
         Core.render.onEvent(() -> drawAll());
