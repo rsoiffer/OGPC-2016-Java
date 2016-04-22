@@ -1,8 +1,6 @@
 package map;
 
-import engine.Signal;
 import game.Fog;
-import graphics.data.Animation;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,7 +10,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Stream.of;
 import java.util.stream.StreamSupport;
 import static map.Chunk.CHUNK_SIZE;
-import networking.Client;
 import util.*;
 
 public class CubeMap {
@@ -22,8 +19,6 @@ public class CubeMap {
 
     private static final CubeType[][][] MAP = new CubeType[WIDTH][DEPTH][HEIGHT];
     private static final Chunk[][][] CHUNKS = new Chunk[WIDTH / CHUNK_SIZE][DEPTH / CHUNK_SIZE][HEIGHT / CHUNK_SIZE];
-    
-    private static final Map<Vec3, Signal<Animation>> MODELS = new HashMap();
 
     private static final Set<Chunk> TO_REDRAW = new HashSet();
 
@@ -40,9 +35,7 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             CHUNKS[x][y][z].draw();
         }));
-        MODELS.forEach((p,a) -> {
-            a.get().draw(p.add(new Vec2(.5).toVec3()), 0);
-        });
+        ModelList.drawAll();
     }
 
     public static Chunk getChunk(Vec3 pos) {
@@ -104,16 +97,17 @@ public class CubeMap {
 
             Files.readAllLines(Paths.get(fileName)).forEach(s -> {
 
-                if (s.charAt(0) == 'f') {
+                if (s.startsWith("f")) {
                     double[] cs = argsGet(s.substring(2), 3);
                     Fog.setFogColor(new Color4(cs[0], cs[1], cs[2]));
-                } else if (s.charAt(0) == 'm'){
+                    System.out.println("fog set");
+                }
+                else if (s.startsWith("m")) {
                     double[] cs = argsGet(s.substring(2),3);
-                    Vec3 j = new Vec3(cs[0], cs[1], cs[2]);
-                    String name = s.substring(s.lastIndexOf(" ")+1);
-                    MODELS.put(j, new Signal(new Animation(name, name+"diffuse")));
-                } else {
-
+                    ModelList.add(new Vec3(cs[0],cs[1],cs[2]),s.substring(s.lastIndexOf(" ")+1));
+                    ModelList.draw(new Vec3(cs[0],cs[1],cs[2]));
+                }
+                else {
                     double[] cs = argsGet(s, 3);
                     s = s.substring(s.lastIndexOf(" ") + 1).toLowerCase();
 
@@ -190,6 +184,7 @@ public class CubeMap {
                     writer.println(x + " " + y + " " + z + " " + ct.name);
                 }
             }));
+            ModelList.save(writer);
             writer.close();
         } catch (Exception ex) {
             Log.error(ex);

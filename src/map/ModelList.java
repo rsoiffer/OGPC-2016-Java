@@ -22,11 +22,18 @@ public class ModelList {
     }
     
     public static List<Animation> get(Vec3 p){
+        if(!models.containsKey(p)) return null;
         return models.get(p);
     }
     
     public static void add(Vec3 pos, String s){
-        if(!get(pos).contains(new Animation(s,s+"diffuse"))){
+        if(models.containsKey(pos)){
+            if(!models.get(pos).contains(new Animation(s,s+"diffuse"))){
+                List al = new ArrayList();
+                al.add(new Animation(s,s+"diffuse"));
+                models.put(pos, al);
+            }
+        } else {
             List al = new ArrayList();
             al.add(new Animation(s,s+"diffuse"));
             models.put(pos, al);
@@ -46,15 +53,11 @@ public class ModelList {
     }
     
     public static void draw(Vec3 pos){
-        
+        if(!models.containsKey(pos)) return;
         models.get(pos).forEach(m -> {
             m.draw(pos.add(new Vec2(.5).toVec3()), 0);
         });
 //        new Animation(models.get(p),models.get(p)+"diffuse").draw(p.add(new Vec2(.5).toVec3()), 0);
-    }
-    
-    public static void load(PrintWriter writer){
-        
     }
     
     public static void save(PrintWriter writer){
