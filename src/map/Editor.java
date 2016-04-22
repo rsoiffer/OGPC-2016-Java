@@ -31,6 +31,7 @@ public class Editor {
 
     private static final boolean GENERATE_RANDOM_TERRAIN = false;
     private static final boolean IS_MULTIPLAYER = false;
+    public static boolean model = false;
 
     public static void start(String mapname, String ip) {
         Client.connect(ip);
@@ -43,10 +44,13 @@ public class Editor {
         //Selecting blocks
         Mutable<Integer> selected = new Mutable(0);
 
-        Input.mouseWheel.forEach(x -> selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct());
-        Input.whenKey(KEY_UP, true).onEvent(() -> selected.o = (selected.o + 1) % CubeType.distinct());
-        Input.whenKey(KEY_DOWN, true).onEvent(() -> selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct());
+        Input.mouseWheel.filter(a -> !model).forEach(x -> selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct());
+        Input.whenKey(KEY_UP, true).filter(() -> !model).onEvent(() -> selected.o = (selected.o + 1) % CubeType.distinct());
+        Input.whenKey(KEY_DOWN, true).filter(()  -> !model).onEvent(() -> selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct());
 
+        Input.whenKey(KEY_M, true).onEvent(() -> {
+            model = !model;
+        });
         //Initial level
         if (!IS_MULTIPLAYER) {
             if (GENERATE_RANDOM_TERRAIN) {
@@ -136,7 +140,13 @@ public class Editor {
 
         //Destroy blocks
         Input.whenMouse(0, true).filter(() -> !isSolid(pos)).onEvent(() -> {
-            if (toFill.o != null) {
+            if(model){
+                rayCastStream(pos, facing.toVec3()).filter(cd -> ModelList.get(new Vec3(cd.x,cd.y,cd.z))!=null).findFirst().ifPresent(cd -> {
+                    ModelList.remove(pos);
+                    ModelList.draw(pos);
+                });
+            }
+            else if (toFill.o != null) {
                 rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
@@ -155,7 +165,12 @@ public class Editor {
 
         //Place blocks
         Input.whenMouse(1, true).filter(() -> !isSolid(pos)).onEvent(() -> {
-            if (toFill.o != null) {
+            if(model){
+                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {                    
+                    ModelList.add(new Vec3(cd.x,cd.y,cd.z), "tree");
+                });
+            }
+            else if (toFill.o != null) {
                 rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {

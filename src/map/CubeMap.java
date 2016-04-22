@@ -1,10 +1,8 @@
 package map;
 
-import engine.Signal;
 import game.BallAttack;
 import game.Fog;
 import game.Snow;
-import graphics.data.Animation;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,8 +22,6 @@ public class CubeMap {
     private static final CubeType[][][] MAP = new CubeType[WIDTH][DEPTH][HEIGHT];
     private static final Chunk[][][] CHUNKS = new Chunk[WIDTH / CHUNK_SIZE][DEPTH / CHUNK_SIZE][HEIGHT / CHUNK_SIZE];
 
-    private static final Map<Vec3, Signal<Animation>> MODELS = new HashMap();
-
     private static final Set<Chunk> TO_REDRAW = new HashSet();
 
     static {
@@ -41,9 +37,7 @@ public class CubeMap {
         Util.forRange(0, WIDTH / CHUNK_SIZE, 0, DEPTH / CHUNK_SIZE, (x, y) -> Util.forRange(0, HEIGHT / CHUNK_SIZE, z -> {
             CHUNKS[x][y][z].draw();
         }));
-        MODELS.forEach((p, a) -> {
-            a.get().draw(p.add(new Vec2(.5).toVec3()), 0);
-        });
+        ModelList.drawAll();
     }
 
     public static Chunk getChunk(Vec3 pos) {
@@ -132,9 +126,8 @@ public class CubeMap {
 
                 if (s.charAt(0) == 'm') {
                     double[] cs = getArgs(s.substring(2), 3);
-                    Vec3 j = new Vec3(cs[0], cs[1], cs[2]);
-                    String name = s.substring(s.lastIndexOf(" ") + 1);
-                    MODELS.put(j, new Signal(new Animation(name, name + "diffuse")));
+                    ModelList.add(new Vec3(cs[0], cs[1], cs[2]), s.substring(s.lastIndexOf(" ") + 1));
+                    ModelList.draw(new Vec3(cs[0], cs[1], cs[2]));
                     return;
                 }
 
@@ -207,6 +200,7 @@ public class CubeMap {
                     writer.println(x + " " + y + " " + z + " " + ct.name);
                 }
             }));
+            ModelList.save(writer);
             writer.close();
         } catch (Exception ex) {
             Log.error(ex);
