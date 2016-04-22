@@ -72136,6 +72136,7 @@ f 0.600000 0.600000 0.600000
 55 48 10 pavement
 55 48 11 pavement
 55 48 12 pavement
+55 48 13 planks
 55 49 0 snow
 55 49 1 snow
 55 49 2 snow
@@ -72149,6 +72150,7 @@ f 0.600000 0.600000 0.600000
 55 49 10 pavement
 55 49 11 pavement
 55 49 12 pavement
+55 49 13 planks
 55 50 0 snow
 55 50 1 snow
 55 50 2 snow
@@ -72162,6 +72164,7 @@ f 0.600000 0.600000 0.600000
 55 50 10 pavement
 55 50 11 pavement
 55 50 12 pavement
+55 50 13 planks
 55 51 0 snow
 55 51 1 snow
 55 51 2 snow
@@ -72175,6 +72178,7 @@ f 0.600000 0.600000 0.600000
 55 51 10 pavement
 55 51 11 pavement
 55 51 12 pavement
+55 51 13 planks
 55 52 0 snow
 55 52 1 snow
 55 52 2 snow
@@ -73436,6 +73440,7 @@ f 0.600000 0.600000 0.600000
 56 48 10 pavement
 56 48 11 pavement
 56 48 12 pavement
+56 48 13 planks_b
 56 49 0 snow
 56 49 1 snow
 56 49 2 snow
@@ -73449,6 +73454,7 @@ f 0.600000 0.600000 0.600000
 56 49 10 pavement
 56 49 11 pavement
 56 49 12 pavement
+56 49 13 planks_b
 56 50 0 snow
 56 50 1 snow
 56 50 2 snow
@@ -73462,6 +73468,7 @@ f 0.600000 0.600000 0.600000
 56 50 10 pavement
 56 50 11 pavement
 56 50 12 pavement
+56 50 13 planks_b
 56 51 0 snow
 56 51 1 snow
 56 51 2 snow
@@ -73475,6 +73482,7 @@ f 0.600000 0.600000 0.600000
 56 51 10 pavement
 56 51 11 pavement
 56 51 12 pavement
+56 51 13 planks_b
 56 52 0 snow
 56 52 1 snow
 56 52 2 snow
@@ -74736,6 +74744,7 @@ f 0.600000 0.600000 0.600000
 57 48 10 pavement
 57 48 11 pavement
 57 48 12 pavement
+57 48 13 planks
 57 49 0 snow
 57 49 1 snow
 57 49 2 snow
@@ -74749,6 +74758,7 @@ f 0.600000 0.600000 0.600000
 57 49 10 pavement
 57 49 11 pavement
 57 49 12 pavement
+57 49 13 planks
 57 50 0 snow
 57 50 1 snow
 57 50 2 snow
@@ -74762,6 +74772,7 @@ f 0.600000 0.600000 0.600000
 57 50 10 pavement
 57 50 11 pavement
 57 50 12 pavement
+57 50 13 planks
 57 51 0 snow
 57 51 1 snow
 57 51 2 snow
@@ -74775,6 +74786,7 @@ f 0.600000 0.600000 0.600000
 57 51 10 pavement
 57 51 11 pavement
 57 51 12 pavement
+57 51 13 planks
 57 52 0 snow
 57 52 1 snow
 57 52 2 snow

@@ -20,6 +20,7 @@ import static networking.Client.sendMessage;
 import static networking.MessageType.BLOCK_PLACE;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
+import static util.Color4.BLACK;
 import static util.Color4.RED;
 import util.Mutable;
 import util.Util;
@@ -75,7 +76,7 @@ public class Editor {
             }
         }
 
-        new Fog(Client.fogColor, .00025, 1).create();
+        new Fog(BLACK, .00025, 1).create();
 
         //Draw world
         Core.render.onEvent(() -> drawAll());

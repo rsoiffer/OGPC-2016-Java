@@ -24,13 +24,13 @@ import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.TRANSPARENT;
 import util.*;
+import static util.Color4.BLACK;
 
 public abstract class Client {
 
     public static boolean IS_MULTIPLAYER = true;
     private static Connection conn;
     public static Chat con;
-    public static Color4 fogColor;
 
     public static void main(String[] args) {
         //Set the game to 3D - this must go before Core.init();
@@ -74,6 +74,7 @@ public abstract class Client {
             //Handle messages recieved from the connection
             registerMessageHandlers();
 
+            sendMessage(GET_NAME, "NewPlayer");
             Core.timer(.5, conn::open);
         }
     }
@@ -89,6 +90,17 @@ public abstract class Client {
     }
 
     public static void registerMessageHandlers() {
+        
+        handleMessage(GET_NAME, data -> {
+        
+            Game.setName((String) data[0]);
+        });
+        
+        handleMessage(SCORE, data -> {
+        
+            ((Score) GUIController.getGUI("scorb")).point((String) data[0]);
+        });
+        
         handleMessage(FOOTSTEP, data -> {
             Footstep f = new Footstep();
             f.create();
@@ -108,6 +120,7 @@ public abstract class Client {
             b.get("position", Vec3.class).set((Vec3) data[0]);
             b.get("velocity", Vec3.class).set((Vec3) data[1]);
             b.isEnemy = true;
+            b.thrower = (int) data[2];
         });
 
         handleMessage(HIT, data -> {
@@ -159,9 +172,10 @@ public abstract class Client {
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
 
         //Create the snow particles
-        //new Snow().create();
+        new Snow().create();
+        
         //Create the fog
-        new Fog(fogColor, .0025, .95).create(); // .95 .8 .3
+        new Fog(BLACK, .0025, .95).create(); // .95 .8 .3
 
         //Draw the level
         Core.render.onEvent(() -> {

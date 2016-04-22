@@ -1,6 +1,7 @@
 package map;
 
 import engine.Signal;
+import game.Fog;
 import graphics.data.Animation;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -96,7 +97,7 @@ public class CubeMap {
         try {
             CubeType.getAll();
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                MAP[x][y][z] = null;
+                setCube(x,y,z,null);
             }));
 
             Map<String, String> replace = new HashMap();
@@ -105,7 +106,7 @@ public class CubeMap {
 
                 if (s.charAt(0) == 'f') {
                     double[] cs = argsGet(s.substring(2), 3);
-                    Client.fogColor = new Color4(cs[0], cs[1], cs[2]);
+                    Fog.setFogColor(new Color4(cs[0], cs[1], cs[2]));
                 } else if (s.charAt(0) == 'm'){
                     double[] cs = argsGet(s.substring(2),3);
                     Vec3 j = new Vec3(cs[0], cs[1], cs[2]);
@@ -182,7 +183,7 @@ public class CubeMap {
     public static void save(String fileName) {
         try {
             PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-            writer.printf("f %f %f %f \n", Client.fogColor.r, Client.fogColor.g, Client.fogColor.b);
+            writer.printf("f %f %f %f \n", Fog.FOG_COLOR.r, Fog.FOG_COLOR.g, Fog.FOG_COLOR.b);
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 CubeType ct = MAP[x][y][z];
                 if (ct != null) {

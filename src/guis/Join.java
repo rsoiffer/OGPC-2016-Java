@@ -62,17 +62,16 @@ public class Join extends ComponentInputGUI {
                 Client.IS_MULTIPLAYER = true;
                 if(server){
                     
-                    Editor.start("current", (String) info);
+                    Editor.start("empty", (String) info);
                 }else{
                     
                     Client.IS_MULTIPLAYER = false;
-                    Client.fogColor = Color4.WHITE;
                     CubeMap.save("levels/level_" + (String) info + ".txt");
                     Editor.start((String) info, "");
                 }
             } else {
                 
-                Game.start("current", (String) info);
+                Game.start("empty", (String) info);
             }
         } else if (name.equals("back play")) {
             

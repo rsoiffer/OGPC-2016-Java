@@ -21,6 +21,8 @@ wood_lower_b 3
 wood_upper_b 3
 log_lower_b
 log_upper_b
+planks
+planks_b
 
 water 4
 seaweed 2

@@ -8,9 +8,12 @@ public enum MessageType {
     FOOTSTEP(Vec3.class, Double.class, Boolean.class, Double.class), //position, rotation, isLeft, opacity
     SMOKE(Vec3.class, Double.class), //position, opacity
 
-    SNOWBALL(Vec3.class, Vec3.class), //position, velocity
+    SCORE(String.class), //who got a point
+    GET_NAME(String.class), //retrieve client name
+    
+    SNOWBALL(Vec3.class, Vec3.class, Integer.class), //position, velocity, id
 
-    HIT(Vec3.class), //position
+    HIT(Vec3.class, Integer.class), //position, id
 
     CHAT_MESSAGE(String.class), //the contents of the message
 

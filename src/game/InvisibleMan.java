@@ -30,7 +30,7 @@ public class InvisibleMan extends RegisteredEntity {
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
         Premade3D.makeWASDMovement(this, 5);
-        Premade3D.makeGravity(this, new Vec3(0, 0, -10));
+        Premade3D.makeGravity(this, new Vec3(0, 0, -15));
 
         //Flying cheat
         Signal<Boolean> fly = Input.whenKey(KEY_TAB, true).reduce(false, b -> !b);
@@ -63,7 +63,7 @@ public class InvisibleMan extends RegisteredEntity {
             Vec3 pos = position.get().add(new Vec3(0, 0, .8));
             Vec3 vel = Window3D.facing.toVec3().withLength(30);
 
-            Client.sendMessage(SNOWBALL, pos, vel);
+            Client.sendMessage(SNOWBALL, pos, vel, -1);
 
             BallAttack b = new BallAttack();
             b.create();
@@ -73,7 +73,7 @@ public class InvisibleMan extends RegisteredEntity {
 
         //Jumping
         add(Input.whileKey(Keyboard.KEY_SPACE, true).filter(onGround).onEvent(() -> {
-            velocity.edit(v -> v.withZ(4.75));
+            velocity.edit(v -> v.withZ(6));
         }));
 
         //Creating footsteps
@@ -107,5 +107,6 @@ public class InvisibleMan extends RegisteredEntity {
             }
             Client.sendMessage(SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
         }));
+        
     }
 }

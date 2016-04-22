@@ -8,6 +8,7 @@ import graphics.data.Sprite;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import map.CubeMap;
 import static org.lwjgl.opengl.GL11.*;
 import static util.Color4.WHITE;
 import util.Noise;
@@ -21,36 +22,44 @@ public class Snow extends AbstractEntity {
     @Override
     public void create() {
         List<Particle> particles = new LinkedList();
-        for (int i = 0; i < 1500; i++) {
-            particles.add(new Particle(Vec2.randomCircle(MAX_DIST).toVec3().withZ(Math.random() * 5), Math.random() * .04 + .06));
+        for (int i = 0; i < 2500; i++) {
+            particles.add(new Particle(Window3D.pos.add(Vec3.randomSquare(MAX_DIST)), Math.random() * .04 + .06));
+            //particles.add(new Particle(Vec2.randomCircle(MAX_DIST).toVec3().withZ(Math.random() * 5), Math.random() * .04 + .06));
         }
         onUpdate(dt -> {
             Iterator<Particle> it = particles.iterator();
             while (it.hasNext()) {
                 Particle p = it.next();
                 p.pos = p.pos.add(Vec3.randomSquare(dt / 10).add(new Vec3(0, 0, -dt * (p.getDR() + .5) / 2)));
-                if (p.pos.z < 0) {
-                    p.pos = p.pos.withZ(p.pos.z + 5);
+                Vec3 relPos = p.pos.subtract(Window3D.pos);
+                if (Math.abs(relPos.x) > MAX_DIST || Math.abs(relPos.y) > MAX_DIST || relPos.z > MAX_DIST) {
+                    p.pos = Window3D.pos.add(Vec3.randomSquare(MAX_DIST));
                 }
-                if (p.pos.toVec2().lengthSquared() < MIN_DIST * MIN_DIST) {
-                    p.pos = p.pos.toVec2().withLength(MIN_DIST).toVec3().withZ(p.pos.z);
-                }
-                if (p.pos.toVec2().lengthSquared() > MAX_DIST * MAX_DIST) {
-                    p.pos = p.pos.toVec2().withLength(MAX_DIST).toVec3().withZ(p.pos.z);
-                }
+                if (CubeMap.rayCastStream(p.pos, new Vec3(0,0,1)).anyMatch(cd -> cd.c != null)) {
+                                        p.pos = Window3D.pos.add(Vec3.randomSquare(MAX_DIST).withZ(MAX_DIST));
+                };
+//                if (p.pos.z < 0) {
+//                    p.pos = p.pos.withZ(p.pos.z + 5);
+//                }
+//                if (p.pos.toVec2().lengthSquared() < MIN_DIST * MIN_DIST) {
+//                    p.pos = p.pos.toVec2().withLength(MIN_DIST).toVec3().withZ(p.pos.z);
+//                }
+//                if (p.pos.toVec2().lengthSquared() > MAX_DIST * MAX_DIST) {
+//                    p.pos = p.pos.toVec2().withLength(MAX_DIST).toVec3().withZ(p.pos.z);
+//                }
                 p.pos = p.pos.add(Snow.Particle.getWind(dt / 10).toVec3());
                 p.setRotation((p.getRotation() + dt * p.getDR()) % Math.PI);
             }
         });
 
         Sprite s = new Sprite("snowflake2");
-        Core.renderLayer(2).onEvent(() -> {
+        Core.renderLayer(.2).onEvent(() -> {
             glEnable(GL_TEXTURE_2D);
             s.getTexture().bind();
             WHITE.glColor();
             glBegin(GL_QUADS);
             particles.forEach(p -> {
-                Vec3 pos = p.pos.add(Window3D.pos.subtract(new Vec3(0, 0, 1)));
+                Vec3 pos = p.pos;//.add(Window3D.pos.subtract(new Vec3(0, 0, 1)));
                 Vec3 towards = pos.subtract(Window3D.pos);
                 Vec3 side = towards.cross(Window3D.UP).withLength(Math.cos(p.getRotation()) * p.size / 2);
                 Vec3 snowUp = towards.cross(side).withLength(p.size / 2);
@@ -95,7 +104,7 @@ public class Snow extends AbstractEntity {
         }
 
         public double getRotation() {
-            return rotation;
+            return 0;//rotation;
         }
 
         public void setRotation(double r) {

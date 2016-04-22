@@ -40,7 +40,7 @@ public class Smoke extends RegisteredEntity {
     public void createInner() {
         ALL_SMOKE.add(this);
         Signal<Vec3> position = Premade3D.makePosition(this);
-        Signal<Double> opacity = addChild(Core.update.reduce(1., (dt, x) -> x * Math.pow(.97, dt)), "opacity");
+        Signal<Double> opacity = addChild(Core.update.reduce(1., (dt, x) -> x * Math.pow(.85, dt)), "opacity");
         opacity.filter(x -> x < .0001).onEvent(this::destroy);
     }
 

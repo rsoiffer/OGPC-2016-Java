@@ -56,7 +56,7 @@ public class Footstep extends RegisteredEntity {
         Signal<Vec3> position = Premade3D.makePosition(this);
         Signal<Double> rotation = Premade3D.makeRotation(this);
         Signal<Boolean> isLeft = addChild(new Signal(false), "isLeft");
-        Signal<Double> opacity = addChild(Core.update.reduce(1., (dt, x) -> x * Math.pow(.97, dt)), "opacity");
+        Signal<Double> opacity = addChild(Core.update.reduce(1., (dt, x) -> x * Math.pow(.85, dt)), "opacity");
 
         //Make the footstep sink slightly so it does depth order correctly
         onUpdate(dt -> position.edit(new Vec3(0, 0, -dt / 10000)::add));

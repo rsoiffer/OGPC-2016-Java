@@ -24,12 +24,13 @@ import util.*;
 
 public class Server {
 
-    public static String currentMap = "sandtemple";
+    public static String currentMap = "sand_temple";
 
     private static class ClientInfo {
 
         static int maxID = 0;
 
+        String name;
         Connection conn;
         int id = maxID++;
 
@@ -70,13 +71,55 @@ public class Server {
                 b.get("position", Vec3.class).set((Vec3) data[0]);
                 b.get("velocity", Vec3.class).set((Vec3) data[1]);
                 b.isEnemy = true;
+                b.thrower = client.id;
+                data[2] = client.id;
                 sendToOthers(client, SNOWBALL, data);
             });
             handleMessage(client, HIT, data -> {
                 Particle.explode((Vec3) data[0], RED);
                 Sounds.playSound("hit.wav");
                 sendToOthers(client, HIT, data);
+                
+                String name = "";
+                
+                for(ClientInfo ci : CLIENTS){
+                    
+                    if(ci.id == (int) data[1]){
+                        
+                        name = ci.name;
+                        break;
+                    }
+                }
+                
+                sendToAll(SCORE, name);
+                sendToAll(CHAT_MESSAGE, name + " got " + client.name);
             });
+
+            handleMessage(client, GET_NAME, data -> {
+
+                boolean cnae = false;
+
+                for (ClientInfo c : CLIENTS) {
+
+                    if (c.name != null && c.name.equals((String) data[0])) {
+
+                        cnae = true;
+                        break;
+                    }
+                }
+
+                System.out.println(client.toString() + " changed their name to " + client.name);
+                
+                if (!cnae) {
+                    
+                    client.name = (String) data[0];
+                }else{
+                    
+                    client.name = (String) data[0] +" "+ client.id;
+                    sendTo(client, GET_NAME, client.name);
+                }
+            });
+
             handleMessage(client, SMOKE, data -> {
                 Smoke f = new Smoke();
                 f.create();

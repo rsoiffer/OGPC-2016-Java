@@ -5,10 +5,12 @@ import commands.CommController;
 import commands.Command;
 import gui.GUIController;
 import guis.Chat;
+import guis.Score;
 import static networking.Client.*;
 import static networking.MessageType.BLOCK_PLACE;
 import map.CubeMap;
 import map.CubeType;
+import static networking.MessageType.GET_NAME;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import util.RegisteredEntity;
@@ -26,6 +28,11 @@ public class Game {
     public static String getName() {
 
         return name;
+    }
+    
+    public static void setName(String n){
+        
+        name = n;
     }
 
     public static void start(String map, String ip) {
@@ -49,18 +56,24 @@ public class Game {
 
     private static void setupGUI() {
         con = new Chat("Con1", Keyboard.KEY_T, new Vec2(700, 700));
-        GUIController.add(con);
+        Score sb = new Score("scorb");
+        GUIController.add(con, sb);
+        
         con.addChat("Welcome " + name + " to invisible man! To move around, just"
                 + " use WASD. To use chat, press T. To change your name, use the"
                 + " \\name command. Have fun!");
+        
+        sb.setVisible(true);
 
         CommController.add(new Command("\\name", al -> {
 
             if (al.size() != 1) {
                 return "\\name needs to have something to change your name to.";
             }
-
+            
+            if(name.length()>14) return "Your name is too long. Maximum 8 characters.";
             name = al.get(0);
+            Client.sendMessage(GET_NAME, name);
             return "Your name has been changed to " + name;
         }));
 

@@ -10,6 +10,7 @@ import util.Util;
 public class Fog extends AbstractEntity {
 
     private static final Shader FOG = new Shader("default.vert", "fog.frag");
+    public static Color4 FOG_COLOR;
 
     public Fog(Color4 color, double density, double fade) {
         Window3D.background = color;
@@ -25,6 +26,12 @@ public class Fog extends AbstractEntity {
     public void create() {
         add(Core.renderLayer(-1).onEvent(() -> Shader.pushShader(FOG)),
                 Core.renderLayer(1).onEvent(() -> Shader.popShader()));
+    }
+    
+    public static void setFogColor(Color4 color) {
+        FOG_COLOR = color;
+        Window3D.background = color;
+        FOG.setVec3("fogColor", color.toFloatBuffer3());
     }
 
     public static void setMinTexColor(double... vals) {
