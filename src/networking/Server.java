@@ -272,7 +272,7 @@ public class Server {
         Input.whenMouse(0, true).onEvent(() -> {
             Vec3 vel = Window3D.facing.toVec3().withLength(30);
 
-            sendToAll(SNOWBALL, pos, vel);
+            sendToAll(SNOWBALL, pos, vel, -1);
 
             BallAttack b = new BallAttack();
             b.create();

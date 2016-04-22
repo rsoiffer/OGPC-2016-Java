@@ -11,8 +11,8 @@ import util.Vec2;
 import util.Vec3;
 
 public class BallAttack extends RegisteredEntity {
-    
-    private static Color4 BALL_COLOR = new Color4(0,.5,1);
+
+    public static Color4 BALL_COLOR = new Color4(0, .5, 1);
 
     public boolean isEnemy;
     public int thrower;
@@ -28,7 +28,6 @@ public class BallAttack extends RegisteredEntity {
         sprite.get().color = BALL_COLOR;
         sprite.get().scale = new Vec2(.1);
 
-        
         //Check for collisions with the player
         Core.update.filter(dt -> isEnemy).forEach(dt -> RegisteredEntity.getAll(InvisibleMan.class).forEach(im -> {
             if (im.get("invincible", Double.class).get() < 0) {
@@ -39,16 +38,15 @@ public class BallAttack extends RegisteredEntity {
                 }
             }
         })).addChild(this);
-        
+
         //Trail particles
         add(Core.interval(.02).onEvent(() -> Particle.addParticle(4, () -> new Particle(position.get(), Vec3.randomCircle(1), new Vec3(0), 1, .02, BALL_COLOR))));
-
 
         //Destroy the ball when it hits the ground
         Premade3D.makeCollisions(this, new Vec3(0)).onEvent(() -> {
             destroy();
-            Particle.explode(position.get(),BALL_COLOR);
+            Particle.explode(position.get(), BALL_COLOR);
         });
-        
+
     }
 }

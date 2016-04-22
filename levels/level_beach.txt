@@ -1,4 +1,5 @@
-f 0.300000 0.500000 1.000000 
+fog color: 0.300000 0.500000 1.000000 
+ball color: 0.000000 0.500000 1.000000 
 0 0 0 sand_white
 0 0 1 sand_white
 0 0 2 sand_white
@@ -17620,7 +17621,7 @@ f 0.300000 0.500000 1.000000
 14 38 6 sand_white
 14 38 7 sand_white
 14 38 8 water_2
-14 38 9 stone
+14 38 9 water_2
 14 39 0 sand_white
 14 39 1 sand_white
 14 39 2 sand_white
@@ -19101,6 +19102,7 @@ f 0.300000 0.500000 1.000000
 15 62 15 trunk
 15 62 16 trunk
 15 62 17 trunk
+15 62 18 palms
 15 63 0 sand_white
 15 63 1 sand_white
 15 63 2 sand_white
@@ -20054,7 +20056,7 @@ f 0.300000 0.500000 1.000000
 16 39 6 sand_white
 16 39 7 sand_white
 16 39 8 water_4
-16 39 9 water_3
+16 39 9 water_2
 16 40 0 sand_white
 16 40 1 sand_white
 16 40 2 sand_white
@@ -20064,7 +20066,7 @@ f 0.300000 0.500000 1.000000
 16 40 6 sand_white
 16 40 7 sand_white
 16 40 8 water_3
-16 40 9 stone
+16 40 9 water_1
 16 41 0 sand_white
 16 41 1 sand_white
 16 41 2 sand_white
@@ -22447,7 +22449,7 @@ f 0.300000 0.500000 1.000000
 18 42 6 sand_white
 18 42 7 sand_white
 18 42 8 sand_white
-18 42 9 water_3
+18 42 9 water_1
 18 43 0 sand_white
 18 43 1 sand_white
 18 43 2 sand_white
@@ -23628,7 +23630,7 @@ f 0.300000 0.500000 1.000000
 19 44 6 sand_white
 19 44 7 sand_white
 19 44 8 sand_white
-19 44 9 stone
+19 44 9 water_1
 19 45 0 sand_white
 19 45 1 sand_white
 19 45 2 sand_white
@@ -33682,7 +33684,7 @@ f 0.300000 0.500000 1.000000
 28 62 7 sand_white
 28 62 8 sand_white
 28 62 9 sand_white
-28 62 10 stone
+28 62 10 sand_white
 28 63 0 sand_white
 28 63 1 sand_white
 28 63 2 sand_white
@@ -34755,7 +34757,7 @@ f 0.300000 0.500000 1.000000
 29 62 7 sand_white
 29 62 8 sand_white
 29 62 9 sand_white
-29 62 10 stone
+29 62 10 sand_white
 29 63 0 sand_white
 29 63 1 sand_white
 29 63 2 sand_white
@@ -39014,7 +39016,7 @@ f 0.300000 0.500000 1.000000
 33 63 7 sand_white
 33 63 8 sand_white
 33 63 9 sand_white
-33 63 10 stone
+33 63 10 sand_white
 33 64 0 sand_white
 33 64 1 sand_white
 33 64 2 sand_white
@@ -54256,7 +54258,7 @@ f 0.300000 0.500000 1.000000
 47 60 8 water_4
 47 60 9 sand_white
 47 60 10 sand_white
-47 60 16 stone
+47 60 16 palms
 47 60 17 palms
 47 61 0 sand_white
 47 61 1 sand_white
@@ -76455,6 +76457,7 @@ f 0.300000 0.500000 1.000000
 66 70 16 stone
 66 70 17 stone
 66 70 18 stone
+66 70 19 stone
 66 71 0 sand_white
 66 71 1 sand_white
 66 71 2 sand_white
@@ -77720,6 +77723,9 @@ f 0.300000 0.500000 1.000000
 67 70 13 sand_white
 67 70 14 lava_1
 67 70 15 lava_1
+67 70 16 stone
+67 70 17 stone
+67 70 18 stone
 67 71 0 sand_white
 67 71 1 sand_white
 67 71 2 sand_white
@@ -77736,6 +77742,10 @@ f 0.300000 0.500000 1.000000
 67 71 13 sand_white
 67 71 14 lava_3
 67 71 15 lava_4
+67 71 16 stone
+67 71 17 stone
+67 71 18 stone
+67 71 19 stone
 67 72 0 sand_white
 67 72 1 sand_white
 67 72 2 sand_white
@@ -85231,6 +85241,8 @@ f 0.300000 0.500000 1.000000
 73 71 13 sand_white
 73 71 14 lava_3
 73 71 15 lava_1
+73 71 16 stone
+73 71 17 stone
 73 72 0 sand_white
 73 72 1 sand_white
 73 72 2 sand_white

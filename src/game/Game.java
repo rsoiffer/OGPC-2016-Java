@@ -51,11 +51,11 @@ public class Game {
         //Hide the mouse
         Mouse.setGrabbed(true);
 
-        //Load the level
-        CubeMap.load("levels/level_" + map + ".txt");
-
         //Setup graphics effects
         setupGraphics();
+
+        //Load the level
+        CubeMap.load("levels/level_" + map + ".txt");
 
         //Set up GUI
         setupGUI();
@@ -77,9 +77,6 @@ public class Game {
                 wobble).toggleOn(cMod.map(i -> i == 3));
         new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
-
-        //Create the snow particles
-        new Snow().create();
 
         //Create the fog
         new Fog(BLACK, .0025, .95).create(); // .95 .8 .3

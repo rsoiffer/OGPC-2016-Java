@@ -1,7 +1,9 @@
 package map;
 
 import engine.Signal;
+import game.BallAttack;
 import game.Fog;
+import game.Snow;
 import graphics.data.Animation;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -92,6 +94,19 @@ public class CubeMap {
         return false;
     }
 
+    private static double[] getArgs(String s, int q) {
+        double[] ia = new double[q];
+        for (int i = 0; i < q; i++) {
+            if (s.contains(" ")) {
+                ia[i] = Double.parseDouble(s.substring(0, s.indexOf(" ")));
+                s = s.substring(s.indexOf(" ") + 1);
+            } else {
+                ia[i] = Double.parseDouble(s);
+            }
+        }
+        return ia;
+    }
+
     public static void load(String fileName) {
         try {
             CubeType.getAll();
@@ -103,51 +118,52 @@ public class CubeMap {
 
             Files.readAllLines(Paths.get(fileName)).forEach(s -> {
 
-                if (s.charAt(0) == 'f') {
-                    double[] cs = argsGet(s.substring(2), 3);
+                if (s.startsWith("fog color: ")) {
+                    double[] cs = getArgs(s.substring(11), 3);
                     Fog.setFogColor(new Color4(cs[0], cs[1], cs[2]));
-                } else if (s.charAt(0) == 'm') {
-                    double[] cs = argsGet(s.substring(2), 3);
+                    return;
+                }
+
+                if (s.startsWith("ball color: ")) {
+                    double[] cs = getArgs(s.substring(12), 3);
+                    BallAttack.BALL_COLOR = new Color4(cs[0], cs[1], cs[2]);
+                    return;
+                }
+
+                if (s.charAt(0) == 'm') {
+                    double[] cs = getArgs(s.substring(2), 3);
                     Vec3 j = new Vec3(cs[0], cs[1], cs[2]);
                     String name = s.substring(s.lastIndexOf(" ") + 1);
                     MODELS.put(j, new Signal(new Animation(name, name + "diffuse")));
-                } else {
-
-                    double[] cs = argsGet(s, 3);
-                    s = s.substring(s.lastIndexOf(" ") + 1).toLowerCase();
-
-                    CubeType ct = CubeType.getByName(s);//s.equals("null") ? null : CubeType.valueOf(s);
-
-                    if (ct == null) {
-                        if (!replace.containsKey(s)) {
-                            System.out.println("Unknown block type: " + s);
-                            System.out.println("Please enter the replacement name:");
-                            Scanner in = new Scanner(System.in);
-                            String n = in.next();
-                            replace.put(s, n);
-                        }
-                        ct = CubeType.getByName(replace.get(s));
-                    }
-
-                    setCube((int) cs[0], (int) cs[1], (int) cs[2], ct);
+                    return;
                 }
+
+                if (s.startsWith("snow")) {
+                    new Snow().create();
+                    return;
+                }
+
+                double[] cs = getArgs(s, 3);
+                s = s.substring(s.lastIndexOf(" ") + 1).toLowerCase();
+                CubeType ct = CubeType.getByName(s);
+
+                if (ct == null) {
+                    if (!replace.containsKey(s)) {
+                        System.out.println("Unknown block type: " + s);
+                        System.out.println("Please enter the replacement name:");
+                        Scanner in = new Scanner(System.in);
+                        String n = in.next();
+                        replace.put(s, n);
+                    }
+                    ct = CubeType.getByName(replace.get(s));
+                }
+
+                setCube((int) cs[0], (int) cs[1], (int) cs[2], ct);
+
             });
         } catch (Exception ex) {
             Log.error(ex);
         }
-    }
-
-    private static double[] argsGet(String s, int q) {
-
-        double[] ia = new double[q];
-
-        for (int i = 0; i < q; i++) {
-
-            ia[i] = Double.parseDouble(s.substring(0, s.indexOf(" ")));
-            s = s.substring(s.indexOf(" ") + 1);
-        }
-
-        return ia;
     }
 
     public static Iterable<CubeData> rayCast(Vec3 pos, Vec3 dir) {
@@ -182,7 +198,9 @@ public class CubeMap {
     public static void save(String fileName) {
         try {
             PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-            writer.printf("f %f %f %f \n", Fog.FOG_COLOR.r, Fog.FOG_COLOR.g, Fog.FOG_COLOR.b);
+            writer.printf("fog color: %f %f %f \n", Fog.FOG_COLOR.r, Fog.FOG_COLOR.g, Fog.FOG_COLOR.b);
+            writer.printf("ball color: %f %f %f \n", BallAttack.BALL_COLOR.r, BallAttack.BALL_COLOR.g, BallAttack.BALL_COLOR.b);
+            RegisteredEntity.get(Snow.class).ifPresent(s -> writer.println("snow"));
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
                 CubeType ct = MAP[x][y][z];
                 if (ct != null) {
