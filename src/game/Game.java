@@ -66,6 +66,7 @@ public class Game {
 
     public static void setupGraphics() {
         //Silly graphics effects
+        /*
         Signal<Integer> cMod = Input.whenMouse(1, true).reduce(0, i -> (i + 1) % 5);
         new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
                 new Shader("default.vert", "invert.frag")).toggleOn(cMod.map(i -> i == 1));
@@ -77,6 +78,7 @@ public class Game {
                 wobble).toggleOn(cMod.map(i -> i == 3));
         new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
+        */
 
         //Create the fog
         new Fog(BLACK, .0025, .95).create(); // .95 .8 .3
