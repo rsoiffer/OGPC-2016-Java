@@ -37,6 +37,7 @@ coconut
 sand_brick
 sand
 
+old_ice
 concrete
 pavement
 lava 4
