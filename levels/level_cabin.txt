@@ -1,4 +1,5 @@
-fog color: 0.800000 0.800000 0.800000
+fog color: 0.800000 0.800000 0.800000 
+ball color: 0.000000 0.500000 1.000000 
 snow
 0 0 0 snow
 0 0 1 snow
@@ -58444,7 +58445,6 @@ snow
 56 88 9 snow
 56 88 10 snow
 56 88 11 snow
-56 88 15 snow
 56 88 16 snow
 56 89 0 snow
 56 89 1 snow
@@ -80287,6 +80287,7 @@ snow
 74 15 7 snow
 74 15 8 snow
 74 15 9 snow
+74 15 10 trunk
 74 15 11 trunk
 74 15 12 trunk
 74 15 13 trunk
@@ -89855,6 +89856,7 @@ snow
 81 81 7 snow
 81 81 8 snow
 81 81 9 brick
+81 81 10 lava_2
 81 81 12 brick
 81 81 22 wood_lower_2
 81 81 23 wood_lower_1
@@ -89868,6 +89870,7 @@ snow
 81 82 7 snow
 81 82 8 snow
 81 82 9 brick
+81 82 10 lava_1
 81 82 12 brick
 81 82 22 wood_lower_3
 81 82 23 wood_lower_1
@@ -91131,6 +91134,7 @@ snow
 82 81 7 snow
 82 81 8 snow
 82 81 9 brick
+82 81 10 lava_2
 82 81 12 brick
 82 81 21 wood_lower_1
 82 81 22 wood_upper_1
@@ -91144,6 +91148,7 @@ snow
 82 82 7 snow
 82 82 8 snow
 82 82 9 pavement
+82 82 10 lava_3
 82 82 12 brick
 82 82 13 brick
 82 82 14 brick
@@ -106571,6 +106576,7 @@ snow
 94 0 7 snow
 94 0 8 snow
 94 0 9 snow
+94 0 10 snow
 94 1 0 snow
 94 1 1 snow
 94 1 2 snow
@@ -107928,6 +107934,7 @@ snow
 95 0 7 snow
 95 0 8 snow
 95 0 9 snow
+95 0 10 snow
 95 1 0 snow
 95 1 1 snow
 95 1 2 snow
@@ -107938,6 +107945,7 @@ snow
 95 1 7 snow
 95 1 8 snow
 95 1 9 snow
+95 1 10 snow
 95 2 0 snow
 95 2 1 snow
 95 2 2 snow
@@ -109297,6 +109305,8 @@ snow
 96 0 7 snow
 96 0 8 snow
 96 0 9 snow
+96 0 10 snow
+96 0 11 snow
 96 1 0 snow
 96 1 1 snow
 96 1 2 snow
@@ -109307,6 +109317,7 @@ snow
 96 1 7 snow
 96 1 8 snow
 96 1 9 snow
+96 1 10 snow
 96 2 0 snow
 96 2 1 snow
 96 2 2 snow
@@ -109317,6 +109328,7 @@ snow
 96 2 7 snow
 96 2 8 snow
 96 2 9 snow
+96 2 10 snow
 96 3 0 snow
 96 3 1 snow
 96 3 2 snow
@@ -109327,6 +109339,7 @@ snow
 96 3 7 snow
 96 3 8 snow
 96 3 9 snow
+96 3 10 snow
 96 4 0 snow
 96 4 1 snow
 96 4 2 snow
@@ -110664,6 +110677,9 @@ snow
 97 0 7 snow
 97 0 8 snow
 97 0 9 snow
+97 0 10 snow
+97 0 11 snow
+97 0 12 snow
 97 1 0 snow
 97 1 1 snow
 97 1 2 snow
@@ -110674,6 +110690,8 @@ snow
 97 1 7 snow
 97 1 8 snow
 97 1 9 snow
+97 1 10 snow
+97 1 11 snow
 97 2 0 snow
 97 2 1 snow
 97 2 2 snow
@@ -110684,6 +110702,8 @@ snow
 97 2 7 snow
 97 2 8 snow
 97 2 9 snow
+97 2 10 snow
+97 2 11 snow
 97 3 0 snow
 97 3 1 snow
 97 3 2 snow
@@ -110694,6 +110714,8 @@ snow
 97 3 7 snow
 97 3 8 snow
 97 3 9 snow
+97 3 10 snow
+97 3 11 snow
 97 4 0 snow
 97 4 1 snow
 97 4 2 snow
@@ -110704,6 +110726,7 @@ snow
 97 4 7 snow
 97 4 8 snow
 97 4 9 snow
+97 4 10 snow
 97 5 0 snow
 97 5 1 snow
 97 5 2 snow
@@ -112035,6 +112058,9 @@ snow
 98 0 7 snow
 98 0 8 snow
 98 0 9 snow
+98 0 10 snow
+98 0 11 snow
+98 0 12 snow
 98 1 0 snow
 98 1 1 snow
 98 1 2 snow
@@ -112045,6 +112071,8 @@ snow
 98 1 7 snow
 98 1 8 snow
 98 1 9 snow
+98 1 10 snow
+98 1 12 snow
 98 2 0 snow
 98 2 1 snow
 98 2 2 snow
@@ -112055,6 +112083,9 @@ snow
 98 2 7 snow
 98 2 8 snow
 98 2 9 snow
+98 2 10 snow
+98 2 11 snow
+98 2 12 snow
 98 3 0 snow
 98 3 1 snow
 98 3 2 snow
@@ -112065,6 +112096,8 @@ snow
 98 3 7 snow
 98 3 8 snow
 98 3 9 snow
+98 3 10 snow
+98 3 11 snow
 98 4 0 snow
 98 4 1 snow
 98 4 2 snow
@@ -112075,6 +112108,7 @@ snow
 98 4 7 snow
 98 4 8 snow
 98 4 9 snow
+98 4 10 snow
 98 5 0 snow
 98 5 1 snow
 98 5 2 snow
@@ -112085,6 +112119,7 @@ snow
 98 5 7 snow
 98 5 8 snow
 98 5 9 snow
+98 5 10 snow
 98 6 0 snow
 98 6 1 snow
 98 6 2 snow
@@ -113415,6 +113450,9 @@ snow
 99 0 7 snow
 99 0 8 snow
 99 0 9 snow
+99 0 10 snow
+99 0 12 snow
+99 0 13 snow
 99 1 0 snow
 99 1 1 snow
 99 1 2 snow
@@ -113425,6 +113463,9 @@ snow
 99 1 7 snow
 99 1 8 snow
 99 1 9 snow
+99 1 10 snow
+99 1 11 snow
+99 1 12 snow
 99 2 0 snow
 99 2 1 snow
 99 2 2 snow
@@ -113435,6 +113476,8 @@ snow
 99 2 7 snow
 99 2 8 snow
 99 2 9 snow
+99 2 10 snow
+99 2 11 snow
 99 3 0 snow
 99 3 1 snow
 99 3 2 snow
@@ -113445,6 +113488,7 @@ snow
 99 3 7 snow
 99 3 8 snow
 99 3 9 snow
+99 3 11 snow
 99 4 0 snow
 99 4 1 snow
 99 4 2 snow
@@ -113455,6 +113499,8 @@ snow
 99 4 7 snow
 99 4 8 snow
 99 4 9 snow
+99 4 10 snow
+99 4 11 snow
 99 5 0 snow
 99 5 1 snow
 99 5 2 snow
@@ -113465,6 +113511,7 @@ snow
 99 5 7 snow
 99 5 8 snow
 99 5 9 snow
+99 5 10 snow
 99 6 0 snow
 99 6 1 snow
 99 6 2 snow
@@ -113475,6 +113522,7 @@ snow
 99 6 7 snow
 99 6 8 snow
 99 6 9 snow
+99 6 10 snow
 99 7 0 snow
 99 7 1 snow
 99 7 2 snow
