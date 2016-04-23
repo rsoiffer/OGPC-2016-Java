@@ -41,9 +41,6 @@ public class Options extends ComponentInputGUI {
     private Vec2 bPos;
     private Vec2 bDim;
 
-    private int max;
-    private int min;
-
     private final Map<String, Object> settings = new HashMap();
     private final Map<String, int[]> smm = new HashMap();
 
@@ -89,7 +86,16 @@ public class Options extends ComponentInputGUI {
 
     private void decide(String name) {
 
-        System.out.println(name);
+        Object vl = settings.get(next);
+        
+        if(vl instanceof Boolean){
+            
+            settings.replace(name, !((Boolean) vl));
+        }else if(vl instanceof Integer){
+            
+            int[] mm = smm.get(name);
+            newInt(name, (Integer) vl, mm[1], mm[0]);
+        }
     }
 
     public void changeInt(String on, int v) {
@@ -114,10 +120,13 @@ public class Options extends ComponentInputGUI {
     @Override
     public void recieve(String name, Object o) {
 
+        System.out.println(name);
+        
         if (name.length() == 1) {
 
-            GUIButton gb = getButton(name);
-
+            GUIButton gb = getButton((String) (new ArrayList(settings.keySet())).get(Integer.parseInt(name) * index));
+            System.out.println(gb);
+            
             if (gb != null) {
 
                 String oName = gb.getLabel();
@@ -186,6 +195,8 @@ public class Options extends ComponentInputGUI {
 
                 read(reader.nextLine());
             }
+            
+            reader.close();
         } catch (FileNotFoundException ex) {
 
             System.out.println("error while loading the options folder :(");
@@ -194,6 +205,8 @@ public class Options extends ComponentInputGUI {
 
     private void read(String ln) {
 
+        System.out.println("");
+        
         int ind = ln.indexOf(" ");
         String name = ln.substring(0, ind++);
 
