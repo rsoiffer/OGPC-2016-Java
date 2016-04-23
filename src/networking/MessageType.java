@@ -20,6 +20,8 @@ public enum MessageType {
     BLOCK_PLACE(Vec3.class, Integer.class), //position, cube type id
 
     MAP_FILE(String.class), //map name
+    
+    MODEL_PLACE(Vec3.class, Integer.class),
 
     RESTART(); //no information needed
 
