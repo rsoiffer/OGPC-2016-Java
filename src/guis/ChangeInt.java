@@ -55,6 +55,8 @@ public class ChangeInt extends ComponentInputGUI {
     @Override
     public void recieve(String name, Object o) {
 
+        System.out.println(name);
+        
         if (name.equals("down")) {
 
             val--;
@@ -71,7 +73,7 @@ public class ChangeInt extends ComponentInputGUI {
 
                 val = max;
             }
-        } else {
+        } else if (name.equals("back")){
 
             this.setVisible(false);
             from.changeInt(opName, val);
