@@ -7899,13 +7899,6 @@ snow
 7 91 7 snow
 7 91 8 snow
 7 91 9 snow
-7 91 39 stone_brick
-7 91 40 stone_brick
-7 91 41 stone_brick
-7 91 42 stone_brick
-7 91 43 stone_brick
-7 91 44 stone_brick
-7 91 45 stone_brick
 7 92 0 snow
 7 92 1 snow
 7 92 2 snow
@@ -8886,10 +8879,6 @@ snow
 8 91 7 snow
 8 91 8 snow
 8 91 9 snow
-8 91 37 stone_brick
-8 91 38 stone_brick
-8 91 46 stone_brick
-8 91 47 stone_brick
 8 92 0 snow
 8 92 1 snow
 8 92 2 snow
@@ -9866,8 +9855,6 @@ snow
 9 91 7 snow
 9 91 8 snow
 9 91 9 snow
-9 91 36 stone_brick
-9 91 48 stone_brick
 9 92 0 snow
 9 92 1 snow
 9 92 2 snow
@@ -10841,8 +10828,6 @@ snow
 10 91 7 snow
 10 91 8 snow
 10 91 9 snow
-10 91 35 stone_brick
-10 91 49 stone_brick
 10 92 0 snow
 10 92 1 snow
 10 92 2 snow
@@ -11721,8 +11706,6 @@ snow
 11 91 7 snow
 11 91 8 snow
 11 91 9 snow
-11 91 35 stone_brick
-11 91 49 stone_brick
 11 92 0 snow
 11 92 1 snow
 11 92 2 snow
@@ -12597,8 +12580,6 @@ snow
 12 91 7 snow
 12 91 8 snow
 12 91 9 snow
-12 91 34 stone_brick
-12 91 50 stone_brick
 12 92 0 snow
 12 92 1 snow
 12 92 2 snow
@@ -13473,8 +13454,6 @@ snow
 13 91 7 snow
 13 91 8 snow
 13 91 9 snow
-13 91 34 stone_brick
-13 91 50 stone_brick
 13 92 0 snow
 13 92 1 snow
 13 92 2 snow
@@ -14459,8 +14438,6 @@ snow
 14 91 7 snow
 14 91 8 snow
 14 91 9 snow
-14 91 34 stone_brick
-14 91 50 stone_brick
 14 92 0 snow
 14 92 1 snow
 14 92 2 snow
@@ -15511,32 +15488,6 @@ snow
 15 91 7 snow
 15 91 8 snow
 15 91 9 snow
-15 91 10 stone_brick
-15 91 11 stone_brick
-15 91 12 stone_brick
-15 91 13 stone_brick
-15 91 14 stone_brick
-15 91 15 stone_brick
-15 91 16 stone_brick
-15 91 17 stone_brick
-15 91 18 stone_brick
-15 91 19 stone_brick
-15 91 20 stone_brick
-15 91 21 stone_brick
-15 91 22 stone_brick
-15 91 23 stone_brick
-15 91 24 stone_brick
-15 91 25 stone_brick
-15 91 26 stone_brick
-15 91 27 stone_brick
-15 91 28 stone_brick
-15 91 29 stone_brick
-15 91 30 stone_brick
-15 91 31 stone_brick
-15 91 32 stone_brick
-15 91 33 stone_brick
-15 91 34 stone_brick
-15 91 50 stone_brick
 15 92 0 snow
 15 92 1 snow
 15 92 2 snow
@@ -16574,8 +16525,6 @@ snow
 16 91 7 snow
 16 91 8 snow
 16 91 9 snow
-16 91 34 stone_brick
-16 91 50 stone_brick
 16 92 0 snow
 16 92 1 snow
 16 92 2 snow
@@ -17695,8 +17644,6 @@ snow
 17 91 7 snow
 17 91 8 snow
 17 91 9 snow
-17 91 34 stone_brick
-17 91 50 stone_brick
 17 92 0 snow
 17 92 1 snow
 17 92 2 snow
@@ -19255,8 +19202,6 @@ snow
 18 91 7 snow
 18 91 8 snow
 18 91 9 snow
-18 91 34 stone_brick
-18 91 50 stone_brick
 18 92 0 snow
 18 92 1 snow
 18 92 2 snow
@@ -20815,8 +20760,6 @@ snow
 19 91 7 snow
 19 91 8 snow
 19 91 9 snow
-19 91 35 stone_brick
-19 91 49 stone_brick
 19 92 0 snow
 19 92 1 snow
 19 92 2 snow
@@ -21107,6 +21050,10 @@ snow
 20 18 7 snow
 20 18 8 snow
 20 18 9 snow
+20 18 10 snow
+20 18 11 snow
+20 18 12 snow
+20 18 13 snow
 20 18 21 stone_brick
 20 18 22 stone_brick
 20 19 0 snow
@@ -21119,6 +21066,8 @@ snow
 20 19 7 snow
 20 19 8 snow
 20 19 9 snow
+20 19 10 snow
+20 19 11 snow
 20 19 21 stone_brick
 20 19 22 stone_brick
 20 20 0 snow
@@ -21131,6 +21080,8 @@ snow
 20 20 7 snow
 20 20 8 snow
 20 20 9 snow
+20 20 10 snow
+20 20 11 snow
 20 20 21 stone_brick
 20 20 22 stone_brick
 20 21 0 snow
@@ -21143,6 +21094,7 @@ snow
 20 21 7 snow
 20 21 8 snow
 20 21 9 snow
+20 21 10 snow
 20 21 21 stone_brick
 20 21 22 stone_brick
 20 22 0 snow
@@ -21155,6 +21107,7 @@ snow
 20 22 7 snow
 20 22 8 snow
 20 22 9 snow
+20 22 10 snow
 20 22 21 stone_brick
 20 22 22 stone_brick
 20 23 0 snow
@@ -21167,6 +21120,7 @@ snow
 20 23 7 snow
 20 23 8 snow
 20 23 9 snow
+20 23 10 snow
 20 23 21 stone_brick
 20 23 22 stone_brick
 20 24 0 snow
@@ -21957,8 +21911,6 @@ snow
 20 91 7 snow
 20 91 8 snow
 20 91 9 snow
-20 91 35 stone_brick
-20 91 49 stone_brick
 20 92 0 snow
 20 92 1 snow
 20 92 2 snow
@@ -22249,6 +22201,9 @@ snow
 21 18 7 snow
 21 18 8 snow
 21 18 9 snow
+21 18 10 snow
+21 18 11 snow
+21 18 12 snow
 21 18 21 stone_brick
 21 18 22 stone_brick
 21 19 0 snow
@@ -22261,6 +22216,8 @@ snow
 21 19 7 snow
 21 19 8 snow
 21 19 9 snow
+21 19 10 snow
+21 19 11 snow
 21 20 0 snow
 21 20 1 snow
 21 20 2 snow
@@ -22271,6 +22228,7 @@ snow
 21 20 7 snow
 21 20 8 snow
 21 20 9 snow
+21 20 10 snow
 21 21 0 snow
 21 21 1 snow
 21 21 2 snow
@@ -22281,6 +22239,7 @@ snow
 21 21 7 snow
 21 21 8 snow
 21 21 9 snow
+21 21 10 snow
 21 22 0 snow
 21 22 1 snow
 21 22 2 snow
@@ -23032,8 +22991,6 @@ snow
 21 91 7 snow
 21 91 8 snow
 21 91 9 snow
-21 91 36 stone_brick
-21 91 48 stone_brick
 21 92 0 snow
 21 92 1 snow
 21 92 2 snow
@@ -23324,6 +23281,8 @@ snow
 22 18 7 snow
 22 18 8 snow
 22 18 9 snow
+22 18 10 snow
+22 18 11 snow
 22 18 21 stone_brick
 22 18 22 stone_brick
 22 19 0 snow
@@ -23336,6 +23295,7 @@ snow
 22 19 7 snow
 22 19 8 snow
 22 19 9 snow
+22 19 10 snow
 22 20 0 snow
 22 20 1 snow
 22 20 2 snow
@@ -23346,6 +23306,7 @@ snow
 22 20 7 snow
 22 20 8 snow
 22 20 9 snow
+22 20 10 snow
 22 21 0 snow
 22 21 1 snow
 22 21 2 snow
@@ -24121,10 +24082,6 @@ snow
 22 91 7 snow
 22 91 8 snow
 22 91 9 snow
-22 91 37 stone_brick
-22 91 38 stone_brick
-22 91 46 stone_brick
-22 91 47 stone_brick
 22 92 0 snow
 22 92 1 snow
 22 92 2 snow
@@ -24415,6 +24372,8 @@ snow
 23 18 7 snow
 23 18 8 snow
 23 18 9 snow
+23 18 10 snow
+23 18 11 snow
 23 18 21 stone_brick
 23 18 22 stone_brick
 23 19 0 snow
@@ -24427,6 +24386,7 @@ snow
 23 19 7 snow
 23 19 8 snow
 23 19 9 snow
+23 19 10 snow
 23 20 0 snow
 23 20 1 snow
 23 20 2 snow
@@ -25176,13 +25136,6 @@ snow
 23 91 7 snow
 23 91 8 snow
 23 91 9 snow
-23 91 39 stone_brick
-23 91 40 stone_brick
-23 91 41 stone_brick
-23 91 42 stone_brick
-23 91 43 stone_brick
-23 91 44 stone_brick
-23 91 45 stone_brick
 23 92 0 snow
 23 92 1 snow
 23 92 2 snow
@@ -25473,6 +25426,7 @@ snow
 24 18 7 snow
 24 18 8 snow
 24 18 9 snow
+24 18 10 snow
 24 18 21 stone_brick
 24 18 22 stone_brick
 24 19 0 snow
@@ -26526,6 +26480,7 @@ snow
 25 18 7 snow
 25 18 8 snow
 25 18 9 snow
+25 18 10 snow
 25 18 21 stone_brick
 25 18 22 stone_brick
 25 19 0 snow

@@ -32,7 +32,6 @@ public class Join extends ComponentInputGUI {
     private Vec2 fDim;
     
     private boolean editor;
-    private boolean grabbed;
     private boolean server;
     
     public Join(String n) {

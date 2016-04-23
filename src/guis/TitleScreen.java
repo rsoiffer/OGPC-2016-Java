@@ -89,19 +89,26 @@ public class TitleScreen extends ComponentInputGUI {
     @Override
     public void recieve(String name, Object o) {
 
-        if (name.equals("play")) {
-
-            Mouse.setGrabbed(grabbed);
-            typing(this, false);
-            ((Play) GUIController.getGUI("level select")).start(0);
-        } else if (name.equals("editor")) {
-            
-            Mouse.setGrabbed(grabbed);
-            typing(this, false);
-            ((Play) GUIController.getGUI("level select")).start(1);
-        } else if (name.equals("exit")) {
-
-            System.exit(1);
+        switch (name) {
+            case "play":
+                Mouse.setGrabbed(grabbed);
+                typing(this, false);
+                ((Play) GUIController.getGUI("level select")).start(0);
+                break;
+            case "editor":
+                Mouse.setGrabbed(grabbed);
+                typing(this, false);
+                ((Play) GUIController.getGUI("level select")).start(1);
+                break;
+            case "exit":
+                System.exit(1);
+            case "options":
+                Mouse.setGrabbed(grabbed);
+                typing(this, false);
+                ((Options) GUIController.getGUI("options Menu")).start();
+                break;
+            default:
+                break;
         }
 
     }

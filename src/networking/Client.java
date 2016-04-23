@@ -33,11 +33,13 @@ public abstract class Client {
         MiniChat mc = new MiniChat("mChat++");
         Play ps = new Play("level select", new Vec2(Core.screenWidth, Core.screenHeight));
         Join jn = new Join("ip select");
+        Options op = new Options("options Menu");
+        ChangeInt ci = new ChangeInt("chai");
 
         TitleScreen ts = new TitleScreen("main menu", new Vec2(Core.screenWidth, Core.screenHeight));
 
         TypingManager tpm = new TypingManager(ts);
-        GUIController.add(ts, jn, ps, mc);
+        GUIController.add(ts, jn, ps, mc, op, ci);
 
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(GUIController::update);

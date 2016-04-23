@@ -43,7 +43,6 @@ public class Play extends ComponentInputGUI {
     private GUIButton prev;
     private GUIButton back;
 
-    private boolean grabbed;
     private boolean editor;
     private Join multiP;
 

@@ -10,7 +10,7 @@ import util.Util;
 public class Fog extends AbstractEntity {
 
     private static final Shader FOG = new Shader("default.vert", "fog.frag");
-    public static Color4 FOG_COLOR;
+    public static Color4 FOG_COLOR = Color4.BLACK;
 
     public Fog(Color4 color, double density, double fade) {
         Window3D.background = color;

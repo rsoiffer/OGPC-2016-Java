@@ -1,2 +1,0 @@
-Generate-Terrain b true
-Name s NewPlayer

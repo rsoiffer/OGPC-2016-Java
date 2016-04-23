@@ -123,6 +123,11 @@ public class Editor {
         Input.whileKeyDown(KEY_D).forEach(dt -> pos = pos.add(facing.toVec3().cross(UP).withLength(speed.get() * dt)));
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
+        
+        Input.whenKey(KEY_R, true).filter(() -> model).onEvent(() -> {
+            ModelList.removeAll();
+            ModelList.drawAll();
+        });
 
         pos = WORLD_SIZE.multiply(.5);
 
@@ -141,9 +146,8 @@ public class Editor {
         //Destroy blocks
         Input.whenMouse(0, true).filter(() -> !isSolid(pos)).onEvent(() -> {
             if(model){
-                rayCastStream(pos, facing.toVec3()).filter(cd -> ModelList.get(new Vec3(cd.x,cd.y,cd.z))!=null).findFirst().ifPresent(cd -> {
-                    ModelList.remove(pos);
-                    ModelList.draw(pos);
+                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {            
+                    ModelList.remove(new Vec3(cd.x,cd.y,cd.z));
                 });
             }
             else if (toFill.o != null) {

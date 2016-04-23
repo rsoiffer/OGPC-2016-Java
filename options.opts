@@ -1,0 +1,10 @@
+Generate-Terrain b true
+Name s NewPlayer
+Custom-Footsteps b true
+Fog-Red i 0 100 0
+Fog-Green i 0 100 0
+Fog-Blue i 0 100 0
+
+
+
+

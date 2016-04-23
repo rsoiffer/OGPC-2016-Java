@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import util.Color4;
 import static util.Color4.BLACK;
 import util.RegisteredEntity;
+import util.Sounds;
 import util.Vec2;
 import util.Vec3;
 
@@ -22,6 +23,7 @@ public class Footstep extends RegisteredEntity {
 
     private static List<Footstep> ALL_FOOTSTEPS = new ArrayList();
     private static String texFile;
+    private static int footstepCount;
 
     static {
 
@@ -63,6 +65,12 @@ public class Footstep extends RegisteredEntity {
 
         //Destroy the footstep once it fades enough
         opacity.filter(x -> x < .0001).onEvent(this::destroy);
+
+        footstepCount++;
+
+        if (footstepCount % 3 == 0) {
+            Sounds.playSound("Step" + ((int) Math.random() * 8 + 1) + ".mp3");
+        }
     }
 
     @Override
