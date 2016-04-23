@@ -6,11 +6,14 @@ import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import map.CubeMap;
-import static map.CubeMap.*;
+import static map.CubeMap.WORLD_SIZE;
 import map.CubeType;
 import map.ModelList;
 import network.Connection;
@@ -25,7 +28,7 @@ import util.*;
 
 public class Server {
 
-    public static String currentMap = "city";
+    public static String currentMap;
 
     private static class ClientInfo {
 
@@ -47,7 +50,8 @@ public class Server {
 
     private static final List<ClientInfo> CLIENTS = new LinkedList();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        currentMap = Files.readAllLines(Paths.get("server_map.txt")).get(0);
         NetworkUtils.server(conn -> {
             ClientInfo client = new ClientInfo(conn);
             CLIENTS.add(client);
@@ -147,7 +151,9 @@ public class Server {
                 sendToAll(RESTART, data);
             });
             handleMessage(client, MODEL_PLACE, data -> {
-                if(data[1] == null) ModelList.remove((Vec3) data[0]);
+                if (data[1] == null) {
+                    ModelList.remove((Vec3) data[0]);
+                }
                 ModelList.add((Vec3) data[0], (String) data[1]);
                 sendToOthers(client, MODEL_PLACE, data);
             });
@@ -161,10 +167,9 @@ public class Server {
             RegisteredEntity.getAll(Smoke.class).forEach(s -> {
                 sendTo(client, SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
             });
-            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
-                sendTo(client, BLOCK_PLACE, new Vec3(x, y, z), (int) CubeType.typeToId(CubeMap.getCubeType(new Vec3(x, y, z))));
-                //sendTo(client, BLOCK_PLACE, new Vec3(x, y, z), (int) CubeType.typeToId(MAP[x][y][z]));
-            }));
+//            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+//                sendTo(client, BLOCK_PLACE, new Vec3(x, y, z), (int) CubeType.typeToId(CubeMap.getCubeType(new Vec3(x, y, z))));
+//            }));
         }).start();
 
 //        runCommandInterface();

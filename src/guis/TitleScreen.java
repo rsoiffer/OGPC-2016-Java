@@ -40,15 +40,15 @@ public class TitleScreen extends ComponentInputGUI {
         bPos = new Vec2(0, 150);
 
         Window2D.background = Color4.BLACK;
-        components.add(new GUIPanel("options Panel", bPos, bDim, Color4.ORANGE));
-        components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y)), bDim, Color4.ORANGE.multiply(0.8)));
-        components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.6)));
-        components.add(new GUIPanel("exit Panel", bPos.subtract(new Vec2(0, bDim.y)), bDim, Color4.BLUE.multiply(0.6)));
+        //components.add(new GUIPanel("options Panel", bPos, bDim, Color4.ORANGE));
+        components.add(new GUIPanel("play Panel", bPos.add(new Vec2(0, bDim.y * 2)), bDim, Color4.ORANGE.multiply(0.8)));
+        components.add(new GUIPanel("editor Panel", bPos.add(new Vec2(0, bDim.y * 1)), bDim, Color4.ORANGE.multiply(0.6)));
+        components.add(new GUIPanel("exit Panel", bPos.subtract(new Vec2(0, bDim.y * 0)), bDim, Color4.BLUE.multiply(0.6)));
 
-        buttons.add(new GUIButton("options", this, bPos, bDim, "Options", Color.white));
-        buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y)), bDim, "Play", Color.white));
-        buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Editor", Color.white));
-        buttons.add(new GUIButton("exit", this, bPos.subtract(new Vec2(0, bDim.y)), bDim, "Exit", Color.orange));
+        //buttons.add(new GUIButton("options", this, bPos, bDim, "Options", Color.white));
+        buttons.add(new GUIButton("play", this, bPos.add(new Vec2(0, bDim.y * 2)), bDim, "Play", Color.white));
+        buttons.add(new GUIButton("editor", this, bPos.add(new Vec2(0, bDim.y * 1)), bDim, "Editor", Color.white));
+        buttons.add(new GUIButton("exit", this, bPos.subtract(new Vec2(0, bDim.y * 0)), bDim, "Exit", Color.orange));
     }
 
     public static void setMainVisibleFalse() {
@@ -101,7 +101,7 @@ public class TitleScreen extends ComponentInputGUI {
                 ((Play) GUIController.getGUI("level select")).start(1);
                 break;
             case "exit":
-                System.exit(1);
+                System.exit(0);
             case "options":
                 Mouse.setGrabbed(grabbed);
                 typing(this, false);

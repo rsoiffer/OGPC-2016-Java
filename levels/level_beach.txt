@@ -78789,7 +78789,6 @@ ball color: 0.000000 0.500000 1.000000
 68 59 14 sand_white
 68 59 15 stone
 68 59 16 stone
-68 59 17 stone
 68 60 0 sand_white
 68 60 1 sand_white
 68 60 2 sand_white

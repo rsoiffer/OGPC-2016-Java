@@ -12,7 +12,6 @@ import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
 import graphics.data.Texture;
-import graphics.loading.SpriteContainer;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
@@ -23,10 +22,7 @@ import static networking.MessageType.BLOCK_PLACE;
 import static networking.MessageType.MODEL_PLACE;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
-import static util.Color4.BLACK;
-import static util.Color4.RED;
-import static util.Color4.WHITE;
-import static util.Color4.gray;
+import static util.Color4.*;
 import util.Mutable;
 import util.Util;
 import util.Vec2;
@@ -51,20 +47,29 @@ public class Editor {
         Mutable<Integer> selmodel = new Mutable(0);
 
         Input.mouseWheel.forEach(x -> {
-            if(model) selmodel.o=(selmodel.o + x / 120 + ModelList.getAll().size()) % ModelList.getAll().size();
-            else selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct();
+            if (model) {
+                selmodel.o = (selmodel.o + x / 120 + ModelList.getAll().size()) % ModelList.getAll().size();
+            } else {
+                selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct();
+            }
         });
         Input.whenKey(KEY_UP, true).onEvent(() -> {
-            if(model) selmodel.o=(selmodel.o + 1) % ModelList.getAll().size();
-            else selected.o = (selected.o + 1) % CubeType.distinct();
+            if (model) {
+                selmodel.o = (selmodel.o + 1) % ModelList.getAll().size();
+            } else {
+                selected.o = (selected.o + 1) % CubeType.distinct();
+            }
         });
         Input.whenKey(KEY_DOWN, true).onEvent(() -> {
-            if(model) selmodel.o=(selmodel.o - 1 + ModelList.getAll().size()) % ModelList.getAll().size();
-            else selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct();
+            if (model) {
+                selmodel.o = (selmodel.o - 1 + ModelList.getAll().size()) % ModelList.getAll().size();
+            } else {
+                selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct();
+            }
         });
 
         Input.whenKey(KEY_M, true).onEvent(() -> {
-            model = !model;
+            //model = !model;
         });
         //Initial level
         if (!IS_MULTIPLAYER) {
@@ -112,21 +117,24 @@ public class Editor {
 //            Graphics2D.drawSprite(CubeType.getFirst(selected.o).texture, new Vec2(600, 200), new Vec2(100. / CubeType.getFirst(selected.o).texture.getImageWidth()), 0, WHITE);
 //            Graphics2D.drawRect(new Vec2(550, 150), new Vec2(100), BLACK);
             for (int i = -8; i < 0; i++) {
-                if(model) {
-                    drawIcon(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(ModelList.getAll().size()-(i+selmodel.o))%ModelList.getAll().size());
+                if (model) {
+                    drawIcon(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i), (ModelList.getAll().size() - (i + selmodel.o)) % ModelList.getAll().size());
+                } else {
+                    CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
                 }
-                else CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
             for (int i = 8; i > 0; i--) {
-                if(model){
-                    drawIcon(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(i+selmodel.o)%ModelList.getAll().size());
+                if (model) {
+                    drawIcon(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i), (i + selmodel.o) % ModelList.getAll().size());
+                } else {
+                    CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
                 }
-                else CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
-            if(model){
-                drawIcon(new Vec2(600,100), 100, selmodel.o);
+            if (model) {
+                drawIcon(new Vec2(600, 100), 100, selmodel.o);
+            } else {
+                CubeType.getFirst(selected.o).draw(new Vec2(600, 100), 100);
             }
-            else CubeType.getFirst(selected.o).draw(new Vec2(600, 100), 100);
 
             if (isSolid(pos)) {
                 Graphics2D.fillRect(new Vec2(0), new Vec2(1200, 800), RED.withA(.4));
@@ -147,7 +155,7 @@ public class Editor {
         Input.whileKeyDown(KEY_D).forEach(dt -> pos = pos.add(facing.toVec3().cross(UP).withLength(speed.get() * dt)));
         Input.whileKeyDown(KEY_SPACE).forEach(dt -> pos = pos.add(UP.multiply(speed.get() * dt)));
         Input.whileKeyDown(KEY_LSHIFT).forEach(dt -> pos = pos.add(UP.multiply(-speed.get() * dt)));
-        
+
         Input.whenKey(KEY_R, true).filter(() -> model).onEvent(() -> {
             ModelList.removeAll();
             ModelList.drawAll();
@@ -169,13 +177,12 @@ public class Editor {
 
         //Destroy blocks
         Input.whenMouse(0, true).filter(() -> !isSolid(pos)).onEvent(() -> {
-            if(model){
-                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {            
-                    ModelList.remove(new Vec3(cd.x,cd.y,cd.z));
+            if (model) {
+                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
+                    ModelList.remove(new Vec3(cd.x, cd.y, cd.z));
                     sendMessage(MODEL_PLACE, new Vec3(cd.x, cd.y, cd.z), null);
                 });
-            }
-            else if (toFill.o != null) {
+            } else if (toFill.o != null) {
                 rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
@@ -194,13 +201,12 @@ public class Editor {
 
         //Place blocks
         Input.whenMouse(1, true).filter(() -> !isSolid(pos)).onEvent(() -> {
-            if(model){
-                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {                    
-                    ModelList.add(new Vec3(cd.x,cd.y,cd.z), selmodel.o);
-                    sendMessage(MODEL_PLACE, new Vec3(cd.x,cd.y,cd.z), selmodel.o);
+            if (model) {
+                StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {
+                    ModelList.add(new Vec3(cd.x, cd.y, cd.z), selmodel.o);
+                    sendMessage(MODEL_PLACE, new Vec3(cd.x, cd.y, cd.z), selmodel.o);
                 });
-            }
-            else if (toFill.o != null) {
+            } else if (toFill.o != null) {
                 rayCastStream(pos, facing.toVec3()).filter(cd -> cd.c != null).findFirst().ifPresent(cd -> {
                     Util.forRange(Math.min(cd.x, toFill.o.x), Math.max(cd.x, toFill.o.x) + 1, Math.min(cd.y, toFill.o.y), Math.max(cd.y, toFill.o.y) + 1,
                             (x, y) -> Util.forRange(Math.min(cd.z, toFill.o.z), Math.max(cd.z, toFill.o.z) + 1, z -> {
@@ -284,8 +290,8 @@ public class Editor {
 
         //Save and load
         Input.whenKey(KEY_RETURN, true).combineEventStreams(Core.interval(60)).onEvent(() -> {
-            save("levels/autosaves/level_" + mapname + "_" + System.currentTimeMillis() + ".txt");
-            save("levels/level_" + mapname + ".txt");
+            save("levels/autosaves/level_" + MAP_NAME + "_" + System.currentTimeMillis() + ".txt");
+            save("levels/level_" + MAP_NAME + ".txt");
         });
         //Input.whenKey(KEY_L, true).onEvent(() -> load("levels/level_" + mapname + ".txt"));
 
@@ -298,10 +304,10 @@ public class Editor {
 
         Core.run();
     }
-    
+
     private static void drawIcon(Vec2 pos, double size, int id) {
         Texture t = ModelList.getIcon(id);
-        
+
         Graphics2D.fillRect(pos.subtract(new Vec2(size * .55)), new Vec2(size * 1.1), gray(.5));
         Graphics2D.drawRect(pos.subtract(new Vec2(size * .55)), new Vec2(size * 1.1), BLACK);
 

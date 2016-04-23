@@ -3,17 +3,17 @@ package game;
 import engine.Core;
 import engine.Input;
 import engine.Signal;
+import graphics.Graphics2D;
 import graphics.Window3D;
-import static graphics.Window3D.*;
+import graphics.loading.SpriteContainer;
 import map.CubeMap;
 import static map.CubeMap.WORLD_SIZE;
 import networking.Client;
 import static networking.MessageType.*;
 import org.lwjgl.input.Keyboard;
-import static org.lwjgl.input.Keyboard.*;
-import util.Mutable;
-import util.RegisteredEntity;
-import util.Vec3;
+import static org.lwjgl.input.Keyboard.KEY_LSHIFT;
+import static util.Color4.BLACK;
+import util.*;
 
 public class InvisibleMan extends RegisteredEntity {
 
@@ -30,23 +30,22 @@ public class InvisibleMan extends RegisteredEntity {
         //Mutable ints
         Mutable<Integer> ammoCount = new Mutable<Integer>(3);
         Mutable<Double> moveSpeed = new Mutable<Double>(5.0);
-        
+
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
         Premade3D.makeWASDMovement(this, moveSpeed);
         Premade3D.makeGravity(this, new Vec3(0, 0, -15));
 
         //Flying cheat
-        Signal<Boolean> fly = Input.whenKey(KEY_TAB, true).reduce(false, b -> !b);
-        add(fly,
-                Input.whileKey(KEY_W, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(20 * dt)::add)),
-                Input.whileKey(KEY_S, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(-20 * dt)::add)),
-                Input.whileKey(KEY_A, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(-20 * dt)::add)),
-                Input.whileKey(KEY_D, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(20 * dt)::add)),
-                Input.whileKey(KEY_SPACE, true).filter(fly).forEach(dt -> position.edit(UP.multiply(20 * dt)::add)),
-                Input.whileKey(KEY_LSHIFT, true).filter(fly).forEach(dt -> position.edit(UP.multiply(-20 * dt)::add)),
-                Core.update.filter(fly).forEach(dt -> velocity.set(new Vec3(0))));
-
+//        Signal<Boolean> fly = Input.whenKey(KEY_TAB, true).reduce(false, b -> !b);
+//        add(fly,
+//                Input.whileKey(KEY_W, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(20 * dt)::add)),
+//                Input.whileKey(KEY_S, true).filter(fly).forEach(dt -> position.edit((fly.get() ? facing.toVec3() : forwards()).multiply(-20 * dt)::add)),
+//                Input.whileKey(KEY_A, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(-20 * dt)::add)),
+//                Input.whileKey(KEY_D, true).filter(fly).forEach(dt -> position.edit(facing.toVec3().cross(UP).withLength(20 * dt)::add)),
+//                Input.whileKey(KEY_SPACE, true).filter(fly).forEach(dt -> position.edit(UP.multiply(20 * dt)::add)),
+//                Input.whileKey(KEY_LSHIFT, true).filter(fly).forEach(dt -> position.edit(UP.multiply(-20 * dt)::add)),
+//                Core.update.filter(fly).forEach(dt -> velocity.set(new Vec3(0))));
         //Make the camera automatically follow the player
         position.doForEach(v -> Window3D.pos = v.add(new Vec3(0, 0, .8)));
 
@@ -62,22 +61,33 @@ public class InvisibleMan extends RegisteredEntity {
         //Make the player slowly lose invincibility
         add(Core.update.forEach(dt -> invincible.edit(d -> d - dt)));
 
-        
         //Gathering ammo
         add(Input.whenMouse(1, true).limit(.75).onEvent(() -> {
-           if(ammoCount.o <= 2)
-           {
-               moveSpeed.o = moveSpeed.o *.5;
-               Core.timer(.85, () ->{
-                   ammoCount.o++;
-                   moveSpeed.o = moveSpeed.o / .5;
-               });
-           }
+            if (ammoCount.o <= 2) {
+                moveSpeed.o = moveSpeed.o * .5;
+                Core.timer(.75, () -> {
+                    ammoCount.o++;
+                    moveSpeed.o = moveSpeed.o / .5;
+                });
+            }
         }));
+
+        //Draw ammo
+        Core.renderLayer(100).onEvent(() -> {
+            Window3D.guiProjection();
+
+            Graphics2D.fillRect(new Vec2(800, 50), new Vec2(300, 100), Color4.gray(.5));
+            Graphics2D.drawRect(new Vec2(800, 50), new Vec2(300, 100), BLACK);
+            for (int i = 0; i < ammoCount.o; i++) {
+                Graphics2D.drawSprite(SpriteContainer.loadSprite("ball"), new Vec2(850 + 100 * i, 100), new Vec2(2), 0, BallAttack.BALL_COLOR);
+            }
+
+            Window3D.resetProjection();
+        });
+
         //Throwing snowballs
         add(Input.whenMouse(0, true).limit(.5).onEvent(() -> {
-            if(ammoCount.o >0)
-            {
+            if (ammoCount.o > 0) {
                 Vec3 pos = position.get().add(new Vec3(0, 0, .8));
                 Vec3 vel = Window3D.facing.toVec3().withLength(30);
 
@@ -89,7 +99,7 @@ public class InvisibleMan extends RegisteredEntity {
                 b.get("velocity", Vec3.class).set(vel);
                 ammoCount.o--;
             }
-            
+
         }));
 
         //Jumping
@@ -128,6 +138,6 @@ public class InvisibleMan extends RegisteredEntity {
             }
             Client.sendMessage(SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
         }));
-        
+
     }
 }

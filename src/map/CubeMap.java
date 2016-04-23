@@ -16,6 +16,8 @@ import util.*;
 
 public class CubeMap {
 
+    public static String MAP_NAME;
+
     public static final int WIDTH = 100, DEPTH = 100, HEIGHT = 60;
     public static final Vec3 WORLD_SIZE = new Vec3(WIDTH, DEPTH, HEIGHT);
 
@@ -102,6 +104,7 @@ public class CubeMap {
     }
 
     public static void load(String fileName) {
+        MAP_NAME = fileName.substring(13, fileName.length() - 4);
         try {
             CubeType.getAll();
             Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {

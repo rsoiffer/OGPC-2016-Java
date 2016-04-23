@@ -47,8 +47,8 @@ public abstract class Premade3D {
 
     public static void makeWASDMovement(AbstractEntity e, Supplier<Double> maxSpeed) {
         Signal<Boolean> blink = new Signal(false);
-        Input.whenKey(KEY_B, true).onEvent(() -> blink.set(true));
-        Input.whenKey(KEY_B, true).throttle(.1).onEvent(() -> blink.set(false));
+        //Input.whenKey(KEY_B, true).onEvent(() -> blink.set(true));
+        //Input.whenKey(KEY_B, true).throttle(.1).onEvent(() -> blink.set(false));
         Supplier<Double> speed = () -> maxSpeed.get() * (Input.keySignal(KEY_LSHIFT).get() ? .5 : 1) * (blink.get() ? 20 : 1);
         Signal<Vec3> velocity = e.get("velocity", Vec3.class);
         e.onUpdate(dt -> {

@@ -3,8 +3,6 @@ package game;
 import commands.CommController;
 import commands.Command;
 import engine.Core;
-import engine.Input;
-import engine.Signal;
 import graphics.data.Framebuffer;
 import graphics.data.PostProcessEffect;
 import graphics.data.Shader;
@@ -78,7 +76,7 @@ public class Game {
                 wobble).toggleOn(cMod.map(i -> i == 3));
         new PostProcessEffect(10, new Framebuffer(new Framebuffer.TextureAttachment(), new Framebuffer.DepthAttachment()),
                 new Shader("default.vert", "gamma.frag")).toggleOn(cMod.map(i -> i == 4));
-        */
+         */
 
         //Create the fog
         new Fog(BLACK, .0025, .95).create(); // .95 .8 .3

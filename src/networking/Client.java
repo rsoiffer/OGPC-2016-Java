@@ -3,6 +3,9 @@ package networking;
 import engine.Core;
 import engine.Destructible;
 import game.*;
+import graphics.Graphics2D;
+import graphics.Window3D;
+import graphics.loading.SpriteContainer;
 import gui.GUIController;
 import gui.TypingManager;
 import guis.*;
@@ -45,6 +48,12 @@ public abstract class Client {
         //Sounds.playSound("ethereal.mp3", true, .05);
         Core.update.onEvent(GUIController::update);
         Core.renderLayer(100).onEvent(GUIController::draw);
+
+        Core.renderLayer(99).onEvent(() -> {
+            Window3D.guiProjection();
+            Graphics2D.drawSprite(SpriteContainer.loadSprite("titlepage"), new Vec2(600, 400), new Vec2(.5), 0, Color4.WHITE);
+            Window3D.resetProjection();
+        });
 
         //Start the game
         ts.start();
@@ -139,9 +148,11 @@ public abstract class Client {
             Particle.clear();
             new InvisibleMan().create();
         });
-        
+
         handleMessage(MODEL_PLACE, data -> {
-            if(data[1] == null) ModelList.remove((Vec3) data[0]);
+            if (data[1] == null) {
+                ModelList.remove((Vec3) data[0]);
+            }
             ModelList.add((Vec3) data[0], (String) data[1]);
         });
     }
