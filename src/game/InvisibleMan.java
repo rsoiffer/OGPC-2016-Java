@@ -27,9 +27,13 @@ public class InvisibleMan extends RegisteredEntity {
 
         position.set(WORLD_SIZE.multiply(.5));
 
+        //Mutable ints
+        Mutable<Integer> ammoCount = new Mutable<Integer>(3);
+        Mutable<Double> moveSpeed = new Mutable<Double>(5.0);
+        
         //Give the player basic first-person controls
         Premade3D.makeMouseLook(this, 2, -1.5, 1.5);
-        Premade3D.makeWASDMovement(this, 5);
+        Premade3D.makeWASDMovement(this, moveSpeed);
         Premade3D.makeGravity(this, new Vec3(0, 0, -15));
 
         //Flying cheat
@@ -58,17 +62,34 @@ public class InvisibleMan extends RegisteredEntity {
         //Make the player slowly lose invincibility
         add(Core.update.forEach(dt -> invincible.edit(d -> d - dt)));
 
+        
+        //Gathering ammo
+        add(Input.whenMouse(1, true).limit(.75).onEvent(() -> {
+           if(ammoCount.o <= 2)
+           {
+               moveSpeed.o = moveSpeed.o *.5;
+               Core.timer(.85, () ->{
+                   ammoCount.o++;
+                   moveSpeed.o = moveSpeed.o / .5;
+               });
+           }
+        }));
         //Throwing snowballs
         add(Input.whenMouse(0, true).limit(.5).onEvent(() -> {
-            Vec3 pos = position.get().add(new Vec3(0, 0, .8));
-            Vec3 vel = Window3D.facing.toVec3().withLength(30);
+            if(ammoCount.o >0)
+            {
+                Vec3 pos = position.get().add(new Vec3(0, 0, .8));
+                Vec3 vel = Window3D.facing.toVec3().withLength(30);
 
-            Client.sendMessage(SNOWBALL, pos, vel, -1);
+                Client.sendMessage(SNOWBALL, pos, vel, -1);
 
-            BallAttack b = new BallAttack();
-            b.create();
-            b.get("position", Vec3.class).set(pos);
-            b.get("velocity", Vec3.class).set(vel);
+                BallAttack b = new BallAttack();
+                b.create();
+                b.get("position", Vec3.class).set(pos);
+                b.get("velocity", Vec3.class).set(vel);
+                ammoCount.o--;
+            }
+            
         }));
 
         //Jumping

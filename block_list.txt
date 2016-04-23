@@ -37,6 +37,7 @@ coconut
 sand_brick
 sand
 
+concrete
 pavement
 lava 4
 space_window
