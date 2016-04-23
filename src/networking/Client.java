@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import map.CubeMap;
 import map.CubeType;
+import map.ModelList;
 import network.Connection;
 import network.NetworkUtils;
 import static networking.MessageType.*;
@@ -137,6 +138,11 @@ public abstract class Client {
             RegisteredEntity.getAll(BallAttack.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
             Particle.clear();
             new InvisibleMan().create();
+        });
+        
+        handleMessage(MODEL_PLACE, data -> {
+            if(data[1] == null) ModelList.remove((Vec3) data[0]);
+            ModelList.add((Vec3) data[0], (String) data[1]);
         });
     }
 

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import map.CubeMap;
 import static map.CubeMap.*;
 import map.CubeType;
+import map.ModelList;
 import network.Connection;
 import network.NetworkUtils;
 import static networking.MessageType.*;
@@ -144,6 +145,11 @@ public class Server {
                 RegisteredEntity.getAll(BallAttack.class, Footstep.class, Smoke.class, InvisibleMan.class).forEach(Destructible::destroy);
                 Particle.clear();
                 sendToAll(RESTART, data);
+            });
+            handleMessage(client, MODEL_PLACE, data -> {
+                if(data[1] == null) ModelList.remove((Vec3) data[0]);
+                ModelList.add((Vec3) data[0], (String) data[1]);
+                sendToOthers(client, MODEL_PLACE, data);
             });
 
             client.conn.open();
