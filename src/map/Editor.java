@@ -113,7 +113,7 @@ public class Editor {
 //            Graphics2D.drawRect(new Vec2(550, 150), new Vec2(100), BLACK);
             for (int i = -8; i < 0; i++) {
                 if(model) {
-                    drawIcon(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(ModelList.getAll().size()-(i+selmodel.o))%ModelList.getAll().size());
+                    drawIcon(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(ModelList.getAll().size()-(Math.abs(i)%ModelList.getAll().size())+selmodel.o)%ModelList.getAll().size());
                 }
                 else CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
