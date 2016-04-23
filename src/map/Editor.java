@@ -11,6 +11,8 @@ import graphics.Camera;
 import graphics.Graphics2D;
 import graphics.Window3D;
 import static graphics.Window3D.*;
+import graphics.data.Texture;
+import graphics.loading.SpriteContainer;
 import java.util.*;
 import java.util.function.Supplier;
 import static map.CubeMap.*;
@@ -18,10 +20,13 @@ import static map.CubeType.*;
 import networking.Client;
 import static networking.Client.sendMessage;
 import static networking.MessageType.BLOCK_PLACE;
+import static networking.MessageType.MODEL_PLACE;
 import static org.lwjgl.input.Keyboard.*;
 import org.lwjgl.input.Mouse;
 import static util.Color4.BLACK;
 import static util.Color4.RED;
+import static util.Color4.WHITE;
+import static util.Color4.gray;
 import util.Mutable;
 import util.Util;
 import util.Vec2;
@@ -43,10 +48,20 @@ public class Editor {
 
         //Selecting blocks
         Mutable<Integer> selected = new Mutable(0);
+        Mutable<Integer> selmodel = new Mutable(0);
 
-        Input.mouseWheel.filter(a -> !model).forEach(x -> selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct());
-        Input.whenKey(KEY_UP, true).filter(() -> !model).onEvent(() -> selected.o = (selected.o + 1) % CubeType.distinct());
-        Input.whenKey(KEY_DOWN, true).filter(()  -> !model).onEvent(() -> selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct());
+        Input.mouseWheel.forEach(x -> {
+            if(model) selmodel.o=(selmodel.o + x / 120 + ModelList.getAll().size()) % ModelList.getAll().size();
+            else selected.o = (selected.o + x / 120 + CubeType.distinct()) % CubeType.distinct();
+        });
+        Input.whenKey(KEY_UP, true).onEvent(() -> {
+            if(model) selmodel.o=(selmodel.o + 1) % ModelList.getAll().size();
+            else selected.o = (selected.o + 1) % CubeType.distinct();
+        });
+        Input.whenKey(KEY_DOWN, true).onEvent(() -> {
+            if(model) selmodel.o=(selmodel.o - 1 + ModelList.getAll().size()) % ModelList.getAll().size();
+            else selected.o = (selected.o - 1 + CubeType.distinct()) % CubeType.distinct();
+        });
 
         Input.whenKey(KEY_M, true).onEvent(() -> {
             model = !model;
@@ -97,12 +112,21 @@ public class Editor {
 //            Graphics2D.drawSprite(CubeType.getFirst(selected.o).texture, new Vec2(600, 200), new Vec2(100. / CubeType.getFirst(selected.o).texture.getImageWidth()), 0, WHITE);
 //            Graphics2D.drawRect(new Vec2(550, 150), new Vec2(100), BLACK);
             for (int i = -8; i < 0; i++) {
-                CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
+                if(model) {
+                    drawIcon(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(ModelList.getAll().size()-(i+selmodel.o))%ModelList.getAll().size());
+                }
+                else CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(580 + .25 * (349 + 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
             for (int i = 8; i > 0; i--) {
-                CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
+                if(model){
+                    drawIcon(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)),80 - 5 * Math.abs(i),(i+selmodel.o)%ModelList.getAll().size());
+                }
+                else CubeType.getFirst((selected.o + i + CubeType.distinct()) % CubeType.distinct()).draw(new Vec2(620 + .25 * (349 - 11 * i) * i, 89 - 2.75 * Math.abs(i)), 80 - 5 * Math.abs(i));
             }
-            CubeType.getFirst(selected.o).draw(new Vec2(600, 100), 100);
+            if(model){
+                drawIcon(new Vec2(600,100), 100, selmodel.o);
+            }
+            else CubeType.getFirst(selected.o).draw(new Vec2(600, 100), 100);
 
             if (isSolid(pos)) {
                 Graphics2D.fillRect(new Vec2(0), new Vec2(1200, 800), RED.withA(.4));
@@ -148,6 +172,7 @@ public class Editor {
             if(model){
                 StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {            
                     ModelList.remove(new Vec3(cd.x,cd.y,cd.z));
+                    sendMessage(MODEL_PLACE, new Vec3(cd.x, cd.y, cd.z), null);
                 });
             }
             else if (toFill.o != null) {
@@ -171,7 +196,8 @@ public class Editor {
         Input.whenMouse(1, true).filter(() -> !isSolid(pos)).onEvent(() -> {
             if(model){
                 StreamUtils.takeWhile(rayCastStream(pos, facing.toVec3()).skip(1), cd -> cd.c == null).reduce((a, b) -> b).ifPresent(cd -> {                    
-                    ModelList.add(new Vec3(cd.x,cd.y,cd.z), "tree");
+                    ModelList.add(new Vec3(cd.x,cd.y,cd.z), selmodel.o);
+                    sendMessage(MODEL_PLACE, new Vec3(cd.x,cd.y,cd.z), selmodel.o);
                 });
             }
             else if (toFill.o != null) {
@@ -271,5 +297,16 @@ public class Editor {
         });
 
         Core.run();
+    }
+    
+    private static void drawIcon(Vec2 pos, double size, int id) {
+        Texture t = ModelList.getIcon(id);
+        
+        Graphics2D.fillRect(pos.subtract(new Vec2(size * .55)), new Vec2(size * 1.1), gray(.5));
+        Graphics2D.drawRect(pos.subtract(new Vec2(size * .55)), new Vec2(size * 1.1), BLACK);
+
+        Graphics2D.drawSprite(t, pos, new Vec2(size / t.getImageWidth()), 0, WHITE);
+        Graphics2D.drawRect(pos.subtract(new Vec2(size * .5)), new Vec2(size), BLACK);
+
     }
 }
