@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import map.CubeMap;
-import static map.CubeMap.WORLD_SIZE;
+import static map.CubeMap.*;
 import map.CubeType;
 import network.Connection;
 import network.NetworkUtils;
@@ -24,7 +24,7 @@ import util.*;
 
 public class Server {
 
-    public static String currentMap = "castle";
+    public static String currentMap = "city";
 
     private static class ClientInfo {
 
@@ -155,6 +155,10 @@ public class Server {
             RegisteredEntity.getAll(Smoke.class).forEach(s -> {
                 sendTo(client, SMOKE, s.get("position", Vec3.class).get(), s.get("opacity", Double.class).get());
             });
+            Util.forRange(0, WIDTH, 0, DEPTH, (x, y) -> Util.forRange(0, HEIGHT, z -> {
+                sendTo(client, BLOCK_PLACE, new Vec3(x, y, z), (int) CubeType.typeToId(CubeMap.getCubeType(new Vec3(x, y, z))));
+                //sendTo(client, BLOCK_PLACE, new Vec3(x, y, z), (int) CubeType.typeToId(MAP[x][y][z]));
+            }));
         }).start();
 
 //        runCommandInterface();
