@@ -50,9 +50,11 @@ public abstract class Client {
         Core.renderLayer(100).onEvent(GUIController::draw);
 
         Core.renderLayer(99).onEvent(() -> {
-            Window3D.guiProjection();
-            Graphics2D.drawSprite(SpriteContainer.loadSprite("titlepage"), new Vec2(600, 400), new Vec2(.5), 0, Color4.WHITE);
-            Window3D.resetProjection();
+            if (CubeMap.MAP_NAME == null) {
+                Window3D.guiProjection();
+                Graphics2D.drawSprite(SpriteContainer.loadSprite("titlepage"), new Vec2(600, 400), new Vec2(.5), 0, Color4.WHITE);
+                Window3D.resetProjection();
+            }
         });
 
         //Start the game
